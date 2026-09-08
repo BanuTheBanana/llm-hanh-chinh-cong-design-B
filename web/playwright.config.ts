@@ -6,7 +6,8 @@ export default defineConfig({
   workers: 1,
   reporter: 'line',
   use: {
-    baseURL: process.env.E2E_BASE_URL ?? 'http://127.0.0.1:3000',
+    // Must match WEB_ORIGIN exactly so the browser exercises the intended CORS policy.
+    baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000',
     trace: 'retain-on-failure',
   },
   projects: [
