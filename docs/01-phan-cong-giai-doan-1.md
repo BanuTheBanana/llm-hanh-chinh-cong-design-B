@@ -10,10 +10,23 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 08/09/2026 |
-| Phiên bản | `v1.0` |
-| Trạng thái | Sẵn sàng để nhóm xác nhận ownership và bắt đầu G1 |
+| Phiên bản | `v1.1` |
+| Trạng thái | Đang thực thi: baseline chung đã khóa; phần AI/Integration của Hoan đã có code và test |
 | Phạm vi | Web + Core Backend + PostgreSQL + AI Service Mock |
 | Ngoài phạm vi | RAG, model local, fine-tune, Case, memory dài hạn, queue, Socket.IO |
+| Thay đổi lần này | Sắp xếp repository; triển khai Mock AI Service, Compose, cấu hình, runbook và smoke test |
+
+## Tiến độ thực thi G1
+
+- [x] Khóa API contract G1.
+- [x] Tạo và đồng bộ baseline cho ba branch.
+- [x] Sắp xếp tài liệu vào `docs/`.
+- [x] Hoan: Mock AI Service và failure modes.
+- [x] Hoan: Compose/config/runbook/smoke AI.
+- [ ] Tú: Web React gọi Core API thật.
+- [ ] Minh: Core Backend, PostgreSQL và migration.
+- [ ] Cả nhóm: integration Web → Backend → AI → PostgreSQL.
+- [ ] Cả nhóm: nghiệm thu đủ G1-01 đến G1-12.
 
 ---
 
