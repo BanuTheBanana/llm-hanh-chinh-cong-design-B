@@ -30,6 +30,7 @@ services:
       APP_ENV: ${APP_ENV:-development}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      GROUNDED_PROVIDER: ${GROUNDED_PROVIDER:-template}
       MOCK_MODE: ${MOCK_MODE:-success}
       MOCK_LATENCY_MS: ${MOCK_LATENCY_MS:-10}
       MOCK_TIMEOUT_SECONDS: ${MOCK_TIMEOUT_SECONDS:-35}

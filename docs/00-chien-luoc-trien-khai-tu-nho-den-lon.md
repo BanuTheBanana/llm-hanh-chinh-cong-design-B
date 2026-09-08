@@ -9,15 +9,16 @@
 
 | Trường | Nội dung |
 |---|---|
-| Cập nhật gần nhất | 08/09/2026 |
-| Phiên bản | `v1.4` |
-| Trạng thái | `G1_COMPLETED_ON_MAIN`; tag `g1-v1.0.0`; đang lập kế hoạch G2 |
+| Cập nhật gần nhất | 09/09/2026 |
+| Phiên bản | `v1.7` |
+| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_HOAN_OFFLINE_READY`; Data/RAG branches đang audit |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
-| Thay đổi lần này | Ghi nhận G1 đã chạy end-to-end; chuyển trọng tâm hiện tại sang dữ liệu công khai, gold set và RAG tối giản của G2 |
+| Thay đổi lần này | Khóa grounded contract/prompt v2, provider policy và evaluation D0 8 case; mở review hai branch Data/RAG trước khi ghép; chưa gọi hosted API thật |
 
 Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](parked/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; sơ đồ nằm trong [`architecture/`](architecture/README.md).
 
 Hồ sơ thực thi và nghiệm thu G1: [Phân công Giai đoạn 1 – Tú, Minh, Hoan](01-phan-cong-giai-doan-1.md).
+Kế hoạch thực thi hiện tại: [Phân công Giai đoạn 2 – Data, RAG và Hosted AI baseline](giai-doan-2/02-phan-cong-giai-doan-2.md).
 Trọng tâm đang làm là G2 trong mục **NOW** của tài liệu này.
 
 ### Bằng chứng hoàn thành G1
@@ -414,14 +415,20 @@ Không dùng tên, CCCD, số điện thoại, hồ sơ hay tình huống thật
 data/
 └── demo_public/
     ├── README.md
-    ├── sources/
-    │   ├── dang-ky-khai-sinh.md
-    │   ├── cap-lai-can-cuoc.md
-    │   └── dang-ky-khai-tu.md
-    ├── procedures.jsonl
-    ├── questions.jsonl
-    └── expected_answers.jsonl
+    ├── source_manifest.jsonl
+    ├── raw/<procedure>/<retrieved-date>/...
+    ├── normalized/
+    │   ├── procedures.jsonl
+    │   └── fragments.jsonl
+    ├── gold/questions.jsonl
+    └── reports/data-quality.md
+
+tools/data/
+└── crawler/downloader, normalizer và validator
 ```
+
+Gold lưu expected points, forbidden points và source/fragment IDs; không dùng một
+đoạn văn do LLM sinh làm `expected_answer` rồi coi đó là chân lý.
 
 ### 8.2. Retrieval đơn giản trước
 
@@ -476,14 +483,18 @@ Ngưỡng phần trăm chỉ chốt sau baseline cùng mentor; không tự tuyê
 
 ### 9.1. Mục tiêu
 
-Thay provider bên ngoài bằng model local mà không sửa Web/Core Backend:
+Thay provider bên ngoài bằng model local mà không sửa contract grounded giữa Core
+Backend và AI Service:
 
 ```text
-LLM_PROVIDER=hosted
-→ LLM_PROVIDER=local
+GROUNDED_PROVIDER=hosted
+→ GROUNDED_PROVIDER=local
 
-API /internal/v1/generate giữ nguyên.
+POST /internal/v2/generate giữ nguyên.
 ```
+
+`POST /internal/v1/generate` và `LLM_PROVIDER=mock` chỉ được giữ để chạy regression
+G1; chúng không phải contract cho luồng hành chính công grounded từ G2 trở đi.
 
 ### 9.2. Chiến lược model
 
@@ -659,23 +670,31 @@ Cả nhóm:
 
 Trong Giai đoạn 2:
 
-- A tiếp tục UX/source display;
-- B nhận data/retrieval/backend;
-- C nhận model/evaluation;
-- cả nhóm cùng tạo và review gold test.
+- **Tú – Data & Gold Set Owner:** danh sách nguồn chính thức, snapshot bất biến,
+  chuẩn hóa thủ tục, câu hỏi và expected points/gold source;
+- **Minh – Retrieval/RAG Backend Owner:** kiểm tra và ingest data, exact/keyword/BM25,
+  Evidence Bundle, nối RAG vào Backend và kiểm tra source ID;
+- **Hoan – AI Service, Evaluation & Integration Owner:** hosted-provider adapter được duyệt,
+  grounded prompt/output, evaluation harness, Compose/CI và demo end-to-end;
+- cả nhóm review chéo gold set; người viết một câu hỏi không tự mình là người duyệt cuối;
+- chi tiết path, task ID, contract, checkpoint và Definition of Done nằm trong
+  [kế hoạch G2](giai-doan-2/02-phan-cong-giai-doan-2.md).
 
 ## 15. Contract cần khóa đầu tiên
 
-Chỉ bốn schema:
+Contract G1 tiếp tục ổn định. Trước khi code G2, khóa thêm năm schema nhỏ:
 
 ```text
-Login/session response
-Conversation
-Message
-AI generate request/response
+SourceManifest
+ProcedureRecord
+ProcedureFragment
+GoldQuestion
+EvidenceBundle + GroundedAnswer
 ```
 
-Không khóa CaseCard, EvidenceBundle, AnswerPlan và memory contracts ở Giai đoạn 1. Chúng nằm trong parked architecture và chỉ mở khi phase tương ứng bắt đầu.
+Không mở CaseCard, memory dài hạn, Procedure Engine đầy đủ hay verifier semantic nhiều
+tầng ở G2. `EvidenceBundle` G2 chỉ là danh sách fragment truy hồi có ID và metadata
+nguồn; nó chưa phải toàn bộ Target Architecture trước đây.
 
 ## 16. Quy tắc quản trị phạm vi
 

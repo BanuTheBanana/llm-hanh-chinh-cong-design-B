@@ -12,8 +12,14 @@ __pycache__/
 node_modules/
 dist/
 
-# Local runtime data
-data/
+# Local runtime data. Public demo corpus is intentionally versioned for G2.
+data/*
+!data/demo_public/
+!data/demo_public/**
 uploads/
 models/
 logs/
+
+# Generated evaluation reports; keep only the directory placeholder in Git.
+evaluation/reports/*
+!evaluation/reports/.gitkeep

@@ -1,8 +1,8 @@
-name: G1 CI
+name: G1 regression and G2 foundation CI
 
 on:
   push:
-    branches: [main, "g1/**"]
+    branches: [main, "g1/**", "g2/**"]
   pull_request:
     branches: [main]
 
@@ -36,6 +36,12 @@ jobs:
       - run: uv run --frozen ruff check .
       - run: uv run --frozen ruff format --check .
       - run: uv run --frozen python -m pytest
+      - name: Run offline grounded safety smoke
+        working-directory: .
+        run: >-
+          uv run --project ai-service --frozen python -m app.evaluation run
+          --suite evaluation/fixtures/offline-smoke-v1/manifest.json
+          --candidate template --split DEV --strict-safety
 
   backend:
     runs-on: ubuntu-latest
