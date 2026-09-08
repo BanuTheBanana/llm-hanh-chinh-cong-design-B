@@ -94,7 +94,12 @@ LLM/
 │   └── docker/
 ├── scripts/
 ├── docs/
-│   └── contracts-g1.md
+│   ├── 00-chien-luoc-trien-khai-tu-nho-den-lon.md
+│   ├── 01-phan-cong-giai-doan-1.md
+│   ├── contracts-g1.md
+│   ├── architecture/
+│   ├── archive/
+│   └── parked/
 ├── compose.yaml
 ├── .env.example
 └── README.md
@@ -330,7 +335,7 @@ Mục tiêu hiện tại chỉ là technical vertical slice, chưa làm RAG, Qwe
 
 Luồng cần có: đăng nhập demo bằng display_name → xem/tạo conversation → mở history → gửi message với client_message_id UUID → chờ response synchronous → hiển thị user/assistant message → refresh vẫn tải lại history. Request phải gửi cookie bằng credentials: include. Cần xử lý loading, empty, unauthorized, API error, AI timeout, retry và logout.
 
-Trước khi sửa code, hãy đọc file 01-phan-cong-giai-doan-1.md và contract hiện có trong repo. Không tự thay API schema. Nếu contract thiếu hoặc mâu thuẫn, báo rõ cho Tú thay vì đoán. Chỉ sửa phạm vi web/ trừ khi Tú yêu cầu khác. Sau khi làm, chạy typecheck/test/build và báo file đã đổi, lệnh đã chạy, kết quả cùng blocker còn lại.
+Trước khi sửa code, hãy đọc file docs/01-phan-cong-giai-doan-1.md và contract hiện có trong repo. Không tự thay API schema. Nếu contract thiếu hoặc mâu thuẫn, báo rõ cho Tú thay vì đoán. Chỉ sửa phạm vi web/ trừ khi Tú yêu cầu khác. Sau khi làm, chạy typecheck/test/build và báo file đã đổi, lệnh đã chạy, kết quả cùng blocker còn lại.
 ```
 
 ## 8. Minh – Core Backend và Database Owner
@@ -405,7 +410,7 @@ Stack bắt buộc: Python, FastAPI, Pydantic, SQLAlchemy 2 async, asyncpg, Alem
 
 Backend xác thực bằng opaque session cookie: raw token chỉ ở cookie, DB lưu token_hash. Frontend không được quyết định user_id. Mọi query conversation/message phải kiểm tra ownership. POST message nhận client_message_id và content, lưu user message trước khi gọi AI Service; nếu AI timeout/lỗi vẫn giữ user message; nếu thành công lưu assistant message. Chuẩn hóa error response có code/message/request_id.
 
-Trước khi sửa code, hãy đọc 01-phan-cong-giai-doan-1.md, .env.example và contract trong repo. Không tự đổi schema/API khi chưa báo Minh. Chỉ sửa backend/ và migration liên quan trừ khi Minh yêu cầu khác. Viết pytest cho auth, isolation, idempotency, success và failure. Sau khi làm, chạy migration/test/lint phù hợp và báo file đã đổi, lệnh, kết quả, assumption và blocker.
+Trước khi sửa code, hãy đọc docs/01-phan-cong-giai-doan-1.md, .env.example và contract trong repo. Không tự đổi schema/API khi chưa báo Minh. Chỉ sửa backend/ và migration liên quan trừ khi Minh yêu cầu khác. Viết pytest cho auth, isolation, idempotency, success và failure. Sau khi làm, chạy migration/test/lint phù hợp và báo file đã đổi, lệnh, kết quả, assumption và blocker.
 ```
 
 ## 9. Hoan – AI Service, Integration và Infrastructure Owner
@@ -465,7 +470,7 @@ Kiến trúc G1 gồm React Web → FastAPI Core Backend → FastAPI AI Service,
 
 Internal API bắt buộc là POST /internal/v1/generate với request_id, messages và max_output_tokens; response có request_id, text, provider=mock, model=mock-v1, usage và latency_ms. Mock cần success/error/timeout qua config hoặc dependency override. Hệ thống chạy bằng Docker Compose với web:3000, backend:8000, ai-service:8001 và PostgreSQL.
 
-Hoan cũng giữ docs/contracts-g1.md, .env.example, compose.yaml, README/runbook và smoke test. Trước khi sửa, đọc 00-chien-luoc-trien-khai-tu-nho-den-lon.md và 01-phan-cong-giai-doan-1.md. Không tự sửa API contract mà chưa nêu tác động cho cả Tú và Minh. Không đặt secret thật vào file. Sau khi làm, chạy AI tests, Compose validation và smoke test; báo file đổi, lệnh, kết quả, latency cùng blocker.
+Hoan cũng giữ docs/contracts-g1.md, .env.example, compose.yaml, README/runbook và smoke test. Trước khi sửa, đọc docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md và docs/01-phan-cong-giai-doan-1.md. Không tự sửa API contract mà chưa nêu tác động cho cả Tú và Minh. Không đặt secret thật vào file. Sau khi làm, chạy AI tests, Compose validation và smoke test; báo file đổi, lệnh, kết quả, latency cùng blocker.
 ```
 
 ---
@@ -586,7 +591,7 @@ G1 chỉ được đánh dấu hoàn thành khi `G1-01` đến `G1-12` đều pa
 
 ## 14. Quy tắc dùng AI coding agent cho cả nhóm
 
-1. Luôn đưa cho agent đường dẫn hai file `00-chien-luoc...md` và `01-phan-cong...md`.
+1. Luôn đưa cho agent đường dẫn hai file `docs/00-chien-luoc...md` và `docs/01-phan-cong...md`.
 2. Chỉ giao một deliverable có thể test trong mỗi lượt.
 3. Yêu cầu agent đọc code hiện có trước khi sửa và không tự đổi contract.
 4. Yêu cầu báo rõ assumptions, file đã sửa, command đã chạy và test result.

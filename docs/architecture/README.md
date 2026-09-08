@@ -86,14 +86,14 @@ Qwen 1.7B–4B và Q4/Q5 là cấu hình ứng viên. Quyết định cuối d�
 
 ## Nguồn và cách tạo lại
 
-- [Tài liệu kiến trúc gốc](../kien-truc-he-thong-tro-ly-hanh-chinh-cong.md).
-- [Khung dự án](../khung-du-an-LLM.md).
+- [Tài liệu kiến trúc gốc](../archive/2026-09-07/kien-truc-he-thong-tro-ly-hanh-chinh-cong.md).
+- [Khung dự án](../archive/2026-09-07/khung-du-an-LLM.md).
 - Những điều chỉnh trong trao đổi gần nhất: tra schema trước khi hỏi, checklist theo điều kiện, tách nguồn user/thủ tục, kiểm cả answer và duyệt trước khi stream.
 
 [tao_so_do.py](tao_so_do.py) sinh file XML draw.io và SVG từ cùng mô tả hình học; không cần thư viện ngoài Python tiêu chuẩn:
 
 ~~~powershell
-python so-do-kien-truc/tao_so_do.py
+python docs/architecture/tao_so_do.py
 ~~~
 
 Lệnh này tái tạo và ghi đè các file .drawio/.svg được script quản lý, **không giữ các chỉnh sửa tay đã thực hiện trong draw.io**. Nếu đã chỉnh tay, hãy lưu thành tên khác trước khi chạy lại. PNG được chụp từ SVG bằng trình duyệt; không được tái tạo bởi lệnh trên.

@@ -23,7 +23,7 @@ Khi có yêu cầu hoặc quyết định mới:
 3. Cập nhật đúng file module liên quan và báo cáo thay đổi ở đầu module đó.
 4. Nếu thay đổi schema/API, cập nhật cả producer, consumer, migration và contract test.
 5. Không chép toàn bộ chi tiết module vào file trung tâm; file này chỉ giữ bức tranh chung và liên kết.
-6. Quyết định cũ không còn hiệu lực được chuyển vào `tai-lieu-cu/`, không xóa mất lịch sử.
+6. Quyết định cũ không còn hiệu lực được chuyển vào `docs/archive/`, không xóa mất lịch sử.
 
 ### Bản đồ tài liệu
 

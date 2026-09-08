@@ -1,6 +1,6 @@
 """Generate editable draw.io diagrams and matching standalone SVG previews.
 
-Run: python so-do-kien-truc/tao_so_do.py
+Run: python docs/architecture/tao_so_do.py
 All generated paths are relative to this script. No third-party dependency.
 The diagrams describe a proposed architecture, not implemented services.
 """

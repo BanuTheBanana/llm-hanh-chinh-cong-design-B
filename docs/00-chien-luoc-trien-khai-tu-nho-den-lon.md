@@ -9,13 +9,13 @@
 
 | Trường | Nội dung |
 |---|---|
-| Cập nhật gần nhất | 07/09/2026 |
-| Phiên bản | `v1.2` |
-| Trạng thái | Chiến lược mới đề xuất để nhóm và mentor xác nhận |
+| Cập nhật gần nhất | 08/09/2026 |
+| Phiên bản | `v1.3` |
+| Trạng thái | Đang thực thi Giai đoạn 1 trên ba branch của nhóm |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
-| Thay đổi lần này | Bổ sung kế hoạch bắt đầu G1 và liên kết tài liệu phân công chi tiết cho Tú, Minh, Hoan; chốt React/Vite + FastAPI + PostgreSQL + Mock AI + Docker Compose |
+| Thay đổi lần này | Bắt đầu triển khai G1 trên ba branch; gom toàn bộ tài liệu vào `docs/` và triển khai phần Hoan: Mock AI Service, Compose, cấu hình, test và smoke test |
 
-Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](tai-lieu-tam-hoan/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; thư mục sơ đồ kiến trúc không bị thay đổi.
+Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](parked/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; sơ đồ nằm trong [`architecture/`](architecture/README.md).
 
 Tài liệu thực thi đang dùng cho G1: [Phân công Giai đoạn 1 – Tú, Minh, Hoan](01-phan-cong-giai-doan-1.md).
 

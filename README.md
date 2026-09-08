@@ -16,8 +16,8 @@ Giai đoạn này kiểm tra luồng kỹ thuật, đăng nhập demo, conversat
 
 ## Tài liệu bắt buộc đọc
 
-1. [Chiến lược từ nhỏ đến lớn](00-chien-luoc-trien-khai-tu-nho-den-lon.md)
-2. [Phân công Giai đoạn 1](01-phan-cong-giai-doan-1.md)
+1. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
+2. [Phân công Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
 3. [API contract G1](docs/contracts-g1.md)
 
 ## Cấu trúc repository
@@ -29,9 +29,13 @@ Giai đoạn này kiểm tra luồng kỹ thuật, đăng nhập demo, conversat
 ├── ai-service/          # Hoan – FastAPI + MockProvider
 ├── infra/docker/        # Hạ tầng/container bổ trợ
 ├── scripts/             # Smoke test và script phát triển
-├── docs/                # Contract và tài liệu kỹ thuật đang dùng
-├── so-do-kien-truc/     # Sơ đồ tham khảo
-├── tai-lieu-tam-hoan/   # Target architecture chưa triển khai
+├── docs/
+│   ├── 00-chien-luoc-trien-khai-tu-nho-den-lon.md
+│   ├── 01-phan-cong-giai-doan-1.md
+│   ├── contracts-g1.md
+│   ├── architecture/    # Sơ đồ tham khảo
+│   ├── archive/         # Tài liệu cũ, chỉ giữ lịch sử
+│   └── parked/          # Target architecture chưa triển khai
 ├── compose.yaml         # Sẽ được Hoan bổ sung trong G1
 └── .env.example         # Danh sách biến môi trường, không có secret thật
 ```
