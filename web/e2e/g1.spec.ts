@@ -21,11 +21,11 @@ test('complete browser flow keeps history and isolates a second user', async ({ 
   await page.getByPlaceholder('Viết tin nhắn kiểm thử...').fill(question)
   await page.getByRole('button', { name: 'Gửi' }).click()
 
-  await expect(page.getByText(question, { exact: true })).toBeVisible()
+  await expect(page.locator('article.message.user').getByText(question, { exact: true })).toBeVisible()
   await expect(page.getByText(MOCK_ANSWER, { exact: true })).toBeVisible({ timeout: 15_000 })
 
   await page.reload()
-  await expect(page.getByText(question, { exact: true })).toBeVisible()
+  await expect(page.locator('article.message.user').getByText(question, { exact: true })).toBeVisible()
   await expect(page.getByText(MOCK_ANSWER, { exact: true })).toBeVisible()
 
   await page.getByRole('button', { name: 'Đăng xuất' }).click()
@@ -34,5 +34,5 @@ test('complete browser flow keeps history and isolates a second user', async ({ 
   await page.getByLabel('Tên hiển thị').fill(userB)
   await page.getByRole('button', { name: 'Đăng nhập' }).click()
   await expect(page.getByText('Chưa có cuộc trò chuyện nào.')).toBeVisible()
-  await expect(page.getByText(question, { exact: true })).toHaveCount(0)
+  await expect(page.locator('article.message.user').getByText(question, { exact: true })).toHaveCount(0)
 })
