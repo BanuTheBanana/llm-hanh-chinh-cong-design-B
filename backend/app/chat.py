@@ -11,6 +11,8 @@ from app.errors import APIError
 from app.models import Conversation, Message, utcnow
 from app.schemas import MessageInput, MessagePair
 
+AI_CONTEXT_MAX_MESSAGES = 100
+
 
 async def owned_conversation(db: AsyncSession, conversation_id: UUID, user_id: UUID):
     conversation = await db.scalar(
@@ -104,16 +106,20 @@ async def send_message(
             db.add(user_message)
         conversation.updated_at = utcnow()
         await db.commit()  # Durable even if AI fails or this worker exits.
-        history = (
+        # The internal AI contract accepts at most 100 messages. Select newest first
+        # so long conversations keep the most relevant context, then restore chronology.
+        newest_history = (
             await db.scalars(
                 select(Message)
                 .where(
                     Message.conversation_id == conversation.id,
                     ((Message.status == "completed") | (Message.id == user_message.id)),
                 )
-                .order_by(Message.created_at, Message.id)
+                .order_by(Message.created_at.desc(), Message.id.desc())
+                .limit(AI_CONTEXT_MAX_MESSAGES)
             )
         ).all()
+        history = list(reversed(newest_history))
         await db.commit()  # No idle database transaction during network I/O.
         try:
             answer = await ai.generate(

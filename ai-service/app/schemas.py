@@ -3,7 +3,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
 
-
 NonBlankContent = Annotated[str, StringConstraints(min_length=1, max_length=16_000)]
 
 

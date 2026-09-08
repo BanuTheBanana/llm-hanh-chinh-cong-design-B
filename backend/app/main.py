@@ -71,14 +71,22 @@ async def trace_request(request: Request, call_next):
         # SameSite cookies plus explicit Origin validation for browser mutations.
         origin = request.headers.get("origin")
         if request.method in {"POST", "PUT", "PATCH", "DELETE"} and (
-            (origin is not None and origin not in settings.cors_origins)
+            (origin is not None and origin != settings.web_origin)
             or request.headers.get("sec-fetch-site") == "cross-site"
         ):
             response = error_response(request, 403, "FORBIDDEN_ORIGIN", "Origin không hợp lệ.")
         else:
             response = await call_next(request)
-    except Exception:
-        # Do not log exception text: SQL/HTTP errors can include content or credentials.
+    except Exception as exc:
+        # Exception messages can contain SQL, URLs or credentials. Log only safe metadata.
+        route = request.scope.get("route")
+        logger.error(
+            "unhandled_request_error request_id=%s route=%s method=%s error_type=%s",
+            request.state.request_id,
+            getattr(route, "path", "unmatched"),
+            request.method,
+            type(exc).__name__,
+        )
         response = error_response(request, 500, "INTERNAL_ERROR", "Lỗi hệ thống.")
     response.headers["X-Request-ID"] = str(request.state.request_id)
     response.headers["Cache-Control"] = "no-store"
@@ -97,7 +105,7 @@ async def trace_request(request: Request, call_next):
 # Outer CORS wrapper also decorates normalized error responses.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=[settings.web_origin],
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type"],
@@ -134,7 +142,7 @@ def set_cookie(response: Response, token: str):
         token,
         max_age=settings.session_ttl_seconds,
         httponly=True,
-        secure=settings.session_secure,
+        secure=settings.session_cookie_secure,
         samesite="lax",
         path="/",
     )
@@ -179,7 +187,7 @@ async def logout(request: Request, db: AsyncSession = Depends(get_db)):
         settings.session_cookie_name,
         path="/",
         httponly=True,
-        secure=settings.session_secure,
+        secure=settings.session_cookie_secure,
         samesite="lax",
     )
     return response

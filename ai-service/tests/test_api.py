@@ -10,9 +10,7 @@ from app.providers.mock import MockProvider
 def request_body() -> dict[str, object]:
     return {
         "request_id": str(uuid4()),
-        "messages": [
-            {"role": "user", "content": "Xin chào, đây là tin nhắn kiểm thử."}
-        ],
+        "messages": [{"role": "user", "content": "Xin chào, đây là tin nhắn kiểm thử."}],
         "max_output_tokens": 300,
     }
 
@@ -31,9 +29,7 @@ def test_health_returns_service_and_configured_provider(client: TestClient) -> N
 def test_health_does_not_report_ok_for_unsupported_provider(
     client: TestClient,
 ) -> None:
-    client.app.dependency_overrides[get_settings] = lambda: Settings(
-        llm_provider="not-implemented"
-    )
+    client.app.dependency_overrides[get_settings] = lambda: Settings(llm_provider="not-implemented")
 
     response = client.get("/health")
 
@@ -59,9 +55,7 @@ def test_generate_success_matches_frozen_contract(client: TestClient) -> None:
 
 def test_generate_error_mode_is_predictable(client: TestClient) -> None:
     body = request_body()
-    client.app.dependency_overrides[get_provider] = lambda: MockProvider(
-        mode="error", latency_ms=0
-    )
+    client.app.dependency_overrides[get_provider] = lambda: MockProvider(mode="error", latency_ms=0)
 
     response = client.post("/internal/v1/generate", json=body)
 
@@ -99,9 +93,7 @@ def test_unsupported_provider_dependency_returns_contract_error(
     client: TestClient,
 ) -> None:
     body = request_body()
-    client.app.dependency_overrides[get_settings] = lambda: Settings(
-        llm_provider="not-implemented"
-    )
+    client.app.dependency_overrides[get_settings] = lambda: Settings(llm_provider="not-implemented")
 
     response = client.post("/internal/v1/generate", json=body)
 

@@ -28,12 +28,8 @@ def _error_response(
     message: str,
     request_id: UUID,
 ) -> JSONResponse:
-    payload = ErrorResponse(
-        error=ErrorDetail(code=code, message=message, request_id=request_id)
-    )
-    return JSONResponse(
-        status_code=status_code, content=payload.model_dump(mode="json")
-    )
+    payload = ErrorResponse(error=ErrorDetail(code=code, message=message, request_id=request_id))
+    return JSONResponse(status_code=status_code, content=payload.model_dump(mode="json"))
 
 
 def _request_id_from_invalid_body(request_error: RequestValidationError) -> UUID:

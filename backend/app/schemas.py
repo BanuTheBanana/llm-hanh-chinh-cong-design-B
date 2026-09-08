@@ -70,7 +70,7 @@ class Usage(BaseModel):
 class AIOutput(BaseModel):
     request_id: UUID
     text: str = Field(min_length=1)
-    provider: Literal["mock"]
+    provider: str = Field(min_length=1, pattern=r"\S")
     model: str = Field(min_length=1)
     usage: Usage
     latency_ms: float = Field(ge=0)

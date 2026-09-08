@@ -8,6 +8,7 @@ from sqlalchemy import select, update
 
 from app.ai import AIClient, get_ai
 from app.auth import token_hash
+from app.chat import AI_CONTEXT_MAX_MESSAGES
 from app.config import get_settings
 from app.main import app
 from app.models import Message, SessionRecord, utcnow
@@ -109,6 +110,41 @@ async def test_success_history_relogin_and_idempotency(client, ai_mock):
     assert len((await client.get(P + "/conversations")).json()) == 1
 
 
+async def test_ai_context_is_capped_to_internal_contract(client, database, ai_mock):
+    path = await conversation(client)
+    conversation_id = UUID(path.split("/")[-2])
+    async with database() as db:
+        for index in range(55):
+            request_id = uuid4()
+            db.add_all(
+                [
+                    Message(
+                        conversation_id=conversation_id,
+                        client_message_id=uuid4(),
+                        role="user",
+                        content=f"seed-user-{index}",
+                        status="completed",
+                        request_id=request_id,
+                    ),
+                    Message(
+                        conversation_id=conversation_id,
+                        role="assistant",
+                        content=f"seed-assistant-{index}",
+                        status="completed",
+                        request_id=request_id,
+                    ),
+                ]
+            )
+        await db.commit()
+
+    response = await client.post(path, json=body("latest-turn"))
+
+    assert response.status_code == 200, response.text
+    sent_messages = ai_mock[0]["messages"]
+    assert len(sent_messages) == AI_CONTEXT_MAX_MESSAGES
+    assert sent_messages[-1] == {"role": "user", "content": "latest-turn"}
+
+
 async def test_ownership(client, ai_mock):
     path = await conversation(client)
     await client.post(path, json=body())
@@ -162,7 +198,7 @@ async def test_ai_failure_keeps_message_then_retry(
         return httpx.Response(500)
 
     if mode == "slow":
-        monkeypatch.setattr(get_settings(), "ai_timeout_seconds", 0.05)
+        monkeypatch.setattr(get_settings(), "ai_request_timeout_seconds", 0.05)
     async with httpx.AsyncClient(transport=httpx.MockTransport(fail)) as http:
         app.dependency_overrides[get_ai] = lambda: AIClient(http)
         response = await client.post(path, json=payload)

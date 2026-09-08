@@ -2,17 +2,19 @@
 
 import asyncio
 import json
+import logging
 from uuid import uuid4
 
 import httpx
 import pytest
 from pydantic import ValidationError
+from starlette.requests import Request
 
 from app.ai import AIClient
-from app.config import get_settings
+from app.config import Settings, get_settings
 from app.errors import APIError
-from app.main import app
-from app.schemas import ConversationInput, LoginInput, MessageInput
+from app.main import app, trace_request
+from app.schemas import AIOutput, ConversationInput, LoginInput, MessageInput
 
 
 def reply(request_id, **changes):
@@ -27,9 +29,59 @@ def reply(request_id, **changes):
     }
 
 
+def test_settings_match_root_environment(monkeypatch):
+    monkeypatch.setenv("AI_SERVICE_URL", "http://ai-service.example:9001/")
+    monkeypatch.setenv("AI_REQUEST_TIMEOUT_SECONDS", "7.5")
+    monkeypatch.setenv("SESSION_COOKIE_SECURE", "true")
+    monkeypatch.setenv("WEB_ORIGIN", "https://web.example")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.ai_service_url == "http://ai-service.example:9001/"
+    assert settings.ai_request_timeout_seconds == 7.5
+    assert settings.session_cookie_secure is True
+    assert settings.web_origin == "https://web.example"
+
+
+def test_ai_output_accepts_future_provider_names():
+    output = AIOutput.model_validate(reply(uuid4(), provider="local-qwen"))
+    assert output.provider == "local-qwen"
+
+
+async def test_unhandled_error_log_is_correlated_without_exception_data(caplog):
+    request = Request(
+        {
+            "type": "http",
+            "http_version": "1.1",
+            "method": "GET",
+            "scheme": "http",
+            "path": "/test-error",
+            "raw_path": b"/test-error",
+            "query_string": b"",
+            "headers": [],
+            "client": ("127.0.0.1", 1234),
+            "server": ("test", 80),
+        }
+    )
+
+    async def fail(_request):
+        raise RuntimeError("sensitive-exception-data")
+
+    with caplog.at_level(logging.ERROR, logger="g1.requests"):
+        response = await trace_request(request, fail)
+
+    payload = json.loads(response.body)
+    request_id = payload["error"]["request_id"]
+    assert response.status_code == 500
+    assert response.headers["x-request-id"] == request_id
+    assert request_id in caplog.text
+    assert "error_type=RuntimeError" in caplog.text
+    assert "sensitive-exception-data" not in caplog.text
+
+
 async def test_ai_contract_success(monkeypatch):
     request_id = uuid4()
-    monkeypatch.setattr(get_settings(), "ai_service_url", "http://ai-service:8001/internal/v1/")
+    monkeypatch.setattr(get_settings(), "ai_service_url", "http://ai-service:8001/")
 
     def handler(request):
         assert str(request.url) == "http://ai-service:8001/internal/v1/generate"
@@ -54,6 +106,7 @@ async def test_ai_contract_success(monkeypatch):
         ("deadline", 504, "AI_SERVICE_TIMEOUT"),
         ("network", 502, "AI_SERVICE_ERROR"),
         ("http", 502, "AI_SERVICE_ERROR"),
+        ("http_timeout", 504, "AI_SERVICE_TIMEOUT"),
         ("json", 502, "AI_SERVICE_ERROR"),
         ("request_id", 502, "AI_SERVICE_ERROR"),
         ("blank", 502, "AI_SERVICE_ERROR"),
@@ -62,7 +115,7 @@ async def test_ai_contract_success(monkeypatch):
 )
 async def test_ai_errors(monkeypatch, mode, status, code):
     request_id = uuid4()
-    monkeypatch.setattr(get_settings(), "ai_timeout_seconds", 0.01)
+    monkeypatch.setattr(get_settings(), "ai_request_timeout_seconds", 0.01)
 
     async def handler(request):
         if mode == "timeout":
@@ -73,6 +126,8 @@ async def test_ai_errors(monkeypatch, mode, status, code):
             raise httpx.ConnectError("test network")
         if mode == "http":
             return httpx.Response(503)
+        if mode == "http_timeout":
+            return httpx.Response(504)
         if mode == "json":
             return httpx.Response(200, content=b"not JSON")
         payload = reply(request_id)

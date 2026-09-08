@@ -18,16 +18,22 @@ class AIClient:
         settings = get_settings()
         try:
             # A wall-clock deadline also bounds a response that keeps streaming bytes.
-            async with asyncio.timeout(settings.ai_timeout_seconds):
+            async with asyncio.timeout(settings.ai_request_timeout_seconds):
                 response = await self.client.post(
-                    settings.ai_service_url.rstrip("/") + "/generate",
+                    settings.ai_service_url.rstrip("/") + "/internal/v1/generate",
                     json={
                         "request_id": str(request_id),
                         "messages": messages,
                         "max_output_tokens": 300,
                     },
-                    timeout=settings.ai_timeout_seconds,
+                    timeout=settings.ai_request_timeout_seconds,
                 )
+                if response.status_code == 504:
+                    raise APIError(
+                        504,
+                        "AI_SERVICE_TIMEOUT",
+                        "AI đang phản hồi chậm. Vui lòng thử lại.",
+                    )
                 response.raise_for_status()
                 result = AIOutput.model_validate(response.json())
                 if result.request_id != request_id or not result.text.strip():

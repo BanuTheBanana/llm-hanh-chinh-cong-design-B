@@ -3,10 +3,9 @@
 Gói `backend/` để ghép vào monorepo LLM. FastAPI + Pydantic + SQLAlchemy 2 async +
 asyncpg + Alembic; PostgreSQL lưu users, sessions, conversations, messages.
 
-**Trạng thái bàn giao:** đã triển khai source, migration và tests. 18 unit/contract
-checks đã pass. 18 PostgreSQL integration cases đã viết nhưng CHƯA chạy được
-trong môi trường bàn giao. Chưa có Web của Tú hoặc AI Service của Hoan để kiểm thử
-end-to-end, nên chưa đánh dấu toàn bộ Definition of Done G1 hoàn thành.
+**Trạng thái:** source Backend đã được đưa vào nhánh tích hợp cùng Web và AI Service.
+Các kiểm tra PostgreSQL, migration online, Docker và end-to-end vẫn phải pass trước
+khi đánh dấu Definition of Done G1 hoàn thành; xem `docs/TEST_REPORT.md`.
 
 ## 1. Chạy nhanh
 
@@ -15,10 +14,18 @@ Chạy các lệnh Python bên dưới từ thư mục `backend/`.
 
 ```bash
 uv sync --frozen
-cp .env.example .env
+cp ../.env.example .env
 ```
 
-PowerShell: dùng `Copy-Item .env.example .env` thay lệnh `cp`.
+PowerShell: dùng `Copy-Item ..\.env.example .env` thay lệnh `cp`.
+File root `.env.example` dùng hostname nội bộ của Compose. Nếu chạy Backend trực
+tiếp trên máy host, sửa tối thiểu hai giá trị trong `backend/.env` thành:
+
+```env
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/g1
+AI_SERVICE_URL=http://localhost:8001
+```
+
 Nếu chưa có PostgreSQL local, dùng Docker trên máy của anh:
 
 ```bash
@@ -45,16 +52,16 @@ uv run --frozen uvicorn app.main:app --host 0.0.0.0 --port 8000 --no-access-log 
 | Biến | Giá trị mẫu | Ý nghĩa |
 |---|---|---|
 | `DATABASE_URL` | `postgresql+asyncpg://postgres:postgres@localhost:5432/g1` | DSN PostgreSQL async |
-| `AI_SERVICE_URL` | `http://localhost:8001/internal/v1` | Base URL gồm `/internal/v1`, chưa gồm `/generate` |
-| `AI_TIMEOUT_SECONDS` | `10` | Deadline tổng và timeout HTTP |
+| `AI_SERVICE_URL` | `http://localhost:8001` | Origin của AI Service; Backend nối `/internal/v1/generate` |
+| `AI_REQUEST_TIMEOUT_SECONDS` | `10` | Deadline tổng và timeout HTTP |
 | `SESSION_COOKIE_NAME` | `g1_session` | Tên cookie opaque |
-| `SESSION_SECURE` | `false` | Đặt `true` khi dùng HTTPS |
+| `SESSION_COOKIE_SECURE` | `false` | Đặt `true` khi dùng HTTPS |
 | `SESSION_TTL_SECONDS` | `86400` | Session hết hạn sau 24 giờ |
-| `CORS_ORIGINS` | `["http://localhost:3000"]` | JSON array origin của Web |
+| `WEB_ORIGIN` | `http://localhost:3000` | Origin duy nhất được phép gọi Core API ở G1 |
 
 `.env` chỉ dùng local, không commit. Giá trị trong `.env.example` là thông tin demo.
 Trong Compose của Hoan, dùng `postgres` làm database hostname và đặt
-`AI_SERVICE_URL=http://ai-service:8001/internal/v1`. Không dùng `localhost` để gọi
+`AI_SERVICE_URL=http://ai-service:8001`. Không dùng `localhost` để gọi
 container khác. Docker build context là `./backend`; Dockerfile được cung cấp.
 Hoan có thể đặt healthcheck bằng Python urllib gọi `http://localhost:8000/health`.
 
@@ -63,9 +70,9 @@ PgBouncer transaction pooling với advisory lock ở G1.
 
 ## 3. Điểm chưa được quy định trong contract — cần Tú/Hoan review
 
-Các endpoint/schema đã có được giữ nguyên. Các chi tiết contract chưa ghi được
-triển khai với quy ước dưới đây; đây không phải nội dung đã được cả nhóm xác nhận.
-Bản contract nguồn không bị chỉnh sửa, xem `docs/contracts-g1.reference.md`.
+Các endpoint/schema đã có được giữ nguyên. Contract duy nhất của cả monorepo nằm
+tại [`../docs/contracts-g1.md`](../docs/contracts-g1.md); không giữ bản sao trong
+Backend để tránh hai tài liệu lệch nhau.
 
 | Điểm bổ sung | Quy ước hiện tại |
 |---|---|
@@ -160,8 +167,8 @@ Mọi lỗi có dạng:
 
 Assistant được liên kết với user turn bằng `(conversation_id, request_id)`;
 unique `(conversation_id, request_id, role)` là lớp bảo vệ thứ hai. Không cần thêm
-bảng ngoài bốn bảng G1. Context gửi AI gồm các message completed và user message
-đang xử lý; bỏ các failed/pending cũ chưa có câu trả lời. Nếu worker chết, pending
+bảng ngoài bốn bảng G1. Context gửi AI gồm tối đa 100 message gần nhất: các message
+completed và user message đang xử lý; bỏ các failed/pending cũ. Nếu worker chết, pending
 vẫn còn và có thể retry turn mới nhất. Không bảo đảm AI chỉ được gọi đúng một lần
 khi crash xảy ra sau AI response nhưng trước DB commit; chỉ bảo đảm không nhân đôi
 message đã lưu theo key. G1 chưa có side effect ngoài Mock AI.
@@ -229,18 +236,14 @@ DB test/dev có thể bỏ. Không đưa lệnh reset vào luồng chạy mặc 
 - `migrations/`: Alembic migration bốn bảng, hỗ trợ online/offline.
 - `tests/`: unit và integration cases.
 - `uv.lock`: khóa toàn bộ dependency; dùng `--frozen` khi cài/chạy.
-- `Dockerfile`, `logging.json`, `.env.example`: cấu hình để Hoan ghép hạ tầng.
+- `Dockerfile`, `.dockerignore`, `logging.json`: cấu hình để ghép hạ tầng an toàn.
 - `docs/openapi.json`: OpenAPI xuất từ app hiện tại.
 - `docs/TEST_REPORT.md`: bằng chứng kiểm tra và blocker.
 
 ## 8. Các bước còn lại để chốt DoD với nhóm
 
-1. Tú và Hoan review các quy ước bổ sung ở mục 3.
-2. Chạy PostgreSQL integration suite và `alembic check` trên máy/CI có PostgreSQL.
-3. Hoan thêm backend vào Compose chung, chạy migration trước khi start backend.
-4. Ghép AI Service thật của Hoan và Web của Tú: login → create → send → reload.
-5. Đổi sang user khác để xác nhận không đọc được conversation cũ; test AI error và
+1. Chạy PostgreSQL integration suite và `alembic check` trên máy/CI có PostgreSQL.
+2. Xác nhận Compose chạy migration trước khi Backend bắt đầu nhận traffic.
+3. Ghép AI Service thật và Web: login → create → send → reload.
+4. Đổi sang user khác để xác nhận không đọc được conversation cũ; test AI error và
    timeout mode bằng cấu hình service của Hoan.
-
-Không có repo gốc, `.env.example` chung hoặc source Web/AI trong đầu vào nên gói này
-chỉ thêm `backend/`, không chỉnh các phần thuộc Tú/Hoan và không tạo Compose chung.

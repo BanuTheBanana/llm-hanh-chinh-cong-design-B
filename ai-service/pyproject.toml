@@ -17,11 +17,18 @@ dependencies = [
 test = [
     "httpx>=0.28,<1",
     "pytest>=8.4,<9",
+    "ruff>=0.11,<1",
 ]
 
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
 
 [tool.setuptools.packages.find]
 include = ["app*"]

@@ -2,6 +2,25 @@
 
 Ngày: 08/09/2026. Đầu vào: hai tài liệu phân công và contract G1 người dùng gửi.
 
+## Cập nhật sau integration review
+
+Backend đã được đồng bộ với tên biến môi trường và AI route của monorepo, bổ sung
+kiểm tra HTTP 504, provider linh hoạt, giới hạn context 100 messages và log lỗi đã
+redact. Kết quả kiểm tra sau thay đổi:
+
+| Lệnh | Kết quả |
+|---|---|
+| `ruff check .` | Pass |
+| `ruff format --check .` | Pass, 15 files formatted |
+| `python -m compileall -q app migrations tests` | Pass |
+| `python -m pytest tests/test_unit.py -q` | 22 passed |
+| `python -m pytest --collect-only -q` | 41 tests collected |
+
+Unit suite trên được chạy trong virtual environment tạm với Python 3.11 và các
+dependency tương thích vì máy tích hợp chưa có Python 3.12/uv. Gate chính thức vẫn
+cần chạy lại bằng Python 3.12 với `uv sync --frozen`; các kiểm tra PostgreSQL và
+end-to-end trong phần dưới vẫn chưa được tính là pass.
+
 ## Đã chạy thành công
 
 | Lệnh (trong backend/) | Kết quả |

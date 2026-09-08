@@ -14,14 +14,12 @@ Request/response chính thức nằm trong
 
 ## Chạy local
 
-Yêu cầu Python 3.11 trở lên:
+Yêu cầu Python 3.11 trở lên và `uv`:
 
 ```powershell
 cd ai-service
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -e ".[test]"
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+uv sync --frozen --extra test
+uv run --frozen uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 ```
 
 Hoặc chạy container từ thư mục gốc repository:
@@ -53,8 +51,10 @@ vấn hành chính.
 
 ```powershell
 cd ai-service
-python -m pip install -e ".[test]"
-python -m pytest
+uv sync --frozen --extra test
+uv run --frozen python -m pytest
+uv run --frozen ruff check .
+uv run --frozen ruff format --check .
 ```
 
 Test bao phủ health, contract success, provider error, timeout và validation.

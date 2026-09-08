@@ -1,28 +1,28 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { FormEvent } from 'react'
 import './App.css'
-import { ApiError, createConversation, createMessage, getConversations, getCurrentUser, getMessages, login, logout } from './services/api'
+import {
+  ApiError,
+  createConversation,
+  createMessage,
+  getConversations,
+  getCurrentUser,
+  getMessages,
+  login,
+  logout,
+} from './services/api'
 import type { Conversation, Message, User } from './types/api'
 
-const newClientMessageId = () => crypto.randomUUID()
-const localAdminEnabled = import.meta.env.VITE_ENABLE_LOCAL_ADMIN_BYPASS === 'true'
-const localUsers: Record<string, User> = {
-  admin: { id: 'local-admin', display_name: 'admin' },
-  admin2: { id: 'local-admin-2', display_name: 'admin2' },
+type BusyAction = 'login' | 'create-conversation' | 'send-message' | 'logout' | null
+type ErrorKind = 'unauthorized' | 'api' | 'ai-timeout' | ''
+type RetryTurn = {
+  clientMessageId: string
+  content: string
+  conversationId: string
 }
 
-const localStorageKey = (userId: string, resource: string) => `g1-local-${userId}-${resource}`
-
-function readLocalData<T>(key: string, fallback: T): T {
-  try {
-    return JSON.parse(localStorage.getItem(key) ?? JSON.stringify(fallback)) as T
-  } catch {
-    return fallback
-  }
-}
-
-function writeLocalData<T>(key: string, value: T) {
-  localStorage.setItem(key, JSON.stringify(value))
-}
+const ACTIVE_CONVERSATION_KEY = 'g1-active-conversation-id'
+const UNAUTHORIZED_MESSAGE = 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -31,100 +31,194 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([])
   const [displayName, setDisplayName] = useState('')
   const [messageDraft, setMessageDraft] = useState('')
-  const [clientMessageId, setClientMessageId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [working, setWorking] = useState(false)
+  const [retryTurn, setRetryTurn] = useState<RetryTurn | null>(null)
+  const [loadingSession, setLoadingSession] = useState(true)
+  const [loadingMessages, setLoadingMessages] = useState(false)
+  const [busyAction, setBusyAction] = useState<BusyAction>(null)
   const [error, setError] = useState('')
-  const [errorKind, setErrorKind] = useState<'unauthorized' | 'api' | 'ai-timeout' | ''>('')
-  const isLocalUser = user?.id === 'local-admin' || user?.id === 'local-admin-2'
+  const [errorKind, setErrorKind] = useState<ErrorKind>('')
+
+  const activeConversationIdRef = useRef<string | null>(null)
+  const loadVersionRef = useRef(0)
+  const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    if (localAdminEnabled) {
-      setLoading(false)
+    let cancelled = false
+
+    async function restoreSession() {
+      try {
+        const currentUser = await getCurrentUser()
+        const availableConversations = await getConversations()
+        if (cancelled) return
+
+        setUser(currentUser)
+        setConversations(availableConversations)
+
+        const rememberedId = sessionStorage.getItem(ACTIVE_CONVERSATION_KEY)
+        const rememberedConversation = availableConversations.find(({ id }) => id === rememberedId)
+        if (!rememberedConversation) {
+          sessionStorage.removeItem(ACTIVE_CONVERSATION_KEY)
+          return
+        }
+
+        activeConversationIdRef.current = rememberedConversation.id
+        setActiveConversation(rememberedConversation)
+        setLoadingMessages(true)
+        const history = await getMessages(rememberedConversation.id)
+        if (!cancelled && activeConversationIdRef.current === rememberedConversation.id) {
+          setMessages(history)
+        }
+      } catch (requestError) {
+        if (cancelled) return
+        if (isUnauthorized(requestError)) {
+          activeConversationIdRef.current = null
+          sessionStorage.removeItem(ACTIVE_CONVERSATION_KEY)
+          setUser(null)
+          setConversations([])
+          setActiveConversation(null)
+          setMessages([])
+          setRetryTurn(null)
+          setErrorKind('unauthorized')
+          setError(UNAUTHORIZED_MESSAGE)
+        } else {
+          setErrorKind('api')
+          setError(getErrorMessage(requestError))
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingSession(false)
+          setLoadingMessages(false)
+        }
+      }
+    }
+
+    void restoreSession()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView?.({ block: 'end' })
+  }, [messages, loadingMessages])
+
+  function clearWorkspace() {
+    loadVersionRef.current += 1
+    activeConversationIdRef.current = null
+    sessionStorage.removeItem(ACTIVE_CONVERSATION_KEY)
+    setUser(null)
+    setConversations([])
+    setActiveConversation(null)
+    setMessages([])
+    setMessageDraft('')
+    setRetryTurn(null)
+    setLoadingMessages(false)
+  }
+
+  function showRequestError(requestError: unknown) {
+    if (isUnauthorized(requestError)) {
+      clearWorkspace()
+      setErrorKind('unauthorized')
+      setError(UNAUTHORIZED_MESSAGE)
       return
     }
 
-    getCurrentUser()
-      .then((currentUser) => {
-        setUser(currentUser)
-        return getConversations()
-      })
-      .then(setConversations)
-      .catch((requestError: unknown) => {
-        if (requestError instanceof ApiError && requestError.status === 401) {
-          setErrorKind('unauthorized')
-          setError('Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.')
-        } else setError(getErrorMessage(requestError))
-      })
-      .finally(() => setLoading(false))
-  }, [])
+    setErrorKind(isAiTimeout(requestError) ? 'ai-timeout' : 'api')
+    setError(getErrorMessage(requestError))
+  }
+
+  function clearError() {
+    setError('')
+    setErrorKind('')
+  }
+
+  async function loadConversationMessages(
+    conversationId: string,
+    options: { clearBeforeLoad?: boolean; reportError?: boolean } = {},
+  ) {
+    const loadVersion = ++loadVersionRef.current
+    if (options.clearBeforeLoad) setMessages([])
+    setLoadingMessages(true)
+
+    try {
+      const history = await getMessages(conversationId)
+      if (
+        loadVersion === loadVersionRef.current &&
+        activeConversationIdRef.current === conversationId
+      ) {
+        setMessages(history)
+      }
+      return history
+    } catch (requestError) {
+      if (
+        loadVersion === loadVersionRef.current &&
+        activeConversationIdRef.current === conversationId
+      ) {
+        if (isUnauthorized(requestError) || options.reportError !== false) {
+          showRequestError(requestError)
+        }
+      }
+      return null
+    } finally {
+      if (loadVersion === loadVersionRef.current) setLoadingMessages(false)
+    }
+  }
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!displayName.trim()) return
-    setWorking(true)
-    setError('')
-    setErrorKind('')
+    const normalizedDisplayName = displayName.trim()
+    if (!normalizedDisplayName || busyAction) return
+
+    setBusyAction('login')
+    clearError()
     try {
-      const localUser = localUsers[displayName.trim().toLowerCase()]
-      if (localAdminEnabled && localUser) {
-        setUser(localUser)
-        setConversations(readLocalData<Conversation[]>(localStorageKey(localUser.id, 'conversations'), []))
-        return
-      }
-      const loggedInUser = await login(displayName.trim())
-      if (!loggedInUser?.id || !loggedInUser.display_name) {
-        throw new Error('Core Backend trả về dữ liệu đăng nhập không hợp lệ.')
-      }
+      const loggedInUser = await login(normalizedDisplayName)
+      const availableConversations = await getConversations()
+      sessionStorage.removeItem(ACTIVE_CONVERSATION_KEY)
       setUser(loggedInUser)
-      setConversations(await getConversations())
+      setConversations(availableConversations)
+      setActiveConversation(null)
+      activeConversationIdRef.current = null
+      setMessages([])
+      setDisplayName('')
     } catch (requestError) {
-      setErrorKind(requestError instanceof ApiError && requestError.status === 401 ? 'unauthorized' : 'api')
-      setError(getErrorMessage(requestError))
+      showRequestError(requestError)
     } finally {
-      setWorking(false)
+      setBusyAction(null)
     }
   }
 
   async function handleSelectConversation(conversation: Conversation) {
+    if (busyAction) return
+
+    activeConversationIdRef.current = conversation.id
+    sessionStorage.setItem(ACTIVE_CONVERSATION_KEY, conversation.id)
     setActiveConversation(conversation)
-    setError('')
-    setErrorKind('')
-    try {
-      if (isLocalUser) {
-        const storedMessages = readLocalData<Record<string, Message[]>>(localStorageKey(user?.id ?? '', 'messages'), {})
-        setMessages(storedMessages[conversation.id] ?? [])
-        return
-      }
-      setMessages(await getMessages(conversation.id))
-    } catch (requestError) {
-      setError(getErrorMessage(requestError))
-    }
+    setMessageDraft('')
+    setRetryTurn(null)
+    clearError()
+    await loadConversationMessages(conversation.id, { clearBeforeLoad: true })
   }
 
   async function handleNewConversation() {
-    setWorking(true)
-    setError('')
-    setErrorKind('')
+    if (busyAction) return
+
+    setBusyAction('create-conversation')
+    clearError()
     try {
-      if (isLocalUser) {
-        const now = new Date().toISOString()
-        const conversation: Conversation = { id: crypto.randomUUID(), title: 'Cuộc trò chuyện mới', created_at: now, updated_at: now }
-        const nextConversations = [conversation, ...conversations]
-        writeLocalData(localStorageKey(user?.id ?? '', 'conversations'), nextConversations)
-        setConversations(nextConversations)
-        setActiveConversation(conversation)
-        setMessages([])
-        return
-      }
       const conversation = await createConversation()
+      loadVersionRef.current += 1
+      activeConversationIdRef.current = conversation.id
+      sessionStorage.setItem(ACTIVE_CONVERSATION_KEY, conversation.id)
       setConversations((current) => [conversation, ...current])
       setActiveConversation(conversation)
       setMessages([])
+      setMessageDraft('')
+      setRetryTurn(null)
     } catch (requestError) {
-      setError(getErrorMessage(requestError))
+      showRequestError(requestError)
     } finally {
-      setWorking(false)
+      setBusyAction(null)
     }
   }
 
@@ -134,64 +228,128 @@ function App() {
   }
 
   async function sendMessage() {
+    const conversation = activeConversation
     const content = messageDraft.trim()
-    if (!activeConversation || !content || working) return
-    setWorking(true)
-    setError('')
-    setErrorKind('')
-    try {
-      if (isLocalUser) {
-        const now = new Date().toISOString()
-        const userMessage: Message = { id: crypto.randomUUID(), conversation_id: activeConversation.id, role: 'user', content, status: 'completed', created_at: now }
-        const assistantMessage: Message = { id: crypto.randomUUID(), conversation_id: activeConversation.id, role: 'assistant', content: 'Đây là phản hồi local để kiểm thử giao diện G1.', status: 'completed', created_at: now }
-        const nextMessages = [...messages, userMessage, assistantMessage]
-        const storedMessages = readLocalData<Record<string, Message[]>>(localStorageKey(user?.id ?? '', 'messages'), {})
-        writeLocalData(localStorageKey(user?.id ?? '', 'messages'), { ...storedMessages, [activeConversation.id]: nextMessages })
-        setMessages(nextMessages)
-        setMessageDraft('')
-        setClientMessageId(null)
-        return
+    if (!conversation || !content || busyAction) return
+
+    const existingRetry =
+      retryTurn?.conversationId === conversation.id && retryTurn.content === content
+        ? retryTurn
+        : null
+    const attempt: RetryTurn =
+      existingRetry ?? {
+        clientMessageId: crypto.randomUUID(),
+        content,
+        conversationId: conversation.id,
       }
-      const response = await createMessage(activeConversation.id, {
-        client_message_id: clientMessageId ?? newClientMessageId(),
+    const existingFailedMessage = existingRetry
+      ? [...messages]
+          .reverse()
+          .find(
+            (message) =>
+              message.role === 'user' && message.status === 'failed' && message.content === content,
+          )
+      : undefined
+    const optimisticId = existingFailedMessage?.id ?? `pending:${attempt.clientMessageId}`
+    const optimisticMessage: Message = {
+      id: optimisticId,
+      conversation_id: conversation.id,
+      role: 'user',
+      content,
+      status: 'pending',
+      created_at: existingFailedMessage?.created_at ?? new Date().toISOString(),
+    }
+
+    setRetryTurn(attempt)
+    setBusyAction('send-message')
+    clearError()
+    setMessages((current) => {
+      if (existingFailedMessage) {
+        return current.map((message) =>
+          message.id === existingFailedMessage.id ? optimisticMessage : message,
+        )
+      }
+      return [...current.filter(({ id }) => id !== optimisticId), optimisticMessage]
+    })
+
+    try {
+      const response = await createMessage(conversation.id, {
+        client_message_id: attempt.clientMessageId,
         content,
       })
-      setMessages((current) => [...current, response.user_message, response.assistant_message])
-      setMessageDraft('')
-      setClientMessageId(null)
+
+      if (activeConversationIdRef.current === conversation.id) {
+        setMessages((current) => [
+          ...current.filter(({ id }) => id !== optimisticId),
+          response.user_message,
+          response.assistant_message,
+        ])
+        setMessageDraft('')
+        setRetryTurn(null)
+        setConversations((current) =>
+          current
+            .map((item) =>
+              item.id === conversation.id
+                ? { ...item, updated_at: response.assistant_message.created_at }
+                : item,
+            )
+            .sort((left, right) => right.updated_at.localeCompare(left.updated_at)),
+        )
+      }
+
+      // Backend remains the source of truth. Re-read history instead of trusting only local state.
+      await loadConversationMessages(conversation.id, { reportError: false })
     } catch (requestError) {
-      if (!clientMessageId) setClientMessageId(newClientMessageId())
-      setErrorKind(isAiTimeout(requestError) ? 'ai-timeout' : requestError instanceof ApiError && requestError.status === 401 ? 'unauthorized' : 'api')
-      setError(getErrorMessage(requestError))
+      if (activeConversationIdRef.current === conversation.id) {
+        setMessages((current) =>
+          current.map((message) =>
+            message.id === optimisticId ? { ...message, status: 'failed' } : message,
+          ),
+        )
+        showRequestError(requestError)
+      }
+
+      // The Core API stores the user message before calling AI. Load that durable state after failure.
+      await loadConversationMessages(conversation.id, { reportError: false })
     } finally {
-      setWorking(false)
+      setBusyAction(null)
     }
   }
 
   async function handleLogout() {
-    if (isLocalUser) {
-      setUser(null)
-      setConversations([])
-      setActiveConversation(null)
-      setMessages([])
-      setMessageDraft('')
-      setClientMessageId(null)
-      setError('')
-      setErrorKind('')
-      return
+    if (busyAction) return
+
+    setBusyAction('logout')
+    clearError()
+    let logoutError: unknown = null
+    try {
+      await logout()
+    } catch (requestError) {
+      if (!isUnauthorized(requestError)) logoutError = requestError
+    } finally {
+      clearWorkspace()
+      setBusyAction(null)
     }
-    await logout()
-    setUser(null)
-    setConversations([])
-    setActiveConversation(null)
-    setMessages([])
-    setMessageDraft('')
-    setClientMessageId(null)
-    setError('')
-    setErrorKind('')
+
+    if (logoutError) {
+      setErrorKind('api')
+      setError(
+        `Đã xóa dữ liệu khỏi giao diện nhưng chưa xác nhận được phiên trên máy chủ: ${getErrorMessage(logoutError)}`,
+      )
+    }
   }
 
-  if (loading) return <main className="status-screen">Đang kiểm tra phiên đăng nhập...</main>
+  function handleDraftChange(value: string) {
+    setMessageDraft(value)
+    if (retryTurn && value.trim() !== retryTurn.content) {
+      setRetryTurn(null)
+      if (errorKind === 'ai-timeout') clearError()
+    }
+  }
+
+  if (loadingSession) {
+    return <main className="status-screen">Đang kiểm tra phiên đăng nhập...</main>
+  }
 
   if (!user) {
     return (
@@ -200,60 +358,215 @@ function App() {
           <p className="eyebrow">G1 / SYSTEM SMOKE</p>
           <h1>Trợ lý hành chính</h1>
           <p className="intro">Đăng nhập demo để bắt đầu một cuộc hội thoại.</p>
-          {localAdminEnabled && <p className="local-mode" role="status">Local test mode đang bật. Dùng tên <strong>admin</strong> hoặc <strong>admin2</strong>. Hai tài khoản có history riêng.</p>}
           <form onSubmit={handleLogin} className="login-form">
             <label htmlFor="display-name">Tên hiển thị</label>
-            <input id="display-name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Ví dụ: Tú" autoComplete="name" disabled={working} />
-            <button type="submit" disabled={working || !displayName.trim()}>{working ? 'Đang đăng nhập...' : 'Đăng nhập'}</button>
+            <input
+              id="display-name"
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder="Ví dụ: Tú"
+              autoComplete="name"
+              maxLength={100}
+              disabled={busyAction === 'login'}
+            />
+            <button type="submit" disabled={busyAction === 'login' || !displayName.trim()}>
+              {busyAction === 'login' ? 'Đang đăng nhập...' : 'Đăng nhập'}
+            </button>
           </form>
-          {error && <StatusBanner kind={errorKind} message={error} onRetry={() => window.location.reload()} />}
+          {error && <StatusBanner kind={errorKind} message={error} />}
         </section>
       </main>
     )
   }
 
+  const retryAvailable = Boolean(
+    retryTurn &&
+      activeConversation &&
+      retryTurn.conversationId === activeConversation.id &&
+      retryTurn.content === messageDraft.trim(),
+  )
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
-        <div className="brand-block"><p className="eyebrow">G1 / WORKSPACE</p><h1>Hành chính</h1></div>
-        <button className="new-conversation" type="button" onClick={handleNewConversation} disabled={working}><span aria-hidden="true">+</span> Cuộc trò chuyện mới</button>
-        <div className="conversation-list">
-          {conversations.length === 0 ? <p className="muted">Chưa có cuộc trò chuyện nào.</p> : conversations.map((conversation) => (
-            <button className={activeConversation?.id === conversation.id ? 'conversation active' : 'conversation'} type="button" key={conversation.id} onClick={() => handleSelectConversation(conversation)}>
-              <span>{conversation.title}</span><small>{formatDate(conversation.updated_at)}</small>
-            </button>
-          ))}
+        <div className="brand-block">
+          <p className="eyebrow">G1 / WORKSPACE</p>
+          <h1>Hành chính</h1>
         </div>
-        <div className="account-block"><span className="avatar">{user.display_name.charAt(0).toUpperCase()}</span><span className="account-name">{user.display_name}</span><button className="logout-button" type="button" onClick={handleLogout} title="Đăng xuất">↗</button></div>
+        <button
+          className="new-conversation"
+          type="button"
+          onClick={handleNewConversation}
+          disabled={busyAction !== null}
+        >
+          <span aria-hidden="true">+</span> Cuộc trò chuyện mới
+        </button>
+        <div className="conversation-list" aria-label="Danh sách cuộc trò chuyện">
+          {conversations.length === 0 ? (
+            <p className="muted">Chưa có cuộc trò chuyện nào.</p>
+          ) : (
+            conversations.map((conversation) => (
+              <button
+                className={activeConversation?.id === conversation.id ? 'conversation active' : 'conversation'}
+                type="button"
+                key={conversation.id}
+                onClick={() => void handleSelectConversation(conversation)}
+                disabled={busyAction !== null}
+              >
+                <span>{conversation.title}</span>
+                <small>{formatDate(conversation.updated_at)}</small>
+              </button>
+            ))
+          )}
+        </div>
+        <div className="account-block">
+          <span className="avatar">{user.display_name.charAt(0).toUpperCase()}</span>
+          <span className="account-name">{user.display_name}</span>
+          <button
+            className="logout-button"
+            type="button"
+            onClick={() => void handleLogout()}
+            disabled={busyAction !== null}
+            aria-label="Đăng xuất"
+            title="Đăng xuất"
+          >
+            ↗
+          </button>
+        </div>
       </aside>
       <section className="chat-panel">
-        <header className="chat-header"><div><p className="eyebrow">CONVERSATION</p><h2>{activeConversation?.title ?? 'Chọn một cuộc trò chuyện'}</h2></div><span className="connection-status"><i /> {isLocalUser ? 'Local admin mode' : 'Core Backend'}</span></header>
-        {error && <StatusBanner kind={errorKind} message={error} onRetry={messageDraft.trim() ? sendMessage : undefined} />}
-        <div className="messages" aria-live="polite">
-          {!activeConversation ? <div className="empty-state"><span className="empty-mark">01</span><h3>Bắt đầu từ một cuộc trò chuyện mới</h3><p>Lịch sử sẽ được tải từ Core Backend sau khi bạn chọn conversation.</p></div> : messages.length === 0 ? <div className="empty-state"><span className="empty-mark">02</span><h3>Cuộc trò chuyện đang trống</h3><p>Gửi một tin nhắn đầu tiên để kiểm tra đường ống G1.</p></div> : messages.map((message) => <article className={`message ${message.role}`} key={message.id}><div className="message-meta">{message.role === 'user' ? user.display_name : 'Mock AI'}</div><p>{message.content}</p></article>)}
+        <header className="chat-header">
+          <div>
+            <p className="eyebrow">CONVERSATION</p>
+            <h2>{activeConversation?.title ?? 'Chọn một cuộc trò chuyện'}</h2>
+          </div>
+          <span className="connection-status">
+            <i aria-hidden="true" /> Core Backend
+          </span>
+        </header>
+        <div className="alert-slot">
+          {error && (
+            <StatusBanner
+              kind={errorKind}
+              message={error}
+              onRetry={retryAvailable ? () => void sendMessage() : undefined}
+            />
+          )}
         </div>
-        <form className="composer" onSubmit={handleSendMessage}><textarea value={messageDraft} onChange={(event) => { setMessageDraft(event.target.value); if (!event.target.value.trim()) setClientMessageId(null) }} placeholder={activeConversation ? 'Viết tin nhắn kiểm thử...' : 'Tạo hoặc chọn một cuộc trò chuyện trước'} disabled={!activeConversation || working} rows={2} /><button type="submit" disabled={!activeConversation || !messageDraft.trim() || working}>{working ? 'Đang gửi...' : 'Gửi'}</button></form>
+        <div className="messages" aria-live="polite" aria-busy={loadingMessages}>
+          {!activeConversation ? (
+            <EmptyState
+              mark="01"
+              title="Bắt đầu từ một cuộc trò chuyện mới"
+              description="Tạo hoặc chọn một cuộc trò chuyện để tải lịch sử từ Core Backend."
+            />
+          ) : loadingMessages ? (
+            <div className="messages-loading" role="status">Đang tải lịch sử...</div>
+          ) : messages.length === 0 ? (
+            <EmptyState
+              mark="02"
+              title="Cuộc trò chuyện đang trống"
+              description="Gửi một tin nhắn đầu tiên để kiểm tra đường ống G1."
+            />
+          ) : (
+            messages.map((message) => (
+              <article className={`message ${message.role} ${message.status}`} key={message.id}>
+                <div className="message-meta">
+                  {message.role === 'user' ? user.display_name : 'Mock AI'}
+                  {message.status !== 'completed' && (
+                    <span className="message-status">
+                      {message.status === 'pending' ? 'Đang xử lý' : 'Gửi chưa hoàn tất'}
+                    </span>
+                  )}
+                </div>
+                <p>{message.content}</p>
+              </article>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+        <form className="composer" onSubmit={handleSendMessage}>
+          <textarea
+            value={messageDraft}
+            onChange={(event) => handleDraftChange(event.target.value)}
+            placeholder={
+              activeConversation
+                ? 'Viết tin nhắn kiểm thử...'
+                : 'Tạo hoặc chọn một cuộc trò chuyện trước'
+            }
+            disabled={!activeConversation || busyAction !== null}
+            maxLength={10_000}
+            rows={2}
+          />
+          <button
+            type="submit"
+            disabled={!activeConversation || !messageDraft.trim() || busyAction !== null}
+          >
+            {busyAction === 'send-message' ? 'Đang gửi...' : 'Gửi'}
+          </button>
+        </form>
       </section>
     </main>
   )
 }
 
-function getErrorMessage(error: unknown) {
-  if (error instanceof ApiError) return error.message
-  return error instanceof Error ? error.message : 'Không thể kết nối Core Backend.'
+function EmptyState({ mark, title, description }: { mark: string; title: string; description: string }) {
+  return (
+    <div className="empty-state">
+      <span className="empty-mark">{mark}</span>
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  )
 }
 
-function isAiTimeout(error: unknown) {
-  return error instanceof ApiError && (error.status === 408 || error.status === 504 || error.code === 'AI_SERVICE_TIMEOUT' || error.message.toLowerCase().includes('timeout'))
+function getErrorMessage(requestError: unknown) {
+  if (requestError instanceof ApiError) return requestError.message
+  return requestError instanceof Error ? requestError.message : 'Không thể kết nối Core Backend.'
 }
 
-function StatusBanner({ kind, message, onRetry }: { kind: 'unauthorized' | 'api' | 'ai-timeout' | ''; message: string; onRetry?: () => void }) {
-  const label = kind === 'unauthorized' ? 'UNAUTHORIZED' : kind === 'ai-timeout' ? 'AI TIMEOUT' : 'API ERROR'
-  return <div className="error-banner login-error" role="alert"><span><strong>{label}</strong> {message}</span>{onRetry && <button type="button" onClick={onRetry}>Thử lại</button>}</div>
+function isUnauthorized(requestError: unknown) {
+  return requestError instanceof ApiError && requestError.status === 401
+}
+
+function isAiTimeout(requestError: unknown) {
+  return (
+    requestError instanceof ApiError &&
+    (requestError.status === 408 ||
+      requestError.status === 504 ||
+      requestError.code === 'AI_SERVICE_TIMEOUT' ||
+      requestError.message.toLowerCase().includes('timeout'))
+  )
+}
+
+function StatusBanner({
+  kind,
+  message,
+  onRetry,
+}: {
+  kind: ErrorKind
+  message: string
+  onRetry?: () => void
+}) {
+  const label = kind === 'unauthorized' ? 'PHIÊN ĐĂNG NHẬP' : kind === 'ai-timeout' ? 'AI TIMEOUT' : 'LỖI API'
+  return (
+    <div className="error-banner" role="alert">
+      <span>
+        <strong>{label}</strong> {message}
+      </span>
+      {onRetry && (
+        <button type="button" onClick={onRetry}>
+          Thử lại
+        </button>
+      )}
+    </div>
+  )
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit' }).format(new Date(value))
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '--/--'
+  return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit' }).format(date)
 }
 
 export default App

@@ -61,7 +61,6 @@ services:
       API_HOST: 0.0.0.0
       API_PORT: 8000
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
-      SESSION_SIGNING_SECRET: ${SESSION_SIGNING_SECRET:-replace-with-a-random-development-secret}
       SESSION_TTL_SECONDS: ${SESSION_TTL_SECONDS:-86400}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
       DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://app_user:change-me-local-only@postgres:5432/hanh_chinh_mvp}
@@ -75,6 +74,12 @@ services:
         condition: service_healthy
       ai-service:
         condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - |
+        .venv/bin/alembic upgrade head &&
+        exec .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --no-access-log --log-config logging.json
     healthcheck:
       test:
         - CMD
@@ -96,8 +101,6 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
-    environment:
-      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
     ports:
       - "127.0.0.1:${WEB_PORT:-3000}:3000"
     depends_on:

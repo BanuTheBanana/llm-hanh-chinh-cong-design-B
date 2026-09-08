@@ -4,7 +4,6 @@ from app.providers.base import ProviderError, ProviderTimeoutError
 from app.providers.mock import MockProvider
 from app.schemas import ChatMessage
 
-
 MESSAGES = [ChatMessage(role="user", content="Smoke test")]
 
 
