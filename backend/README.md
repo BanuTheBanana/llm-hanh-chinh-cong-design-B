@@ -1,246 +1,472 @@
-# Backend Giai đoạn 1 — Minh
+# Core Backend G1
 
-Gói `backend/` để ghép vào monorepo LLM. FastAPI + Pydantic + SQLAlchemy 2 async +
-asyncpg + Alembic; PostgreSQL lưu users, sessions, conversations, messages.
+FastAPI + PostgreSQL + SQLAlchemy async + asyncpg + Alembic. Backend quản lý demo
+user, session cookie, conversation, message và gọi AI Service qua HTTP synchronous.
+API giữ nguyên contract G1. Chỉ dùng dữ liệu giả D0_SYSTEM_SMOKE.
 
-**Trạng thái bàn giao:** đã triển khai source, migration và tests. 18 unit/contract
-checks đã pass. 18 PostgreSQL integration cases đã viết nhưng CHƯA chạy được
-trong môi trường bàn giao. Chưa có Web của Tú hoặc AI Service của Hoan để kiểm thử
-end-to-end, nên chưa đánh dấu toàn bộ Definition of Done G1 hoàn thành.
+## 1. Bắt đầu ở đâu?
 
-## 1. Chạy nhanh
+| Tình huống | Đọc |
+|---|---|
+| Đã có PostgreSQL/container từ bản cũ | Mục 2 — giữ database hiện tại |
+| Cài lần đầu, muốn database local bằng Docker | Mục 3 — môi trường mới |
+| Đã cài PostgreSQL trực tiếp hoặc có server PostgreSQL | Mục 4 |
+| Đã cấu hình database | Mục 5 — kiểm tra, migrate, chạy backend |
+| Lỗi Docker, cổng, mật khẩu, URL | Mục 10 |
+| Ghép Web và AI Service | Mục 7 và docs/API_AND_DESIGN.md |
 
-Yêu cầu: Python 3.12, uv, PostgreSQL (ví dụ PostgreSQL 16), AI Service của Hoan.
-Chạy các lệnh Python bên dưới từ thư mục `backend/`.
+Yêu cầu: Python 3.12, [uv](https://docs.astral.sh/uv/getting-started/installation/).
+Cách Docker cần Docker Engine/Desktop đang chạy, Linux containers và Compose v2.
+Docker chỉ cần cho database nếu chọn mục 3; backend chạy bằng Python trên máy.
 
-```bash
+**Quy ước:** mở terminal ngay trong thư mục `backend/` đã giải nén, có
+`pyproject.toml`. Không phụ thuộc tên user Windows, thư mục Downloads hay ổ đĩa.
+Lệnh `uv`, `docker` bên dưới dùng được trên PowerShell, Bash và zsh trừ nơi có ghi riêng.
+
+**Trạng thái xác minh bản này:** 32 unit/contract/config tests pass. 18 integration
+cases đã có nhưng chưa chạy được trên PostgreSQL trong môi trường bàn giao.
+Chưa xác minh Docker build/Compose runtime hoặc Web + AI end-to-end. Xem
+[TEST_REPORT](docs/TEST_REPORT.md); không coi toàn bộ G1 DoD đã hoàn thành.
+
+## 2. Nâng cấp từ gói backend cũ — giữ dữ liệu
+
+1. Dừng backend đang chạy bằng Ctrl+C.
+2. Giải nén bản mới vào một thư mục riêng và copy `.env` cũ sang thư mục mới.
+   Không copy `.venv`; không xóa database/container/volume.
+3. Mở terminal trong `backend/` mới và chạy `uv sync --frozen`.
+4. Tiếp tục dùng container/server cũ. **Không chạy Compose ở mục 3** nếu muốn giữ
+   nguyên database đang dùng: Compose đó tạo volume riêng và không tự nhập dữ liệu cũ.
+5. Kiểm tra và migrate theo mục 5. Migration vẫn là `0001_g1`, không có migration
+   mới xóa hay thay cấu trúc dữ liệu trong bản cập nhật này.
+
+DATABASE_URL cũ vẫn được hỗ trợ. Nếu muốn chuyển sang cấu hình từng trường, bỏ
+DATABASE_URL khỏi `.env` (hoặc đặt rỗng), rồi điền DB_* theo mục 6.
+
+Ví dụ riêng cho người đã dùng container `minh-g1-postgres-15432` trong hướng dẫn cũ:
+
+```powershell
+docker start minh-g1-postgres-15432
+```
+
+Với container đó, địa chỉ host là `127.0.0.1`, cổng `15432`, database `g1`.
+Mật khẩu phải là mật khẩu thật của user trong database, không nhất thiết còn là
+mật khẩu khởi tạo. Xem mục 10.3 nếu xác thực thất bại.
+
+## 3. Cài mới bằng Docker Compose
+
+### 3.1. Cài dependency, tạo cấu hình
+
+```text
 uv sync --frozen
-cp .env.example .env
 ```
 
-PowerShell: dùng `Copy-Item .env.example .env` thay lệnh `cp`.
-Nếu chưa có PostgreSQL local, dùng Docker trên máy của anh:
+PowerShell (chỉ tạo `.env` nếu chưa có):
 
-```bash
-docker run --name minh-g1-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=g1 -p 127.0.0.1:5432:5432 -d postgres:16
-docker exec minh-g1-postgres pg_isready -U postgres -d g1
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+notepad .env
 ```
 
-Đợi `accepting connections`, rồi chạy:
+Bash/zsh:
 
 ```bash
+if [ ! -f .env ]; then cp .env.example .env; fi
+```
+
+Mở `.env` bằng editor. Với môi trường mới, dùng các giá trị demo mặc định hoặc đổi
+DB_PORT/DB_NAME/DB_USER/DB_PASSWORD theo nhu cầu. Để DATABASE_URL rỗng khi dùng DB_*.
+
+### 3.2. Khởi động Docker rồi PostgreSQL
+
+Windows/macOS: mở Docker Desktop và đợi Engine chạy. Linux: khởi động Docker Engine
+theo cách cài đặt của máy. Kiểm tra:
+
+```text
+docker version
+docker compose version
+```
+
+`docker version` cần hiển thị phần Server. Sau đó:
+
+```text
+docker compose -f compose.db.yaml up -d --wait
+```
+
+Compose chỉ dựng **PostgreSQL**, không dựng Web hoặc AI Service. Không đặt tên
+container cố định; dùng service `db` trong các lệnh để mọi người đều dùng được.
+Mặc định cổng host là **15432**, cổng trong container vẫn là **5432**.
+
+```text
+docker compose -f compose.db.yaml ps
+docker compose -f compose.db.yaml port db 5432
+```
+
+Service `db` cần healthy; port mặc định là `127.0.0.1:15432`.
+Tiếp tục mục 5.
+
+### 3.3. Dữ liệu được lưu ở đâu?
+
+Compose dùng named volume `pgdata` thuộc project `COMPOSE_PROJECT_NAME` (mặc định
+`g1-backend`). Giữ nguyên project name để dùng lại volume đó. `stop` và `down`
+không kèm `-v` giữ named volume; **không dùng `down -v` nếu cần giữ dữ liệu**.
+
+Đổi POSTGRES_USER/PASSWORD/DB qua `.env` không sửa user/mật khẩu/database trong
+volume đã khởi tạo. Thay đổi những giá trị đó cần thao tác trong PostgreSQL,
+không phải chỉ restart container. Xem mục 10.3.
+
+## 4. Dùng PostgreSQL đã có, không cần Docker
+
+Tạo một database (ví dụ `g1`) và user có quyền kết nối, tạo bảng/index trong schema
+ứng dụng. Có thể dùng pgAdmin hoặc công cụ quản trị của server. Điền vào `.env`:
+
+```dotenv
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_NAME=g1
+DB_USER=your_database_user
+DB_PASSWORD='your_database_password'
+DATABASE_URL=
+```
+
+Các giá trị `your_*` là chỗ cần thay. Mục này dùng cổng 5432 làm ví dụ cho PostgreSQL
+cài trực tiếp; luôn dùng cổng thật của server. Không chạy `compose.db.yaml` cho
+server đã có. Với PostgreSQL hosted cần TLS, dùng DSN asyncpg đúng yêu cầu của
+nhà cung cấp; không tự tắt xác minh TLS để xử lý lỗi kết nối.
+
+## 5. Kiểm tra → migrate → chạy backend
+
+### 5.1. Xem cấu hình an toàn
+
+```text
+uv run --frozen python -m app.doctor --config-only
+```
+
+In đường dẫn `.env`, chế độ DATABASE_URL hay DB_*, host, port, database và tên các
+biến shell đang override. Không in mật khẩu hoặc URL query parameters.
+`CONFIG_OK` chỉ xác nhận cấu trúc cấu hình, **chưa xác nhận mật khẩu đúng**.
+
+### 5.2. Kiểm tra kết nối thật
+
+```text
+uv run --frozen python -m app.doctor
+```
+
+Cần thấy `DB_OK`. Nếu báo lỗi, xử lý theo mã ở mục 10 trước khi chạy Alembic.
+Lệnh này chỉ đọc; không tạo bảng, thay mật khẩu hoặc xóa dữ liệu.
+
+### 5.3. Tạo/cập nhật bảng
+
+```text
 uv run --frozen alembic upgrade head
-uv run --frozen uvicorn app.main:app --host 0.0.0.0 --port 8000 --no-access-log --log-config logging.json
+uv run --frozen alembic current
 ```
 
-- Swagger: http://localhost:8000/docs
-- OpenAPI: http://localhost:8000/openapi.json
-- Health kiểm tra database: http://localhost:8000/health
-- AI Service phải cung cấp `POST /internal/v1/generate` theo file contract đính kèm.
-- Backend vẫn khởi động khi AI chưa chạy; gửi message lúc đó trả lỗi 502 chuẩn và giữ user message.
-- Không tự chạy migration lúc server khởi động: chạy migration một lần trước khi scale workers.
+Chỉ chạy lệnh tiếp theo khi lệnh trước thành công. Mong đợi `0001_g1 (head)`.
+Migration tạo users, sessions, conversations, messages; Alembic quản lý thêm
+alembic_version. Không chạy `downgrade base` để sửa lỗi kết nối: nó xóa bảng.
 
-## 2. Environment
+### 5.4. Khởi động API
 
-| Biến | Giá trị mẫu | Ý nghĩa |
+```text
+uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log --log-config logging.json
+```
+
+Giữ terminal chạy, mở:
+
+- [Health](http://localhost:8000/health) → `{"status":"ok"}` khi DB sẵn sàng.
+- [Swagger](http://localhost:8000/docs) → thử API bằng trình duyệt.
+- [OpenAPI](http://localhost:8000/openapi.json) → schema public API.
+
+Cổng backend 8000 độc lập với cổng database 15432. Dùng `--host 0.0.0.0` nếu chạy
+backend trong container; Dockerfile đã cấu hình như vậy.
+
+### 5.5. Những lần chạy sau
+
+Với Compose local:
+
+```text
+docker compose -f compose.db.yaml up -d --wait
+uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log --log-config logging.json
+```
+
+Với database cũ/cài trực tiếp: chỉ đảm bảo database chạy rồi chạy Uvicorn.
+Không copy đè `.env`, tạo lại database hay reset migration mỗi lần chạy.
+Dừng API bằng Ctrl+C; dừng Compose local bằng:
+
+```text
+docker compose -f compose.db.yaml stop
+```
+
+## 6. Cấu hình
+
+Ứng dụng đọc `.env` cạnh `pyproject.toml`, theo đường dẫn thư mục backend, hỗ trợ
+UTF-8 và UTF-8 BOM. Environment của tiến trình ưu tiên hơn `.env`.
+
+| Biến | Mặc định | Ý nghĩa |
 |---|---|---|
-| `DATABASE_URL` | `postgresql+asyncpg://postgres:postgres@localhost:5432/g1` | DSN PostgreSQL async |
-| `AI_SERVICE_URL` | `http://localhost:8001/internal/v1` | Base URL gồm `/internal/v1`, chưa gồm `/generate` |
-| `AI_TIMEOUT_SECONDS` | `10` | Deadline tổng và timeout HTTP |
-| `SESSION_COOKIE_NAME` | `g1_session` | Tên cookie opaque |
-| `SESSION_SECURE` | `false` | Đặt `true` khi dùng HTTPS |
-| `SESSION_TTL_SECONDS` | `86400` | Session hết hạn sau 24 giờ |
-| `CORS_ORIGINS` | `["http://localhost:3000"]` | JSON array origin của Web |
+| DB_HOST | 127.0.0.1 | Địa chỉ PostgreSQL |
+| DB_PORT | 15432 | Cổng PostgreSQL nhìn từ backend |
+| DB_NAME | g1 | Database |
+| DB_USER | postgres | Database user |
+| DB_PASSWORD | postgres | Mật khẩu demo; thay theo database thực tế |
+| DATABASE_URL | rỗng | Nếu có giá trị, ưu tiên hơn toàn bộ DB_* |
+| COMPOSE_PROJECT_NAME | g1-backend trong .env.example | Namespace Compose/volume; giữ ổn định |
+| AI_SERVICE_URL | http://localhost:8001/internal/v1 | Base URL, chưa gồm /generate |
+| AI_TIMEOUT_SECONDS | 10 | Deadline tổng khi gọi AI |
+| SESSION_COOKIE_NAME | g1_session | Tên cookie |
+| SESSION_SECURE | false | Đặt true khi chạy HTTPS |
+| SESSION_TTL_SECONDS | 86400 | Thời hạn session tính bằng giây |
+| CORS_ORIGINS | ["http://localhost:3000"] | JSON array origin của Web |
 
-`.env` chỉ dùng local, không commit. Giá trị trong `.env.example` là thông tin demo.
-Trong Compose của Hoan, dùng `postgres` làm database hostname và đặt
-`AI_SERVICE_URL=http://ai-service:8001/internal/v1`. Không dùng `localhost` để gọi
-container khác. Docker build context là `./backend`; Dockerfile được cung cấp.
-Hoan có thể đặt healthcheck bằng Python urllib gọi `http://localhost:8000/health`.
+Khuyến nghị dùng DB_* để mật khẩu có `@`, `/`, `:`, `#`, `%` không cần tự URL-encode.
+Trong `.env`, đặt mật khẩu trong dấu nháy đơn nếu chứa `$` hoặc `#` để tránh nội suy
+và comment. Không URL-encode giá trị DB_PASSWORD. SQLAlchemy tạo URL object trực tiếp.
 
-Backend cần kết nối PostgreSQL trực tiếp hoặc pool ở **session mode**. Không dùng
-PgBouncer transaction pooling với advisory lock ở G1.
+Cách cũ vẫn dùng được:
 
-## 3. Điểm chưa được quy định trong contract — cần Tú/Hoan review
-
-Các endpoint/schema đã có được giữ nguyên. Các chi tiết contract chưa ghi được
-triển khai với quy ước dưới đây; đây không phải nội dung đã được cả nhóm xác nhận.
-Bản contract nguồn không bị chỉnh sửa, xem `docs/contracts-g1.reference.md`.
-
-| Điểm bổ sung | Quy ước hiện tại |
-|---|---|
-| Login / me response | `200 {"id":"uuid","display_name":"Minh"}` |
-| Logout | `204`, body rỗng, lặp lại vẫn được; hủy session và xóa cookie |
-| Tên cookie | `g1_session`, Path `/`, HttpOnly, SameSite=Lax, TTL 24 giờ |
-| Demo identity | Trim display_name; phân biệt hoa/thường; cùng tên vào cùng demo user |
-| POST conversation body | `{}` hoặc `{"title":"..."}`; response 201 theo schema conversation |
-| GET conversation list | Array trực tiếp, mới cập nhật trước; chưa phân trang G1 |
-| GET message list | Array trực tiếp, cũ trước; bao gồm pending/failed |
-| POST message thành công | 200 theo cặp user_message/assistant_message đã khóa |
-| Không có quyền conversation | 404 giống conversation không tồn tại |
-| Giới hạn | display_name 1–100; title 1–200; content 1–10.000 ký tự sau trim |
-| Field dư / UUID sai / rỗng / quá dài | 422, không lưu message |
-| Retry thành công trước đó | Trả đúng cặp đã lưu, không gọi AI lại |
-| Cùng key, nội dung khác | 409 IDEMPOTENCY_CONFLICT |
-| Đang có generation trong conversation | 409 MESSAGE_IN_PROGRESS; retry cùng key khi request trước kết thúc |
-| Retry failed/pending mới nhất | Gọi AI lại với cùng user message; request_id của lần thử mới |
-| Retry failed/pending cũ sau một turn mới | 409 RETRY_OUT_OF_ORDER; gửi nội dung bằng key mới |
-| `/health` | 200 `{"status":"ok"}` nếu DB kết nối được; không phụ thuộc AI |
-| Request tracing | Backend tạo UUID mỗi HTTP request; trả `X-Request-ID` |
-
-Login demo bằng tên **không xác minh danh tính người thật**. Người biết tên demo có
-thể đăng nhập cùng tài khoản đó. Chỉ dùng dữ liệu giả D0_SYSTEM_SMOKE như tài liệu
-phân công; không coi đây là login production. Isolation ở đây là quyền đọc/ghi dựa
-trên session của demo user đã đăng nhập.
-
-## 4. Public API để Tú ghép Web
-
-Tất cả request cần cookie phải dùng `credentials: "include"`.
-
-```javascript
-const base = import.meta.env.VITE_API_BASE_URL; // http://localhost:8000/api/v1
-await fetch(`${base}/auth/login`, {
-  method: "POST", credentials: "include",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ display_name: "Minh" }),
-});
-const created = await fetch(`${base}/conversations`, {
-  method: "POST", credentials: "include",
-  headers: { "Content-Type": "application/json" }, body: JSON.stringify({}),
-});
-const conversation = await created.json();
-const payload = { client_message_id: crypto.randomUUID(), content: "D0_SYSTEM_SMOKE" };
-const sent = await fetch(`${base}/conversations/${conversation.id}/messages`, {
-  method: "POST", credentials: "include",
-  headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
-});
-// Kiểm tra sent.ok trước khi dùng response như một cặp message.
-// Nếu lỗi mạng/502/504: giữ payload và dùng lại chính client_message_id khi retry.
-// Nếu 409 MESSAGE_IN_PROGRESS: đợi request hiện tại xong rồi retry.
+```dotenv
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@127.0.0.1:15432/g1
 ```
 
-| Method | Path (sau `/api/v1`) |
-|---|---|
-| POST | `/auth/login` |
-| POST | `/auth/logout` |
-| GET | `/auth/me` |
-| GET, POST | `/conversations` |
-| GET, POST | `/conversations/{conversation_id}/messages` |
+Nếu dùng DATABASE_URL với mật khẩu có ký tự đặc biệt, phải URL-encode thành phần
+mật khẩu. Không cấu hình đồng thời hai kiểu với thông tin khác nhau.
 
-Mọi lỗi có dạng:
+Compose local đọc DB_*; nó **không phân tích DATABASE_URL**. Vì vậy môi trường mới
+ở mục 3 cần để DATABASE_URL rỗng. Nếu dùng URL cũ, chọn mục 2 hoặc 4.
 
-```json
-{"error":{"code":"AI_SERVICE_TIMEOUT","message":"AI đang phản hồi chậm. Vui lòng thử lại.","request_id":"uuid"}}
-```
+`.env` chứa thông tin riêng, không commit hay gửi toàn bộ vào chat. File ví dụ chỉ
+chứa giá trị demo. Các ví dụ không dùng thông tin MongoDB/Atlas.
 
-| HTTP | Code | Xử lý |
+## 7. Ghép Web và AI Service
+
+API public: `http://localhost:8000/api/v1`.
+Web gửi cookie bằng `credentials: "include"`; không gửi user_id để quyết định quyền.
+
+| Method | Path sau /api/v1 | Input cơ bản |
 |---|---|---|
-| 401 | UNAUTHORIZED | Đăng nhập lại |
-| 403 | FORBIDDEN_ORIGIN | Kiểm tra origin của Web và CORS config |
-| 404 | NOT_FOUND | Conversation không tồn tại hoặc không thuộc user |
-| 409 | MESSAGE_IN_PROGRESS | Đợi rồi retry |
-| 409 | IDEMPOTENCY_CONFLICT | Không tái dùng key cho nội dung khác |
-| 409 | RETRY_OUT_OF_ORDER | Gửi thành turn mới với key mới |
-| 422 | VALIDATION_ERROR | Sửa dữ liệu đầu vào |
-| 502 | AI_SERVICE_ERROR | Lỗi kết nối/HTTP/schema từ AI; giữ nội dung và retry |
-| 504 | AI_SERVICE_TIMEOUT | AI quá deadline; giữ nội dung và retry |
-| 503 | DATABASE_UNAVAILABLE | Healthcheck DB không đạt |
-| 500 | INTERNAL_ERROR | Lỗi hệ thống; dùng request_id để tra log |
+| POST | /auth/login | {"display_name":"Demo User"} |
+| POST | /auth/logout | Không cần body |
+| GET | /auth/me | Không cần body |
+| GET | /conversations | Không cần body |
+| POST | /conversations | {} hoặc {"title":"Demo"} |
+| GET | /conversations/{id}/messages | Không cần body |
+| POST | /conversations/{id}/messages | client_message_id UUID và content |
 
-## 5. Persistence và idempotency
+Trong Swagger: login → tạo conversation → copy id → POST message với UUID mới →
+GET messages. Thử cùng client_message_id để kiểm tra retry. Chưa có AI Service thì
+login/conversation vẫn dùng được; gửi tin trả lỗi AI 502 và giữ user message.
 
-1. Xác thực session qua SHA-256 hash của token ngẫu nhiên 32 bytes.
-2. Kiểm tra ownership trước khi truy cập lịch sử hoặc lấy khóa.
-3. Lấy PostgreSQL advisory lock cho conversation, áp dụng xuyên nhiều workers.
-4. Lấy lại message theo unique `(conversation_id, client_message_id)` hoặc tạo mới.
-5. Commit user message `pending` trước khi gọi AI. Không giữ transaction DB mở khi chờ AI.
-6. AI trả đúng schema và request_id: commit user `completed` cùng assistant `completed`.
-7. AI lỗi/timeout: commit user `failed`, không tạo assistant giả.
-8. Luôn nhả khóa; nếu nhả khóa lỗi thì hủy connection, không đưa khóa còn giữ về pool.
+Internal AI Service cần `POST /internal/v1/generate`, theo
+[contract gốc](docs/contracts-g1.reference.md). Mock success/error/timeout thuộc
+AI Service của nhóm. Backend không tự bịa assistant response khi AI chưa chạy.
 
-Assistant được liên kết với user turn bằng `(conversation_id, request_id)`;
-unique `(conversation_id, request_id, role)` là lớp bảo vệ thứ hai. Không cần thêm
-bảng ngoài bốn bảng G1. Context gửi AI gồm các message completed và user message
-đang xử lý; bỏ các failed/pending cũ chưa có câu trả lời. Nếu worker chết, pending
-vẫn còn và có thể retry turn mới nhất. Không bảo đảm AI chỉ được gọi đúng một lần
-khi crash xảy ra sau AI response nhưng trước DB commit; chỉ bảo đảm không nhân đôi
-message đã lưu theo key. G1 chưa có side effect ngoài Mock AI.
+Trong Compose chung do nhóm quản lý, backend nối PostgreSQL qua service hostname
+và cổng nội bộ, ví dụ DB_HOST=postgres, DB_PORT=5432; AI_SERVICE_URL là
+`http://ai-service:8001/internal/v1`. Nếu dùng DATABASE_URL thì phải cập nhật URL đó
+thay vì chỉ DB_*. Không dùng 127.0.0.1 để gọi container khác.
 
-Log có request_id, route template, method, HTTP status, latency_ms. Không log
-request body, query string, cookie/token, DSN hoặc exception text. CORS có
-credentials và kiểm tra Origin cho các request thay đổi dữ liệu. Response dùng
-`Cache-Control: no-store`.
+Build context Docker backend là `./backend`. Chạy migration một lần trước khi
+start/scale backend. Không dùng PgBouncer transaction pooling: khóa chống gửi đồng
+thời hiện tại cần PostgreSQL session connection.
 
-## 6. Chạy tests
+Xem [API và thiết kế](docs/API_AND_DESIGN.md) cho toàn bộ response/error codes,
+quy ước cần review, ownership, session và idempotency. Demo login theo tên không
+xác minh danh tính thật; chỉ dùng dữ liệu giả theo yêu cầu G1.
 
-Unit/contract checks, không cần PostgreSQL hoặc AI Service:
+## 8. Tests
 
-```bash
-uv run --frozen pytest tests/test_unit.py -q
+Không cần DB cho unit/contract/config tests:
+
+```text
+uv run --frozen pytest tests/test_unit.py tests/test_config.py -q
 uv run --frozen ruff check .
 uv run --frozen ruff format --check .
 ```
 
-Integration tests dùng PostgreSQL thật, AI HTTP response được mock bằng HTTPX
-transport. Dùng database test riêng; test tự tạo schema `g1_test_<uuid>`, chạy
-Alembic vào schema trống, rồi xóa chính schema đó sau mỗi test. Không truncate
-bảng ứng dụng. Database user test cần quyền CREATE SCHEMA.
+Integration suite cần database test riêng. Với Compose demo mặc định, tạo một lần:
 
-```bash
-docker exec minh-g1-postgres createdb -U postgres g1_test
+```text
+docker compose -f compose.db.yaml exec db createdb -U postgres g1_test
 ```
 
-Bash:
+Nếu g1_test đã tồn tại thì bỏ qua bước tạo. Nếu thay DB_USER, thay `postgres` trong
+lệnh bằng user thật. Với server/container cũ, tạo g1_test ở chính server đó.
 
-```bash
-export TEST_DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/g1_test
+PowerShell, cấu hình demo:
+
+```powershell
+$env:TEST_DATABASE_URL = 'postgresql+asyncpg://postgres:postgres@127.0.0.1:15432/g1_test'
 uv run --frozen pytest -q
 ```
+
+Bash/zsh:
+
+```bash
+export TEST_DATABASE_URL='postgresql+asyncpg://postgres:postgres@127.0.0.1:15432/g1_test'
+uv run --frozen pytest -q
+```
+
+Sửa URL test theo thông tin thật nếu khác mặc định. TEST_DATABASE_URL là DSN đầy đủ,
+không tự lấy DB_* và không dùng database g1 ứng dụng. User test cần CREATE SCHEMA.
+Mỗi integration test tạo schema g1_test_UUID, chạy migration thật và dọn schema đó;
+không truncate bảng ứng dụng. Thiếu TEST_DATABASE_URL sẽ báo lỗi thay vì âm thầm skip.
+
+Kiểm tra migration sau khi kết nối thành công:
+
+```text
+uv run --frozen alembic check
+```
+
+## 9. File và thay đổi của bản cập nhật
+
+- `app/config.py`: DB_* hoặc DATABASE_URL cũ; password ẩn trong repr; `.env` theo
+  thư mục backend; UTF-8 BOM; URL.create cho mật khẩu đặc biệt.
+- `app/doctor.py`: kiểm tra cấu hình/kết nối, phân loại lỗi, không in mật khẩu.
+- `app/db.py`, `migrations/env.py`: dùng connection URL object; đóng migration
+  engine trong finally.
+- `compose.db.yaml`: database local có healthcheck, volume và cổng tùy chỉnh.
+- `.env.example`: cấu hình thống nhất với Compose.
+- `app/main.py`, `auth.py`, `chat.py`, `ai.py`, `models.py`, `schemas.py`: Core API
+  theo G1; schema database và public API không đổi trong cập nhật này.
+- `tests/`: unit, config và PostgreSQL integration.
+- `uv.lock`: dependency lock; dùng `--frozen`.
+- `Dockerfile`, `logging.json`: chạy backend trong container và request logging.
+- `docs/`: contract gốc, OpenAPI, thiết kế và báo cáo kiểm thử.
+
+## 10. Troubleshooting
+
+### 10.1. Docker Engine chưa chạy
+
+Lỗi `dockerDesktopLinuxEngine` / named pipe không tồn tại: mở Docker Desktop, đợi
+Engine rồi chạy `docker version`. Nếu cần, dùng Troubleshoot → Restart Docker Desktop.
+Nếu Docker báo lỗi WSL, PowerShell Administrator:
+
+```powershell
+wsl --update
+wsl --shutdown
+```
+
+Lệnh shutdown dừng các phiên WSL; lưu công việc WSL trước. Mở lại Docker Desktop.
+Nếu vẫn lỗi, xem thông báo của Docker Desktop; chưa chạy Alembic lúc này.
+
+### 10.2. Bind port bị từ chối hoặc port đang được dùng
+
+Chọn DB_PORT khác, ví dụ 15433, trong `.env`. Với Compose local, chạy lại:
+
+```text
+docker compose -f compose.db.yaml up -d --wait
+```
+
+Compose cập nhật ánh xạ port và dùng lại volume của cùng project.
+Nếu DATABASE_URL đang có giá trị, cập nhật port trong URL hoặc bỏ URL để dùng DB_*.
+
+Trên Windows, kiểm tra port đang dùng/dải dành riêng:
+
+```powershell
+Get-NetTCPConnection -LocalPort 15432 -ErrorAction SilentlyContinue
+netsh interface ipv4 show excludedportrange protocol=tcp
+```
+
+Không xóa dải port hệ thống. Với container tạo thủ công, `docker start` không đổi
+port; cần cấu hình container mới, giữ volume và dừng container cũ trước khi dùng
+cùng dữ liệu. Không chạy hai PostgreSQL server trên một volume cùng lúc.
+
+### 10.3. DB_AUTH_FAILED / InvalidPasswordError
+
+Đã tới PostgreSQL nhưng xác thực không thành công. Kiểm tra host/port với doctor
+để chắc đang gọi đúng database trước khi thay mật khẩu.
+
+Với Compose demo:
+
+```text
+docker compose -f compose.db.yaml exec db psql -U postgres -d postgres
+```
+
+Với container cũ trong hướng dẫn trước:
+
+```text
+docker exec -it minh-g1-postgres-15432 psql -U postgres -d postgres
+```
+
+Nếu DB_USER không phải postgres, thay user trong lệnh bằng tài khoản quản trị đúng.
+Khi vào psql, nhập:
+
+```text
+\password postgres
+```
+
+Thay tên user nếu cần. Nhập mật khẩu mong muốn hai lần (không hiện ký tự); thoát
+bằng `\q`. Cập nhật DB_PASSWORD hoặc DATABASE_URL để khớp, rồi chạy doctor lại.
+Nếu lệnh vào psql cũng bị chặn, cần tài khoản quản trị hợp lệ của database;
+không tự tắt authentication hoặc xóa volume.
+
+Đổi POSTGRES_PASSWORD trong cấu hình Docker không đổi mật khẩu đã lưu trong
+volume cũ. Đây là lý do restart container có thể không giải quyết lỗi này.
+
+Nếu psql local vào được nhưng backend vẫn lỗi, kiểm tra TCP bằng mật khẩu:
+
+```text
+docker compose -f compose.db.yaml exec db psql -h 127.0.0.1 -U postgres -d g1 -W -c "SELECT current_user, current_database();"
+```
+
+Với container cũ, thay tiền tố `docker compose ... exec db` bằng
+`docker exec -it minh-g1-postgres-15432`. Dùng user/database thực tế nếu đã đổi.
+
+### 10.4. CONFIG_ERROR / Could not parse SQLAlchemy URL
+
+Chạy `uv run --frozen python -m app.doctor --config-only`. Khuyến nghị đặt
+DATABASE_URL rỗng và dùng DB_*. DB_PORT phải là số, CORS_ORIGINS là JSON array.
+Không copy dấu code fence hoặc nhãn dotenv vào file.
+
+Biến môi trường shell ưu tiên hơn `.env`. Doctor chỉ ra **tên** biến override.
+Nếu muốn bỏ DATABASE_URL override của phiên hiện tại:
 
 PowerShell:
 
 ```powershell
-$env:TEST_DATABASE_URL = 'postgresql+asyncpg://postgres:postgres@localhost:5432/g1_test'
-uv run --frozen pytest -q
+Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue
 ```
 
-Không đặt `TEST_DATABASE_URL` thì integration test báo lỗi cấu hình rõ ràng; không
-âm thầm skip và không tự dùng database thật. Unit suite vẫn chạy riêng được.
-
-Migration trên database ứng dụng:
+Bash/zsh:
 
 ```bash
-uv run --frozen alembic upgrade head
-uv run --frozen alembic current
-uv run --frozen alembic check
+unset DATABASE_URL
 ```
 
-Có downgrade nhưng `alembic downgrade base` xóa bốn bảng và dữ liệu; chỉ dùng với
-DB test/dev có thể bỏ. Không đưa lệnh reset vào luồng chạy mặc định.
+Làm tương tự với từng DB_* đang override ngoài ý muốn. Không in/gửi cả môi trường
+hoặc toàn bộ `.env` khi nhờ hỗ trợ.
 
-## 7. Cấu trúc source
+### 10.5. DB_NETWORK_ERROR / DB_TIMEOUT / ConnectionRefusedError
 
-- `app/main.py`: route, error handlers, CORS, tracing, health.
-- `app/auth.py`: token hashing và xác thực session.
-- `app/chat.py`: ownership, khóa PostgreSQL, retry và orchestration.
-- `app/ai.py`: HTTP client, deadline, validate internal AI response.
-- `app/models.py`, `app/db.py`: schema SQLAlchemy và session async.
-- `app/config.py`, `app/schemas.py`, `app/errors.py`: config, validation, lỗi.
-- `migrations/`: Alembic migration bốn bảng, hỗ trợ online/offline.
-- `tests/`: unit và integration cases.
-- `uv.lock`: khóa toàn bộ dependency; dùng `--frozen` khi cài/chạy.
-- `Dockerfile`, `logging.json`, `.env.example`: cấu hình để Hoan ghép hạ tầng.
-- `docs/openapi.json`: OpenAPI xuất từ app hiện tại.
-- `docs/TEST_REPORT.md`: bằng chứng kiểm tra và blocker.
+Kiểm tra database có chạy và port mapping có khớp:
 
-## 8. Các bước còn lại để chốt DoD với nhóm
+```text
+docker compose -f compose.db.yaml ps
+docker compose -f compose.db.yaml port db 5432
+docker compose -f compose.db.yaml logs --tail 50 db
+```
 
-1. Tú và Hoan review các quy ước bổ sung ở mục 3.
-2. Chạy PostgreSQL integration suite và `alembic check` trên máy/CI có PostgreSQL.
-3. Hoan thêm backend vào Compose chung, chạy migration trước khi start backend.
-4. Ghép AI Service thật của Hoan và Web của Tú: login → create → send → reload.
-5. Đổi sang user khác để xác nhận không đọc được conversation cũ; test AI error và
-   timeout mode bằng cấu hình service của Hoan.
+Với server khác, dùng công cụ quản trị tương ứng. Không dùng hostname service
+Docker khi backend chạy trên Windows host; cũng không dùng localhost để gọi
+container khác trong Compose chung.
 
-Không có repo gốc, `.env.example` chung hoặc source Web/AI trong đầu vào nên gói này
-chỉ thêm `backend/`, không chỉnh các phần thuộc Tú/Hoan và không tạo Compose chung.
+### 10.6. DB_NOT_FOUND
+
+Server đã phản hồi nhưng database DB_NAME chưa tồn tại. Tạo database đó bằng tài
+khoản đủ quyền hoặc sửa DB_NAME về tên đã có. Alembic tạo bảng, không tạo database.
+
+### 10.7. API trả 502 / AI_SERVICE_ERROR
+
+Kiểm tra AI_SERVICE_URL, AI Service của nhóm và chế độ mock. Database khỏe không
+đồng nghĩa AI đã chạy. Backend giữ user message; retry cùng client_message_id sau
+khi AI hoạt động lại.
+
+## 11. Tài liệu tham khảo
+
+- [SQLAlchemy: URL.create và mật khẩu](https://docs.sqlalchemy.org/en/20/core/engines.html#creating-urls-programmatically)
+- [Docker Compose: biến môi trường](https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/)
+- [PostgreSQL Docker image](https://hub.docker.com/_/postgres)
+
+Trước khi chốt G1, nhóm cần chạy PostgreSQL integration suite, migration online,
+Compose và Web → Core → AI smoke flow. Các quy ước bổ sung trong API_AND_DESIGN.md
+vẫn cần nhóm review như bản bàn giao ban đầu.

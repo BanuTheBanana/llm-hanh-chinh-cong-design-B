@@ -1,41 +1,38 @@
-# Báo cáo kiểm tra — Backend G1
+# Báo cáo kiểm tra — Backend G1 cập nhật cấu hình
 
-Ngày: 08/09/2026. Đầu vào: hai tài liệu phân công và contract G1 người dùng gửi.
+## Đã chạy
 
-## Đã chạy thành công
-
-| Lệnh (trong backend/) | Kết quả |
+| Kiểm tra | Kết quả |
 |---|---|
-| `uv lock`, `uv sync --frozen` | Resolve/cài dependency thành công; uv.lock đã có hash |
-| `.venv/bin/ruff check .` | All checks passed |
-| `.venv/bin/ruff format --check .` | Source đã được format |
-| `.venv/bin/python -m pytest tests/test_unit.py -q` | 18 passed |
-| `.venv/bin/python -m pytest --collect-only -q` | Thu thập được unit và integration tests |
-| `.venv/bin/alembic upgrade head --sql` | Sinh SQL migration PostgreSQL offline thành công |
-| `.venv/bin/python -m compileall -q app migrations tests` | Thành công |
+| `ruff check .` | Pass |
+| `ruff format --check .` | Pass |
+| `pytest tests/test_unit.py tests/test_config.py -q` | 32 passed |
+| `python -m app.doctor --config-only` | CONFIG_OK, default DB_* port 15432 |
+| `python -m app.doctor` khi không có PostgreSQL | DB_NETWORK_ERROR gọn, không traceback/mật khẩu |
+| `alembic upgrade head --sql` | Sinh SQL PostgreSQL offline thành công |
+| Python compileall | Pass |
 
-Unit suite kiểm tra AI request schema/URL, response success, HTTP/network error,
-timeout transport và deadline tổng, JSON/schema sai, request_id không khớp,
-response trống; giới hạn input và từ chối user_id; error envelope/CORS;
-endpoint và response schema OpenAPI.
+14 config/diagnostic test cases mới kiểm tra: mật khẩu đặc biệt được giữ nguyên
+qua URL object, hỗ trợ DATABASE_URL cũ và độ ưu tiên, URL trống dùng DB_*, từ chối
+URL/driver/port sai, đọc UTF-8 BOM, shell override, phân loại SQLSTATE của lỗi
+xác thực/database không tồn tại và lỗi mạng. 18 unit/contract cases trước đó vẫn pass.
 
-## Chưa xác minh — không được tính là pass
+## Chưa xác minh
 
-18 integration cases cần PostgreSQL thật: session hash/rotation/expiry/logout,
-authentication, ownership đọc/ghi, user/assistant persistence, history sau login lại,
-idempotency, gửi đồng thời, giữ message khi AI error/timeout/malformed response và
-retry không trùng. Mỗi fixture chạy migration thật vào PostgreSQL schema sạch.
+18 PostgreSQL integration cases đã viết nhưng chưa chạy được trong môi trường
+bàn giao vì không có Docker daemon/PostgreSQL server khả dụng. Không thay bằng
+SQLite và không khẳng định migration online đã thành công. Integration fixtures
+chạy migration thật trong schema PostgreSQL riêng khi có TEST_DATABASE_URL.
 
-Môi trường không có Docker/PostgreSQL server. Cài qua apt thất bại vì không hỗ trợ
-chuyển user/group hệ thống. Thử binary PostgreSQL đóng gói riêng cũng không khởi
-động được vì môi trường chỉ có root và không tạo được user chạy PostgreSQL.
-Không thay PostgreSQL bằng SQLite và không sửa PostgreSQL để bỏ kiểm tra hệ thống.
+Chưa chạy Docker image build, Compose runtime, hoặc Web/AI end-to-end của nhóm.
+Doctor đã được kiểm tra với lỗi network thực tế tại môi trường không có server;
+không coi đó là kiểm chứng đường kết nối PostgreSQL thành công.
 
-Chưa chạy online `alembic upgrade head`/`alembic check`, Docker image build hoặc
-integration với Web/AI Service của nhóm. Offline SQL generation không thay thế
-online migration test. Hướng dẫn chạy các gate còn lại nằm trong README.
+README có lệnh chạy từng gate trên máy người dùng. Nội dung báo cáo không khẳng
+định lỗi mật khẩu trên máy người dùng đã được sửa chỉ nhờ tải bản cập nhật.
 
-## Kết luận phạm vi
+## Phạm vi bản cập nhật
 
-Source backend đã được bàn giao, nhưng chưa thể xác nhận toàn bộ Definition of Done
-của Minh/G1 trước khi chạy các gate PostgreSQL và end-to-end bên trên.
+Giữ schema/migration 0001_g1 và public API. Thêm cấu hình DB_* tương thích DSN cũ,
+lệnh doctor, Compose chỉ cho DB local và hướng dẫn theo hai lộ trình database
+hiện có/môi trường mới. Không đổi password hoặc truy cập database của người dùng.

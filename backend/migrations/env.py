@@ -15,17 +15,19 @@ def run(connection):
 
 
 async def online():
-    engine = create_async_engine(get_settings().database_url, poolclass=NullPool)
-    async with engine.connect() as connection:
-        await connection.run_sync(run)
-    await engine.dispose()
+    engine = create_async_engine(get_settings().connection_url, poolclass=NullPool)
+    try:
+        async with engine.connect() as connection:
+            await connection.run_sync(run)
+    finally:
+        await engine.dispose()
 
 
 if context.config.attributes.get("connection") is not None:
     run(context.config.attributes["connection"])
 elif context.is_offline_mode():
     context.configure(
-        url=get_settings().database_url,
+        url=get_settings().connection_url,
         target_metadata=Base.metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
