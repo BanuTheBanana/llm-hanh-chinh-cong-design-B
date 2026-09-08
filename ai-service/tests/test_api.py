@@ -1,10 +1,13 @@
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 from app.config import Settings, get_settings
 from app.dependencies import get_provider
 from app.providers.mock import MockProvider
+from app.schemas import GenerateResponse
 
 
 def request_body() -> dict[str, object]:
@@ -51,6 +54,22 @@ def test_generate_success_matches_frozen_contract(client: TestClient) -> None:
     assert payload["latency_ms"] >= 0
     assert "phản hồi mô phỏng" in payload["text"]
     assert "không phải tư vấn hành chính" in payload["text"]
+
+
+@pytest.mark.parametrize("field", ["text", "provider", "model"])
+def test_generate_response_rejects_whitespace_only_fields(field: str) -> None:
+    payload = {
+        "request_id": str(uuid4()),
+        "text": "valid response",
+        "provider": "mock",
+        "model": "mock-v1",
+        "usage": {"input_tokens": 0, "output_tokens": 0},
+        "latency_ms": 0,
+    }
+    payload[field] = " \t "
+
+    with pytest.raises(ValidationError):
+        GenerateResponse.model_validate(payload)
 
 
 def test_generate_error_mode_is_predictable(client: TestClient) -> None:

@@ -38,6 +38,29 @@ def test_empty_url_uses_fields(raw):
     assert Settings(_env_file=None, database_url=raw).connection_url.port == 15432
 
 
+def test_empty_url_uses_compose_database_fields(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "")
+    monkeypatch.setenv("DB_HOST", "postgres")
+    monkeypatch.setenv("DB_PORT", "5432")
+    monkeypatch.setenv("DB_NAME", "custom_db")
+    monkeypatch.setenv("DB_USER", "custom_user")
+    monkeypatch.setenv("DB_PASSWORD", "custom_password")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.connection_url.host == "postgres"
+    assert settings.connection_url.port == 5432
+    assert settings.connection_url.database == "custom_db"
+    assert settings.connection_url.username == "custom_user"
+    assert settings.connection_url.password == "custom_password"
+
+
+@pytest.mark.parametrize("value", [0, 4097])
+def test_llm_max_output_tokens_is_bounded(value):
+    with pytest.raises(ValueError):
+        Settings(_env_file=None, llm_max_output_tokens=value)
+
+
 @pytest.mark.parametrize(
     "raw",
     [

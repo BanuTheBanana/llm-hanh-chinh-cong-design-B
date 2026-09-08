@@ -41,6 +41,13 @@ class GenerateResponse(BaseModel):
     usage: Usage
     latency_ms: int = Field(ge=0)
 
+    @field_validator("text", "provider", "model")
+    @classmethod
+    def reject_blank_output_fields(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("response text, provider, and model must not be blank")
+        return value
+
 
 class ErrorDetail(BaseModel):
     code: str

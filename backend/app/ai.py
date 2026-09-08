@@ -24,7 +24,7 @@ class AIClient:
                     json={
                         "request_id": str(request_id),
                         "messages": messages,
-                        "max_output_tokens": 300,
+                        "max_output_tokens": settings.llm_max_output_tokens,
                     },
                     timeout=settings.ai_request_timeout_seconds,
                 )

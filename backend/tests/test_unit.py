@@ -32,6 +32,7 @@ def reply(request_id, **changes):
 def test_settings_match_root_environment(monkeypatch):
     monkeypatch.setenv("AI_SERVICE_URL", "http://ai-service.example:9001/")
     monkeypatch.setenv("AI_REQUEST_TIMEOUT_SECONDS", "7.5")
+    monkeypatch.setenv("LLM_MAX_OUTPUT_TOKENS", "512")
     monkeypatch.setenv("SESSION_COOKIE_SECURE", "true")
     monkeypatch.setenv("WEB_ORIGIN", "https://web.example")
 
@@ -39,6 +40,7 @@ def test_settings_match_root_environment(monkeypatch):
 
     assert settings.ai_service_url == "http://ai-service.example:9001/"
     assert settings.ai_request_timeout_seconds == 7.5
+    assert settings.llm_max_output_tokens == 512
     assert settings.session_cookie_secure is True
     assert settings.web_origin == "https://web.example"
 
@@ -82,13 +84,14 @@ async def test_unhandled_error_log_is_correlated_without_exception_data(caplog):
 async def test_ai_contract_success(monkeypatch):
     request_id = uuid4()
     monkeypatch.setattr(get_settings(), "ai_service_url", "http://ai-service:8001/")
+    monkeypatch.setattr(get_settings(), "llm_max_output_tokens", 512)
 
     def handler(request):
         assert str(request.url) == "http://ai-service:8001/internal/v1/generate"
         assert json.loads(request.content) == {
             "request_id": str(request_id),
             "messages": [{"role": "user", "content": "hello"}],
-            "max_output_tokens": 300,
+            "max_output_tokens": 512,
         }
         return httpx.Response(200, json=reply(request_id))
 

@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     # Root Compose provides the origin; AIClient owns the internal route path.
     ai_service_url: str = "http://localhost:8001"
     ai_request_timeout_seconds: float = Field(default=10, gt=0, le=120)
+    llm_max_output_tokens: int = Field(default=300, ge=1, le=4096)
     session_cookie_name: str = "g1_session"
     session_cookie_secure: bool = False
     session_ttl_seconds: int = Field(default=86400, gt=0)
