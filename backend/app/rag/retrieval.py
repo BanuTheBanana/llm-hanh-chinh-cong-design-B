@@ -1,0 +1,102 @@
+import math
+import re
+import unicodedata
+from collections import Counter
+from dataclasses import dataclass
+from uuid import UUID
+
+from app.rag.corpus import Corpus
+from app.rag.schemas import Evidence, EvidenceBundle, RetrievalInput
+
+
+def normalize(text: str) -> str:
+    text = unicodedata.normalize("NFD", text.lower().replace("đ", "d"))
+    return " ".join(re.findall(r"\w+", "".join(c for c in text if not unicodedata.combining(c))))
+
+
+@dataclass
+class RetrievalResult:
+    bundle: EvidenceBundle
+    needs_clarification: bool = False
+
+
+def retrieve(corpus: Corpus, query: RetrievalInput, request_id: UUID) -> RetrievalResult:
+    q = normalize(query.query)
+    candidates = []
+    for fragment in corpus.fragments.values():
+        proc, source = corpus.procedures[fragment.procedure_id], corpus.sources[fragment.source_id]
+        f = query.filters
+        if f.procedure_id and f.procedure_id != proc.procedure_id:
+            continue
+        if f.jurisdiction and f.jurisdiction != source.jurisdiction:
+            continue
+        if f.as_of and (
+            source.status != "CONFIRMED_FROM_SOURCE"
+            or not source.effective_from
+            or not source.effective_to
+            or not source.effective_from <= f.as_of <= source.effective_to
+        ):
+            continue
+        candidates.append(fragment)
+    exact = set()
+    for fragment in candidates:
+        proc = corpus.procedures[fragment.procedure_id]
+        names = [proc.title, *proc.aliases] + [
+            corpus.sources[s].procedure_code for s in proc.source_ids
+        ]
+        if any(name and normalize(name) == q for name in names):
+            exact.add(proc.procedure_id)
+    empty = EvidenceBundle(
+        request_id=request_id, corpus_version=corpus.version, query=query.query, evidence=[]
+    )
+    if len(exact) > 1:
+        return RetrievalResult(empty, True)
+    if exact:
+        candidates = [f for f in candidates if f.procedure_id in exact]
+    if not candidates:
+        return RetrievalResult(empty)
+    docs = [Counter(normalize(f.text).split()) for f in candidates]
+    avg = sum(sum(d.values()) for d in docs) / len(docs) or 1
+    terms = sorted(set(q.split()))
+    frequencies = {t: sum(t in d for d in docs) for t in terms}
+    scored = []
+    for fragment, doc in zip(candidates, docs):
+        score = 0.0
+        for term in terms:
+            tf = doc[term]
+            if tf:
+                idf = math.log(
+                    1 + (len(docs) - frequencies[term] + 0.5) / (frequencies[term] + 0.5)
+                )
+                score += idf * tf * 2.5 / (tf + 1.5 * (0.25 + 0.75 * sum(doc.values()) / avg))
+        if score > 0 or exact:
+            scored.append((score + (1 if exact else 0), fragment))
+    scored.sort(key=lambda item: (-item[0], item[1].fragment_id))
+    # Abstain instead of mixing jurisdictions when lexical results are ambiguous.
+    scopes = {corpus.sources[f.source_id].jurisdiction for _, f in scored[: query.top_k]}
+    if len(scopes) > 1 and not query.filters.jurisdiction and not query.filters.procedure_id:
+        return RetrievalResult(empty, True)
+    evidence = []
+    for score, fragment in scored[: query.top_k]:
+        source, proc = corpus.sources[fragment.source_id], corpus.procedures[fragment.procedure_id]
+        evidence.append(
+            Evidence(
+                fragment_id=fragment.fragment_id,
+                source_id=source.source_id,
+                title=source.title,
+                url=source.source_url,
+                text=fragment.text,
+                score=round(score, 10),
+                metadata={
+                    "procedure_id": proc.procedure_id,
+                    "jurisdiction": source.jurisdiction,
+                    "status": source.status,
+                    "effective_from": source.effective_from,
+                    "effective_to": source.effective_to,
+                    "retrieved_at": source.retrieved_at,
+                    "procedure_version": proc.version,
+                    "content_sha256": fragment.content_sha256,
+                },
+            )
+        )
+    return RetrievalResult(empty.model_copy(update={"evidence": evidence}))

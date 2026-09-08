@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     db_name: str = "g1"
     db_user: str = "postgres"
     db_password: SecretStr = SecretStr("postgres")
+    rag_enabled: bool = False
+    rag_corpus_version: str = ""
+    rag_top_k: int = Field(default=5, ge=1, le=20)
+    rag_allow_fixtures: bool = False
     # Root Compose provides the origin; AIClient owns the internal route path.
     ai_service_url: str = "http://localhost:8001"
     ai_request_timeout_seconds: float = Field(default=10, gt=0, le=120)

@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
 from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, String, Text, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -56,6 +57,8 @@ class Message(Base):
     conversation_id: Mapped[UUID] = mapped_column(
         ForeignKey("conversations.id", ondelete="CASCADE")
     )
+    grounding: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    retrieval_filters: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     client_message_id: Mapped[UUID | None] = mapped_column(nullable=True)
     role: Mapped[str] = mapped_column(String(16))
     content: Mapped[str] = mapped_column(Text)

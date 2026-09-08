@@ -1,0 +1,169 @@
+{
+  "corpus_version": "fixture-v1",
+  "corpus_sha256": "9eb53ed3f246ebba877bb4ebd0b6a5d02bbe55655afb1a6ebdc70f747f77e0cb",
+  "synthetic_fixture": true,
+  "split": "DEV",
+  "top_k": 5,
+  "metric_scope": "retrieval only; not answer quality or legal correctness",
+  "positive_gold_queries": 7,
+  "query_count": 10,
+  "recall_at_k": 1.0,
+  "mrr": 1.0,
+  "latency_ms": {
+    "p50": 0.07029600010355352,
+    "p95": 0.4242309998971905
+  },
+  "failed_question_ids": [],
+  "results": [
+    {
+      "question_id": "q01",
+      "retrieved_ids": [
+        "frag_documents",
+        "frag_fees",
+        "frag_time"
+      ],
+      "gold_fragment_ids": [
+        "frag_documents",
+        "frag_fees",
+        "frag_time"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.4242
+    },
+    {
+      "question_id": "q02",
+      "retrieved_ids": [
+        "frag_documents",
+        "frag_fees",
+        "frag_time"
+      ],
+      "gold_fragment_ids": [
+        "frag_documents",
+        "frag_fees",
+        "frag_time"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.11
+    },
+    {
+      "question_id": "q03",
+      "retrieved_ids": [
+        "frag_documents",
+        "frag_fees",
+        "frag_time"
+      ],
+      "gold_fragment_ids": [
+        "frag_documents",
+        "frag_fees",
+        "frag_time"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.0794
+    },
+    {
+      "question_id": "q04",
+      "retrieved_ids": [
+        "frag_documents"
+      ],
+      "gold_fragment_ids": [
+        "frag_documents"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.0703
+    },
+    {
+      "question_id": "q05",
+      "retrieved_ids": [
+        "frag_fees"
+      ],
+      "gold_fragment_ids": [
+        "frag_fees"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.062
+    },
+    {
+      "question_id": "q06",
+      "retrieved_ids": [
+        "frag_time"
+      ],
+      "gold_fragment_ids": [
+        "frag_time"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.0776
+    },
+    {
+      "question_id": "q07",
+      "retrieved_ids": [],
+      "gold_fragment_ids": [],
+      "recall_at_k": null,
+      "reciprocal_rank": null,
+      "retrieval_status": "INSUFFICIENT_DATA",
+      "expected_status": "INSUFFICIENT_DATA",
+      "pass": true,
+      "latency_ms": 0.0568
+    },
+    {
+      "question_id": "q08",
+      "retrieved_ids": [],
+      "gold_fragment_ids": [],
+      "recall_at_k": null,
+      "reciprocal_rank": null,
+      "retrieval_status": "INSUFFICIENT_DATA",
+      "expected_status": "INSUFFICIENT_DATA",
+      "pass": true,
+      "latency_ms": 0.0088
+    },
+    {
+      "question_id": "q09",
+      "retrieved_ids": [],
+      "gold_fragment_ids": [],
+      "recall_at_k": null,
+      "reciprocal_rank": null,
+      "retrieval_status": "INSUFFICIENT_DATA",
+      "expected_status": "INSUFFICIENT_DATA",
+      "pass": true,
+      "latency_ms": 0.0086
+    },
+    {
+      "question_id": "q10",
+      "retrieved_ids": [
+        "frag_documents"
+      ],
+      "gold_fragment_ids": [
+        "frag_documents"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.1218
+    }
+  ]
+}

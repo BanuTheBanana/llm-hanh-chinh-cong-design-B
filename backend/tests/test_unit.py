@@ -195,7 +195,15 @@ def test_openapi_contract():
     }
     assert {path: set(methods) for path, methods in schema["paths"].items()} == expected
     message = schema["components"]["schemas"]["MessageOutput"]["properties"]
-    assert set(message) == {"id", "conversation_id", "role", "content", "status", "created_at"}
+    assert set(message) == {
+        "id",
+        "conversation_id",
+        "role",
+        "content",
+        "status",
+        "created_at",
+        "grounding",
+    }
     assert set(schema["components"]["schemas"]["MessagePair"]["properties"]) == {
         "user_message",
         "assistant_message",

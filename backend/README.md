@@ -1,3 +1,8 @@
+> **G2 Retrieval/RAG của Minh đã được thêm.** Bắt đầu ở
+> [docs/g2/README.md](docs/g2/README.md) để migrate lên `0002_g2_rag`, ingest,
+> chạy evaluation và ghép grounded AI. G1 mặc định vẫn bật; RAG là opt-in.
+> Các số liệu/trạng thái G1 bên dưới là baseline cũ, xem báo cáo G2 riêng.
+
 # Core Backend G1
 
 FastAPI + PostgreSQL + SQLAlchemy async + Alembic. Backend là source of truth cho

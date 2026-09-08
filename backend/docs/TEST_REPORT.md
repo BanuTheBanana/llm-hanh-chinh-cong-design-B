@@ -1,3 +1,5 @@
+> Báo cáo G2 mới: [g2/TEST_REPORT.md](g2/TEST_REPORT.md). Nội dung G1 bên dưới là lịch sử baseline.
+
 # Báo cáo kiểm tra Core Backend G1
 
 > Cập nhật: 08/09/2026<br>

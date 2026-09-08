@@ -116,6 +116,16 @@
               }
             }
           },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOutput"
+                }
+              }
+            }
+          },
           "504": {
             "description": "Gateway Timeout",
             "content": {
@@ -199,6 +209,16 @@
           },
           "502": {
             "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOutput"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "application/json": {
                 "schema": {
@@ -297,6 +317,16 @@
           },
           "502": {
             "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOutput"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "application/json": {
                 "schema": {
@@ -407,6 +437,16 @@
               }
             }
           },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOutput"
+                }
+              }
+            }
+          },
           "504": {
             "description": "Gateway Timeout",
             "content": {
@@ -505,6 +545,16 @@
           },
           "502": {
             "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOutput"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "application/json": {
                 "schema": {
@@ -627,6 +677,16 @@
             },
             "description": "Bad Gateway"
           },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOutput"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
           "504": {
             "content": {
               "application/json": {
@@ -745,6 +805,16 @@
             },
             "description": "Bad Gateway"
           },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOutput"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
           "504": {
             "content": {
               "application/json": {
@@ -761,6 +831,47 @@
   },
   "components": {
     "schemas": {
+      "Citation": {
+        "properties": {
+          "fragment_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+            "title": "Fragment Id"
+          },
+          "source_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+            "title": "Source Id"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Url"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fragment_id",
+          "source_id",
+          "title",
+          "url",
+          "metadata"
+        ],
+        "title": "Citation"
+      },
       "ConversationInput": {
         "properties": {
           "title": {
@@ -842,6 +953,89 @@
         ],
         "title": "ErrorOutput"
       },
+      "Filters": {
+        "properties": {
+          "procedure_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Procedure Id"
+          },
+          "jurisdiction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jurisdiction"
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Filters"
+      },
+      "Grounding": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ANSWER",
+              "NEED_CLARIFICATION",
+              "INSUFFICIENT_DATA"
+            ],
+            "title": "Status"
+          },
+          "corpus_version": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+            "title": "Corpus Version"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/Citation"
+            },
+            "type": "array",
+            "title": "Sources"
+          },
+          "missing_information": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing Information"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "corpus_version",
+          "sources",
+          "missing_information"
+        ],
+        "title": "Grounding"
+      },
       "LoginInput": {
         "properties": {
           "display_name": {
@@ -860,6 +1054,9 @@
       },
       "MessageInput": {
         "properties": {
+          "retrieval_filters": {
+            "$ref": "#/components/schemas/Filters"
+          },
           "client_message_id": {
             "type": "string",
             "format": "uuid",
@@ -882,6 +1079,16 @@
       },
       "MessageOutput": {
         "properties": {
+          "grounding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grounding"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "id": {
             "type": "string",
             "format": "uuid",

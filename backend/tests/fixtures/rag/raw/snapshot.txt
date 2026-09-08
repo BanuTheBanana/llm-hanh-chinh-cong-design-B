@@ -1,0 +1,3 @@
+Thủ tục demo sao xanh: hồ sơ gồm phiếu màu xanh và thẻ thử nghiệm.
+Thủ tục demo sao xanh: lệ phí là 7 đơn vị giả lập.
+Thủ tục demo sao xanh: thời gian xử lý là 3 ngày mô phỏng.
