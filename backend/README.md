@@ -1,249 +1,152 @@
-# Backend Giai đoạn 1 — Minh
+# Core Backend G1
 
-Gói `backend/` để ghép vào monorepo LLM. FastAPI + Pydantic + SQLAlchemy 2 async +
-asyncpg + Alembic; PostgreSQL lưu users, sessions, conversations, messages.
+FastAPI + PostgreSQL + SQLAlchemy async + Alembic. Backend là source of truth cho
+demo user, session, conversation và message; Web không gửi `user_id`, còn Backend
+chỉ gọi AI Service qua internal API.
 
-**Trạng thái:** source Backend đã được đưa vào nhánh tích hợp cùng Web và AI Service.
-Các kiểm tra PostgreSQL, migration online, Docker và end-to-end vẫn phải pass trước
-khi đánh dấu Definition of Done G1 hoàn thành; xem `docs/TEST_REPORT.md`.
+Contract duy nhất của monorepo: [`../docs/contracts-g1.md`](../docs/contracts-g1.md).
+G1 chỉ dùng dữ liệu giả `D0_SYSTEM_SMOKE` và Mock AI, không phải hệ thống
+xác thực hay tư vấn hành chính production.
 
-## 1. Chạy nhanh
+## Chạy cả hệ thống – cách khuyến nghị
 
-Yêu cầu: Python 3.12, uv, PostgreSQL (ví dụ PostgreSQL 16), AI Service của Hoan.
-Chạy các lệnh Python bên dưới từ thư mục `backend/`.
+Từ repository root:
 
-```bash
+```powershell
+Copy-Item .env.example .env
+docker compose --profile full up --build --detach --wait
+python scripts/smoke-e2e.py
+```
+
+Compose chờ PostgreSQL và AI Service healthy, chạy `alembic upgrade head`, sau
+đó mới khởi động Backend. Không cần tự migrate thêm trong luồng này.
+
+## Chạy riêng Backend khi phát triển
+
+Yêu cầu Python 3.12, `uv`, PostgreSQL và AI Service:
+
+```powershell
+cd backend
 uv sync --frozen
-cp ../.env.example .env
 ```
 
-PowerShell: dùng `Copy-Item ..\.env.example .env` thay lệnh `cp`.
-File root `.env.example` dùng hostname nội bộ của Compose. Nếu chạy Backend trực
-tiếp trên máy host, sửa tối thiểu hai giá trị trong `backend/.env` thành:
+Backend đọc `backend/.env` theo UTF-8/UTF-8 BOM. Environment của process có
+ưu tiên cao hơn file. Có hai cách cấu hình database:
 
-```env
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/g1
-AI_SERVICE_URL=http://localhost:8001
+```dotenv
+# Cách 1: DSN đầy đủ; có giá trị thì ưu tiên hơn DB_*
+DATABASE_URL=postgresql+asyncpg://app_user:change-me-local-only@127.0.0.1:5432/hanh_chinh_mvp
+
+# Cách 2: hữu ích khi password có ký tự @, :, /, # hoặc %
+# DATABASE_URL=
+# DB_HOST=127.0.0.1
+# DB_PORT=5432
+# DB_NAME=hanh_chinh_mvp
+# DB_USER=app_user
+# DB_PASSWORD='change-me-local-only'
+
+AI_SERVICE_URL=http://127.0.0.1:8001
+AI_REQUEST_TIMEOUT_SECONDS=3
+WEB_ORIGIN=http://localhost:3000
+SESSION_COOKIE_SECURE=false
+SESSION_TTL_SECONDS=86400
 ```
 
-Nếu chưa có PostgreSQL local, dùng Docker trên máy của anh:
+Không commit `backend/.env`. Có thể dựng riêng hai dependency từ repository root:
 
-```bash
-docker run --name minh-g1-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=g1 -p 127.0.0.1:5432:5432 -d postgres:16
-docker exec minh-g1-postgres pg_isready -U postgres -d g1
+```powershell
+docker compose up --detach --wait postgres ai-service
 ```
 
-Đợi `accepting connections`, rồi chạy:
+Kiểm tra cấu hình mà không in password/DSN:
 
-```bash
+```powershell
+uv run --frozen python -m app.doctor --config-only
+uv run --frozen python -m app.doctor
+```
+
+Lệnh thứ hai thực sự kết nối database và báo mã chẩn đoán như
+`DB_NETWORK_ERROR`, `DB_AUTH_FAILED`, `DB_NOT_FOUND` hoặc `DB_TIMEOUT` mà không
+in exception có thể chứa secret.
+
+Migrate và chạy API:
+
+```powershell
 uv run --frozen alembic upgrade head
-uv run --frozen uvicorn app.main:app --host 0.0.0.0 --port 8000 --no-access-log --log-config logging.json
+uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log --log-config logging.json
 ```
 
-- Swagger: http://localhost:8000/docs
-- OpenAPI: http://localhost:8000/openapi.json
-- Health kiểm tra database: http://localhost:8000/health
-- AI Service phải cung cấp `POST /internal/v1/generate` theo file contract đính kèm.
-- Backend vẫn khởi động khi AI chưa chạy; gửi message lúc đó trả lỗi 502 chuẩn và giữ user message.
-- Không tự chạy migration lúc server khởi động: chạy migration một lần trước khi scale workers.
+- Health: `http://localhost:8000/health`
+- Swagger: `http://localhost:8000/docs`
+- OpenAPI: `http://localhost:8000/openapi.json`
 
-## 2. Environment
+## Environment Backend
 
-| Biến | Giá trị mẫu | Ý nghĩa |
+| Biến | Mặc định local | Ý nghĩa |
 |---|---|---|
-| `DATABASE_URL` | `postgresql+asyncpg://postgres:postgres@localhost:5432/g1` | DSN PostgreSQL async |
-| `AI_SERVICE_URL` | `http://localhost:8001` | Origin của AI Service; Backend nối `/internal/v1/generate` |
-| `AI_REQUEST_TIMEOUT_SECONDS` | `10` | Deadline tổng và timeout HTTP |
-| `SESSION_COOKIE_NAME` | `g1_session` | Tên cookie opaque |
-| `SESSION_COOKIE_SECURE` | `false` | Đặt `true` khi dùng HTTPS |
-| `SESSION_TTL_SECONDS` | `86400` | Session hết hạn sau 24 giờ |
-| `WEB_ORIGIN` | `http://localhost:3000` | Origin duy nhất được phép gọi Core API ở G1 |
+| `DATABASE_URL` | rỗng | DSN `postgresql+asyncpg`; nếu có sẽ ưu tiên hơn `DB_*` |
+| `DB_HOST` | `127.0.0.1` | Host PostgreSQL khi không dùng DSN |
+| `DB_PORT` | `15432` | Port PostgreSQL khi không dùng DSN |
+| `DB_NAME` | `g1` | Database name |
+| `DB_USER` | `postgres` | Database user |
+| `DB_PASSWORD` | `postgres` | Password local demo; không dùng cho production |
+| `AI_SERVICE_URL` | `http://localhost:8001` | Origin; Backend tự nối `/internal/v1/generate` |
+| `AI_REQUEST_TIMEOUT_SECONDS` | `10` | Deadline tổng khi gọi AI |
+| `SESSION_COOKIE_NAME` | `g1_session` | Tên opaque cookie |
+| `SESSION_COOKIE_SECURE` | `false` | Phải `true` khi chạy HTTPS |
+| `SESSION_TTL_SECONDS` | `86400` | Tuổi thọ session |
+| `WEB_ORIGIN` | `http://localhost:3000` | Browser origin được phép |
 
-`.env` chỉ dùng local, không commit. Giá trị trong `.env.example` là thông tin demo.
-Trong Compose của Hoan, dùng `postgres` làm database hostname và đặt
-`AI_SERVICE_URL=http://ai-service:8001`. Không dùng `localhost` để gọi
-container khác. Docker build context là `./backend`; Dockerfile được cung cấp.
-Hoan có thể đặt healthcheck bằng Python urllib gọi `http://localhost:8000/health`.
+Trong Docker Compose chung, root config ghi đè database host thành `postgres`
+và AI host thành `ai-service`; không dùng `localhost` để gọi container khác.
 
-Backend cần kết nối PostgreSQL trực tiếp hoặc pool ở **session mode**. Không dùng
-PgBouncer transaction pooling với advisory lock ở G1.
+## Hành vi quan trọng
 
-## 3. Điểm chưa được quy định trong contract — cần Tú/Hoan review
+1. Session token được tạo ngẫu nhiên; database chỉ lưu SHA-256 hash.
+2. Mọi conversation/message query đều kiểm tra ownership.
+3. PostgreSQL advisory lock bảo đảm mỗi conversation chỉ có một generation
+   đang chạy, kể cả khi có nhiều Backend worker.
+4. User message `pending` được commit trước khi gọi AI; không giữ database
+   transaction mở trong lúc chờ network.
+5. AI thành công thì lưu user + assistant `completed`; lỗi/timeout thì giữ
+   user message `failed`, không tạo assistant giả.
+6. `client_message_id` là idempotency key trong một conversation. Retry cùng
+   key/nội dung không tạo thêm user message.
+7. Context gửi AI giữ tối đa 100 message gần nhất theo đúng thứ tự.
+8. Log chỉ ghi `request_id`, route template, method, status, latency và loại lỗi;
+   không ghi body, cookie, token, DSN hay exception text.
 
-Các endpoint/schema đã có được giữ nguyên. Contract duy nhất của cả monorepo nằm
-tại [`../docs/contracts-g1.md`](../docs/contracts-g1.md); không giữ bản sao trong
-Backend để tránh hai tài liệu lệch nhau.
+Login G1 chỉ nhận `display_name`, do đó không xác minh danh tính người thật.
+Nó chỉ phù hợp smoke/demo bằng D0, tuyệt đối không nhập PII thật.
 
-| Điểm bổ sung | Quy ước hiện tại |
-|---|---|
-| Login / me response | `200 {"id":"uuid","display_name":"Minh"}` |
-| Logout | `204`, body rỗng, lặp lại vẫn được; hủy session và xóa cookie |
-| Tên cookie | `g1_session`, Path `/`, HttpOnly, SameSite=Lax, TTL 24 giờ |
-| Demo identity | Trim display_name; phân biệt hoa/thường; cùng tên vào cùng demo user |
-| POST conversation body | `{}` hoặc `{"title":"..."}`; response 201 theo schema conversation |
-| GET conversation list | Array trực tiếp, mới cập nhật trước; chưa phân trang G1 |
-| GET message list | Array trực tiếp, cũ trước; bao gồm pending/failed |
-| POST message thành công | 200 theo cặp user_message/assistant_message đã khóa |
-| Không có quyền conversation | 404 giống conversation không tồn tại |
-| Giới hạn | display_name 1–100; title 1–200; content 1–10.000 ký tự sau trim |
-| Field dư / UUID sai / rỗng / quá dài | 422, không lưu message |
-| Retry thành công trước đó | Trả đúng cặp đã lưu, không gọi AI lại |
-| Cùng key, nội dung khác | 409 IDEMPOTENCY_CONFLICT |
-| Đang có generation trong conversation | 409 MESSAGE_IN_PROGRESS; retry cùng key khi request trước kết thúc |
-| Retry failed/pending mới nhất | Gọi AI lại với cùng user message; request_id của lần thử mới |
-| Retry failed/pending cũ sau một turn mới | 409 RETRY_OUT_OF_ORDER; gửi nội dung bằng key mới |
-| `/health` | 200 `{"status":"ok"}` nếu DB kết nối được; không phụ thuộc AI |
-| Request tracing | Backend tạo UUID mỗi HTTP request; trả `X-Request-ID` |
+## Test
 
-Login demo bằng tên **không xác minh danh tính người thật**. Người biết tên demo có
-thể đăng nhập cùng tài khoản đó. Chỉ dùng dữ liệu giả D0_SYSTEM_SMOKE như tài liệu
-phân công; không coi đây là login production. Isolation ở đây là quyền đọc/ghi dựa
-trên session của demo user đã đăng nhập.
+Unit/config test không cần database:
 
-## 4. Public API để Tú ghép Web
-
-Tất cả request cần cookie phải dùng `credentials: "include"`.
-
-```javascript
-const base = import.meta.env.VITE_API_BASE_URL; // http://localhost:8000/api/v1
-await fetch(`${base}/auth/login`, {
-  method: "POST", credentials: "include",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ display_name: "Minh" }),
-});
-const created = await fetch(`${base}/conversations`, {
-  method: "POST", credentials: "include",
-  headers: { "Content-Type": "application/json" }, body: JSON.stringify({}),
-});
-const conversation = await created.json();
-const payload = { client_message_id: crypto.randomUUID(), content: "D0_SYSTEM_SMOKE" };
-const sent = await fetch(`${base}/conversations/${conversation.id}/messages`, {
-  method: "POST", credentials: "include",
-  headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
-});
-// Kiểm tra sent.ok trước khi dùng response như một cặp message.
-// Nếu lỗi mạng/502/504: giữ payload và dùng lại chính client_message_id khi retry.
-// Nếu 409 MESSAGE_IN_PROGRESS: đợi request hiện tại xong rồi retry.
-```
-
-| Method | Path (sau `/api/v1`) |
-|---|---|
-| POST | `/auth/login` |
-| POST | `/auth/logout` |
-| GET | `/auth/me` |
-| GET, POST | `/conversations` |
-| GET, POST | `/conversations/{conversation_id}/messages` |
-
-Mọi lỗi có dạng:
-
-```json
-{"error":{"code":"AI_SERVICE_TIMEOUT","message":"AI đang phản hồi chậm. Vui lòng thử lại.","request_id":"uuid"}}
-```
-
-| HTTP | Code | Xử lý |
-|---|---|---|
-| 401 | UNAUTHORIZED | Đăng nhập lại |
-| 403 | FORBIDDEN_ORIGIN | Kiểm tra origin của Web và CORS config |
-| 404 | NOT_FOUND | Conversation không tồn tại hoặc không thuộc user |
-| 409 | MESSAGE_IN_PROGRESS | Đợi rồi retry |
-| 409 | IDEMPOTENCY_CONFLICT | Không tái dùng key cho nội dung khác |
-| 409 | RETRY_OUT_OF_ORDER | Gửi thành turn mới với key mới |
-| 422 | VALIDATION_ERROR | Sửa dữ liệu đầu vào |
-| 502 | AI_SERVICE_ERROR | Lỗi kết nối/HTTP/schema từ AI; giữ nội dung và retry |
-| 504 | AI_SERVICE_TIMEOUT | AI quá deadline; giữ nội dung và retry |
-| 503 | DATABASE_UNAVAILABLE | Healthcheck DB không đạt |
-| 500 | INTERNAL_ERROR | Lỗi hệ thống; dùng request_id để tra log |
-
-## 5. Persistence và idempotency
-
-1. Xác thực session qua SHA-256 hash của token ngẫu nhiên 32 bytes.
-2. Kiểm tra ownership trước khi truy cập lịch sử hoặc lấy khóa.
-3. Lấy PostgreSQL advisory lock cho conversation, áp dụng xuyên nhiều workers.
-4. Lấy lại message theo unique `(conversation_id, client_message_id)` hoặc tạo mới.
-5. Commit user message `pending` trước khi gọi AI. Không giữ transaction DB mở khi chờ AI.
-6. AI trả đúng schema và request_id: commit user `completed` cùng assistant `completed`.
-7. AI lỗi/timeout: commit user `failed`, không tạo assistant giả.
-8. Luôn nhả khóa; nếu nhả khóa lỗi thì hủy connection, không đưa khóa còn giữ về pool.
-
-Assistant được liên kết với user turn bằng `(conversation_id, request_id)`;
-unique `(conversation_id, request_id, role)` là lớp bảo vệ thứ hai. Không cần thêm
-bảng ngoài bốn bảng G1. Context gửi AI gồm tối đa 100 message gần nhất: các message
-completed và user message đang xử lý; bỏ các failed/pending cũ. Nếu worker chết, pending
-vẫn còn và có thể retry turn mới nhất. Không bảo đảm AI chỉ được gọi đúng một lần
-khi crash xảy ra sau AI response nhưng trước DB commit; chỉ bảo đảm không nhân đôi
-message đã lưu theo key. G1 chưa có side effect ngoài Mock AI.
-
-Log có request_id, route template, method, HTTP status, latency_ms. Không log
-request body, query string, cookie/token, DSN hoặc exception text. CORS có
-credentials và kiểm tra Origin cho các request thay đổi dữ liệu. Response dùng
-`Cache-Control: no-store`.
-
-## 6. Chạy tests
-
-Unit/contract checks, không cần PostgreSQL hoặc AI Service:
-
-```bash
-uv run --frozen pytest tests/test_unit.py -q
+```powershell
+uv run --frozen python -m pytest tests/test_unit.py tests/test_config.py -q
 uv run --frozen ruff check .
 uv run --frozen ruff format --check .
 ```
 
-Integration tests dùng PostgreSQL thật, AI HTTP response được mock bằng HTTPX
-transport. Dùng database test riêng; test tự tạo schema `g1_test_<uuid>`, chạy
-Alembic vào schema trống, rồi xóa chính schema đó sau mỗi test. Không truncate
-bảng ứng dụng. Database user test cần quyền CREATE SCHEMA.
-
-```bash
-docker exec minh-g1-postgres createdb -U postgres g1_test
-```
-
-Bash:
-
-```bash
-export TEST_DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/g1_test
-uv run --frozen pytest -q
-```
-
-PowerShell:
+Toàn bộ suite cần PostgreSQL test riêng:
 
 ```powershell
-$env:TEST_DATABASE_URL = 'postgresql+asyncpg://postgres:postgres@localhost:5432/g1_test'
-uv run --frozen pytest -q
+$env:TEST_DATABASE_URL='postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/g1_test'
+uv run --frozen python -m pytest
 ```
 
-Không đặt `TEST_DATABASE_URL` thì integration test báo lỗi cấu hình rõ ràng; không
-âm thầm skip và không tự dùng database thật. Unit suite vẫn chạy riêng được.
+Fixture tạo schema ngẫu nhiên, chạy migration thật và xóa schema test khi xong;
+không truncate hay reset database phát triển. CI là gate chính thức cho full suite.
 
-Migration trên database ứng dụng:
+## Cấu trúc
 
-```bash
-uv run --frozen alembic upgrade head
-uv run --frozen alembic current
-uv run --frozen alembic check
-```
-
-Có downgrade nhưng `alembic downgrade base` xóa bốn bảng và dữ liệu; chỉ dùng với
-DB test/dev có thể bỏ. Không đưa lệnh reset vào luồng chạy mặc định.
-
-## 7. Cấu trúc source
-
-- `app/main.py`: route, error handlers, CORS, tracing, health.
-- `app/auth.py`: token hashing và xác thực session.
-- `app/chat.py`: ownership, khóa PostgreSQL, retry và orchestration.
-- `app/ai.py`: HTTP client, deadline, validate internal AI response.
-- `app/models.py`, `app/db.py`: schema SQLAlchemy và session async.
-- `app/config.py`, `app/schemas.py`, `app/errors.py`: config, validation, lỗi.
-- `migrations/`: Alembic migration bốn bảng, hỗ trợ online/offline.
-- `tests/`: unit và integration cases.
-- `uv.lock`: khóa toàn bộ dependency; dùng `--frozen` khi cài/chạy.
-- `Dockerfile`, `.dockerignore`, `logging.json`: cấu hình để ghép hạ tầng an toàn.
-- `docs/openapi.json`: OpenAPI xuất từ app hiện tại.
-- `docs/TEST_REPORT.md`: bằng chứng kiểm tra và blocker.
-
-## 8. Các bước còn lại để chốt DoD với nhóm
-
-1. Chạy PostgreSQL integration suite và `alembic check` trên máy/CI có PostgreSQL.
-2. Xác nhận Compose chạy migration trước khi Backend bắt đầu nhận traffic.
-3. Ghép AI Service thật và Web: login → create → send → reload.
-4. Đổi sang user khác để xác nhận không đọc được conversation cũ; test AI error và
-   timeout mode bằng cấu hình service của Hoan.
+- `app/main.py`: routes, CORS, error envelope, tracing và health.
+- `app/auth.py`: hash token và xác thực session.
+- `app/chat.py`: ownership, lock, persistence, retry và orchestration AI.
+- `app/ai.py`: internal AI client và timeout/schema guard.
+- `app/config.py`: cấu hình DSN/`DB_*` và secret-safe URL.
+- `app/doctor.py`: chẩn đoán cấu hình/kết nối an toàn.
+- `migrations/`: Alembic migration bốn bảng G1.
+- `tests/`: unit, config và PostgreSQL integration tests.
+- `docs/TEST_REPORT.md`: bằng chứng test cập nhật.
