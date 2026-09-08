@@ -1,0 +1,16 @@
+{
+  "request_id": "00000000-0000-4000-8000-000000000001",
+  "answer": "Theo snapshot nguồn, thủ tục được giải quyết trong ngày tiếp nhận yêu cầu. Nếu nhận hồ sơ sau 15 giờ mà chưa giải quyết ngay được thì trả kết quả trong ngày làm việc tiếp theo.",
+  "status": "ANSWER",
+  "cited_fragment_ids": [
+    "frag_birth_processing_time_001"
+  ],
+  "missing_information": [],
+  "provider": "fixture-template",
+  "model": "fixture-v1",
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+  },
+  "latency_ms": 0
+}
