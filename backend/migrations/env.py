@@ -6,6 +6,7 @@ from sqlalchemy.pool import NullPool
 
 from app.config import get_settings
 from app.models import Base
+from app.rag import models as rag_models  # noqa: F401
 
 
 def run(connection):

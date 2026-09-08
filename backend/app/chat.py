@@ -6,9 +6,12 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai import AIClient
+from app.config import get_settings
 from app.db import engine
 from app.errors import APIError
 from app.models import Conversation, Message, utcnow
+from app.rag.grounding import answer_with_rag
+from app.rag.schemas import Filters, RetrievalInput
 from app.schemas import MessageInput, MessagePair
 
 AI_CONTEXT_MAX_MESSAGES = 100
@@ -58,6 +61,7 @@ async def conversation_lock(conversation_id: UUID):
 async def send_message(
     conversation_id: UUID, user_id: UUID, body: MessageInput, request_id: UUID, ai: AIClient
 ) -> MessagePair:
+    filters = body.retrieval_filters.model_dump(mode="json")
     async with conversation_lock(conversation_id) as db:
         conversation = await owned_conversation(db, conversation_id, user_id)
         user_message = await db.scalar(
@@ -68,7 +72,10 @@ async def send_message(
             )
         )
         if user_message:
-            if user_message.content != body.content:
+            if (
+                user_message.content != body.content
+                or (user_message.retrieval_filters or Filters().model_dump(mode="json")) != filters
+            ):
                 raise APIError(
                     409, "IDEMPOTENCY_CONFLICT", "client_message_id đã được dùng với nội dung khác."
                 )
@@ -100,6 +107,7 @@ async def send_message(
                 client_message_id=body.client_message_id,
                 role="user",
                 content=body.content,
+                retrieval_filters=filters,
                 status="pending",
                 request_id=request_id,
             )
@@ -122,10 +130,24 @@ async def send_message(
         history = list(reversed(newest_history))
         await db.commit()  # No idle database transaction during network I/O.
         try:
-            answer = await ai.generate(
-                request_id,
-                [{"role": message.role, "content": message.content} for message in history],
-            )
+            grounding = None
+            if get_settings().rag_enabled:
+                answer, grounding = await answer_with_rag(
+                    db,
+                    RetrievalInput(
+                        query=body.content,
+                        filters=body.retrieval_filters,
+                        top_k=get_settings().rag_top_k,
+                    ),
+                    request_id,
+                    ai,
+                    [{"role": m.role, "content": m.content} for m in history[:-1]][-10:],
+                )
+            else:
+                answer = await ai.generate(
+                    request_id,
+                    [{"role": message.role, "content": message.content} for message in history],
+                )
         except APIError:
             user_message.status = "failed"
             conversation.updated_at = utcnow()
@@ -136,6 +158,7 @@ async def send_message(
             conversation_id=conversation.id,
             role="assistant",
             content=answer,
+            grounding=grounding,
             status="completed",
             request_id=request_id,
         )

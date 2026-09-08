@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.rag.schemas import Filters, Grounding
+
 
 class InputModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
@@ -18,6 +20,7 @@ class ConversationInput(InputModel):
 
 
 class MessageInput(InputModel):
+    retrieval_filters: Filters = Field(default_factory=Filters)
     client_message_id: UUID
     content: str = Field(min_length=1, max_length=10000)
 
@@ -39,6 +42,7 @@ class ConversationOutput(OutputModel):
 
 
 class MessageOutput(OutputModel):
+    grounding: Grounding | None = None
     id: UUID
     conversation_id: UUID
     role: Literal["user", "assistant"]

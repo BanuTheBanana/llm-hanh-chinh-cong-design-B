@@ -131,7 +131,7 @@ async def handle_http(request: Request, exc: HTTPException):
 router = APIRouter(
     prefix="/api/v1",
     responses={
-        status: {"model": ErrorOutput} for status in (401, 403, 404, 409, 422, 500, 502, 504)
+        status: {"model": ErrorOutput} for status in (401, 403, 404, 409, 422, 500, 502, 503, 504)
     },
 )
 
@@ -219,7 +219,11 @@ async def create_conversation(
     return conversation
 
 
-@router.get("/conversations/{conversation_id}/messages", response_model=list[MessageOutput])
+@router.get(
+    "/conversations/{conversation_id}/messages",
+    response_model=list[MessageOutput],
+    response_model_exclude_none=True,
+)
 async def messages(
     conversation_id: UUID, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)
 ):
@@ -233,7 +237,11 @@ async def messages(
     ).all()
 
 
-@router.post("/conversations/{conversation_id}/messages", response_model=MessagePair)
+@router.post(
+    "/conversations/{conversation_id}/messages",
+    response_model=MessagePair,
+    response_model_exclude_none=True,
+)
 async def post_message(
     conversation_id: UUID,
     body: MessageInput,
