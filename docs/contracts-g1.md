@@ -1,6 +1,6 @@
 # API Contract G1
 
-> Trạng thái: `VERIFIED_ON_G1_INTEGRATION`<br>
+> Trạng thái: `VERIFIED_ON_MAIN`; đóng băng tại tag `g1-v1.0.0`<br>
 > Phiên bản: `v1.2`<br>
 > Cập nhật: 08/09/2026<br>
 > Runtime đã kiểm tra: commit `4b64f6f`, GitHub Actions run

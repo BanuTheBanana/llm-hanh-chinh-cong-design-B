@@ -11,7 +11,7 @@
 |---|---|
 | Cập nhật gần nhất | 08/09/2026 |
 | Phiên bản | `v1.2` |
-| Trạng thái | `G1_VERIFIED_ON_INTEGRATION` |
+| Trạng thái | `G1_COMPLETED_ON_MAIN`; tag `g1-v1.0.0` |
 | Phạm vi | Web + Core Backend + PostgreSQL + AI Service Mock |
 | Ngoài phạm vi | RAG, model local, fine-tune, Case, memory dài hạn, queue, Socket.IO |
 | Thay đổi lần này | Ghi nhận code của Tú, Minh và Hoan đã tích hợp; checklist G1 đã được CI kiểm tra trên môi trường sạch |
@@ -42,7 +42,7 @@ GitHub Actions run
 
 API message round-trip là 56,33 ms với Mock AI; Playwright smoke hoàn tất trong
 2,0 giây. Hai số này chỉ là baseline của môi trường CI, không phải SLA hoặc
-benchmark model thật. G1 đã đạt trên nhánh tích hợp nhưng chưa merge vào `main`.
+benchmark model thật. G1 đã được merge vào `main` qua pull request #2.
 
 ---
 
@@ -652,10 +652,10 @@ G1 chỉ được đánh dấu hoàn thành khi `G1-01` đến `G1-12` đều pa
 
 ## 15. Điểm dừng và bước tiếp theo
 
-G1 đã pass trên `g1/integration`. Việc còn lại để đóng mốc:
+G1 đã pass trên `g1/integration`, được merge vào `main` và đóng băng bằng tag
+`g1-v1.0.0`. Việc tiếp theo:
 
-- review pull request về `main`, chưa tự merge khi nhóm chưa xác nhận;
-- sau khi merge, tạo tag/demo baseline và lưu link CI;
+- giữ tag và link CI làm baseline đối chiếu;
 - không tiếp tục trang trí UI;
 - chuyển sang G2: snapshot 2–3 thủ tục công khai, gold set 30–50 câu và RAG tối giản có trích nguồn.
 

@@ -5,7 +5,8 @@ lát cắt nhỏ có gate; không dựng toàn bộ RAG/model/memory cùng lúc.
 
 ## Trạng thái
 
-**Giai đoạn 1 – Technical Vertical Slice đã pass trên `g1/integration`.**
+**Giai đoạn 1 – Technical Vertical Slice đã hoàn tất trên `main` và được đóng
+băng bằng tag `g1-v1.0.0`.**
 
 ```text
 React Web → FastAPI Core Backend → FastAPI Mock AI Service
@@ -54,6 +55,7 @@ vào bản G1. Xem runbook riêng trong [`web/`](web/README.md),
 1. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
 2. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
 3. [API contract G1](docs/contracts-g1.md)
+4. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
 
 ## Cấu trúc repository
 
@@ -77,11 +79,12 @@ vào bản G1. Xem runbook riêng trong [`web/`](web/README.md),
 
 | Vai trò | Branch |
 |---|---|
-| Tích hợp đã pass CI | `g1/integration` |
+| Bản chính đã hoàn tất G1 | `main`, tag `g1-v1.0.0` |
+| Nhánh tích hợp lịch sử | `g1/integration` |
 | Lịch sử Frontend của Tú | `g1/frontend-tu` |
 | Lịch sử Backend của Minh | `g1/backend-minh` |
 | Lịch sử AI/Integration của Hoan | `g1/ai-integration-hoan` |
 
 Nhánh tạo nhầm `feature/frontend-tu` đã bị xóa sau khi xác nhận tree trùng
-với `g1/frontend-tu`. Chưa merge `g1/integration` vào `main` cho đến khi nhóm
-review pull request.
+với `g1/frontend-tu`. Pull request #2 đã được review bằng CI và merge vào
+`main`; source tiếp tục ở gốc repository để G2 nâng cấp trực tiếp.

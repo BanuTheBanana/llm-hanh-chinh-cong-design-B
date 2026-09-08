@@ -5,6 +5,7 @@
 1. [Chiến lược triển khai từ nhỏ đến lớn](00-chien-luoc-trien-khai-tu-nho-den-lon.md)
 2. [API Contract G1](contracts-g1.md)
 3. [Hồ sơ phân công và nghiệm thu Giai đoạn 1](01-phan-cong-giai-doan-1.md)
+4. [Chỉ mục Giai đoạn 1](giai-doan-1/README.md)
 
 Chiến lược là roadmap đang có hiệu lực (hiện chuyển sang G2). Contract là source
 of truth của code/runtime G1. File phân công G1 là hồ sơ nghiệm thu đã hoàn tất,

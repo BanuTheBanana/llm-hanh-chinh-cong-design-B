@@ -11,7 +11,7 @@
 |---|---|
 | Cập nhật gần nhất | 08/09/2026 |
 | Phiên bản | `v1.4` |
-| Trạng thái | `G1_VERIFIED_ON_INTEGRATION`; chuẩn bị review PR và chuyển sang G2 |
+| Trạng thái | `G1_COMPLETED_ON_MAIN`; tag `g1-v1.0.0`; đang lập kế hoạch G2 |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
 | Thay đổi lần này | Ghi nhận G1 đã chạy end-to-end; chuyển trọng tâm hiện tại sang dữ liệu công khai, gold set và RAG tối giản của G2 |
 
@@ -34,7 +34,7 @@ GitHub Actions run
 
 API message round-trip với Mock AI trong run này là 56,33 ms. Đây là baseline
 kỹ thuật CI, không phải SLA và không phản ánh tốc độ hay chất lượng model thật.
-Nhánh chưa được merge vào `main`; bước tiếp theo là review pull request.
+Pull request #2 đã được merge vào `main`; tag `g1-v1.0.0` giữ snapshot G1.
 
 ## Cách dùng file này
 
@@ -603,17 +603,16 @@ Chỉ bắt đầu khi core answer + local model + domain baseline đã đạt g
 
 ## 13. Bảng Now – Next – Later – Parked
 
-### NOW – Đóng G1 và bắt đầu G2
+### NOW – Lập kế hoạch và bắt đầu G2
 
-1. Review pull request `g1/integration` → `main`; chỉ merge khi cả nhóm đồng ý.
-2. Sau khi merge, gắn tag baseline G1 và giữ lại link CI/demo.
-3. Chọn 2–3 thủ tục công khai từ nguồn chính thức; lưu snapshot có version,
+1. Giữ `main` và tag `g1-v1.0.0` làm baseline đã kiểm tra.
+2. Chọn 2–3 thủ tục công khai từ nguồn chính thức; lưu snapshot có version,
    ngày lấy và phạm vi áp dụng.
-4. Tạo 30–50 tình huống giả với expected points và gold source; tách tập kiểm
+3. Tạo 30–50 tình huống giả với expected points và gold source; tách tập kiểm
    thử khỏi dữ liệu dùng để chỉnh prompt.
-5. Làm exact/keyword retrieval tối thiểu và trả source thật hoặc
+4. Làm exact/keyword retrieval tối thiểu và trả source thật hoặc
    `INSUFFICIENT_DATA`.
-6. Chạy baseline, đo riêng retrieval, answer, citation và latency.
+5. Chạy baseline, đo riêng retrieval, answer, citation và latency.
 
 ### NEXT – Sau baseline đầu của G2
 
@@ -654,7 +653,7 @@ Cả nhóm:
 
 - giữ JSON contracts đồng bộ với consumer;
 - tích hợp hằng ngày trên branch tích hợp;
-- giữ `g1/integration` chạy xanh cho đến khi PR vào `main` được duyệt;
+- giữ `main` chạy xanh; phát triển phase mới trên branch riêng;
 - review chéo và ghi bug chung;
 - không để mỗi người làm “module hoàn hảo” hai tuần rồi mới ghép.
 
@@ -744,14 +743,13 @@ Giới hạn công việc:
 
 ## 20. Việc làm tiếp theo
 
-1. Cả nhóm review diff và bằng chứng CI của pull request G1.
-2. Merge vào `main` khi được chấp thuận, rồi tạo tag baseline G1.
-3. Quay demo ngắn cho mentor nếu cần; dùng số 56,33 ms đúng với chú thích
+1. Giữ tag `g1-v1.0.0` và bằng chứng CI làm mốc so sánh.
+2. Quay demo ngắn cho mentor nếu cần; dùng số 56,33 ms đúng với chú thích
    “Mock CI baseline”, không gọi đó là SLA/model benchmark.
-4. Tạo `data/demo_public/` cho 2–3 thủ tục công khai có nguồn chính thức.
-5. Khóa schema snapshot và gold set 30–50 câu trước khi tối ưu retrieval.
-6. Tích hợp exact/keyword retrieval và source output sau cùng API hiện có.
-7. Chạy baseline G2 rồi mới quyết định embedding, reranker hay model local.
+3. Tạo `data/demo_public/` cho 2–3 thủ tục công khai có nguồn chính thức.
+4. Khóa schema snapshot và gold set 30–50 câu trước khi tối ưu retrieval.
+5. Tích hợp exact/keyword retrieval và source output sau cùng API hiện có.
+6. Chạy baseline G2 rồi mới quyết định embedding, reranker hay model local.
 
 ## 21. Câu trình bày với mentor
 
@@ -762,7 +760,7 @@ Giới hạn công việc:
 Chiến lược này được xem là hoạt động đúng khi:
 
 - team luôn biết duy nhất mốc nào đang làm;
-- `g1/integration` đã có vertical slice chạy xanh; `main` nhận nó sau PR review;
+- `main` có vertical slice chạy xanh và tag `g1-v1.0.0` để quay lại;
 - mỗi phase tạo một demo và báo cáo đo lường;
 - không triển khai feature parked nếu chưa có trigger;
 - local lightweight vẫn được hoàn thành, không bị hosted API thay thế;

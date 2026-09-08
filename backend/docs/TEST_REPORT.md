@@ -1,7 +1,7 @@
 # Báo cáo kiểm tra Core Backend G1
 
 > Cập nhật: 08/09/2026<br>
-> Nhánh: `g1/integration`<br>
+> Bản chính: `main`; tag `g1-v1.0.0`<br>
 > Trạng thái: `VERIFIED` tại commit `4b64f6f`<br>
 > GitHub Actions: [`34197723998`](https://github.com/DOMEMON/llm-hanh-chinh-cong/actions/runs/34197723998)
 
