@@ -12,7 +12,7 @@
 | `python -m pytest tests/test_unit.py tests/test_config.py -q` | **36 passed** |
 | `python -m pytest --collect-only -q` | **55 tests collected** |
 | `ruff check .` | Pass |
-| `ruff format --check .` | Pass, 20 files |
+| `ruff format --check .` | Pass |
 | `python -m app.doctor --config-only` | `CONFIG_OK`, không in password/DSN |
 
 36 test không cần database bao phủ:

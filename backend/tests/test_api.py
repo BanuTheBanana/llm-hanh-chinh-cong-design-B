@@ -221,10 +221,11 @@ async def test_ai_failure_keeps_message_then_retry(
         {**body(), "user_id": str(uuid4())},
     ],
 )
-async def test_validation(client, payload):
+async def test_validation(client, ai_mock, payload):
     path = await conversation(client)
     assert_error(await client.post(path, json=payload), 422, "VALIDATION_ERROR")
     assert (await client.get(path)).json() == []
+    assert ai_mock == []
 
 
 async def test_cors_and_client_identity_rejected(client):
