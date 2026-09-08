@@ -12,7 +12,7 @@ React Web → FastAPI Core Backend → FastAPI Mock AI Service
               PostgreSQL
 ```
 
-Giai đoạn này kiểm tra luồng kỹ thuật, đăng nhập demo, conversation, message, history, user isolation và xử lý lỗi. Chưa triển khai RAG, Qwen, fine-tune, Case, queue hoặc Socket.IO.
+Giai đoạn này kiểm tra luồng kỹ thuật, đăng nhập demo, conversation, message, history, user isolation và xử lý lỗi. Mock AI Service cùng hạ tầng tích hợp của Hoan đã được triển khai; Web và Core Backend đang chờ hai branch còn lại. Chưa triển khai RAG, Qwen, fine-tune, Case, queue hoặc Socket.IO.
 
 ## Tài liệu bắt buộc đọc
 
