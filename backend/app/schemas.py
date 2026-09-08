@@ -1,0 +1,76 @@
+from datetime import datetime
+from typing import Literal
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class InputModel(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+
+class LoginInput(InputModel):
+    display_name: str = Field(min_length=1, max_length=100)
+
+
+class ConversationInput(InputModel):
+    title: str = Field(default="Cuộc trò chuyện mới", min_length=1, max_length=200)
+
+
+class MessageInput(InputModel):
+    client_message_id: UUID
+    content: str = Field(min_length=1, max_length=10000)
+
+
+class OutputModel(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserOutput(OutputModel):
+    id: UUID
+    display_name: str
+
+
+class ConversationOutput(OutputModel):
+    id: UUID
+    title: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class MessageOutput(OutputModel):
+    id: UUID
+    conversation_id: UUID
+    role: Literal["user", "assistant"]
+    content: str
+    status: Literal["pending", "completed", "failed"]
+    created_at: datetime
+
+
+class MessagePair(BaseModel):
+    user_message: MessageOutput
+    assistant_message: MessageOutput
+
+
+class ErrorDetail(BaseModel):
+    code: str
+    message: str
+    request_id: UUID
+
+
+class ErrorOutput(BaseModel):
+    error: ErrorDetail
+
+
+class Usage(BaseModel):
+    input_tokens: int = Field(ge=0, strict=True)
+    output_tokens: int = Field(ge=0, strict=True)
+
+
+class AIOutput(BaseModel):
+    request_id: UUID
+    text: str = Field(min_length=1)
+    provider: str = Field(min_length=1, pattern=r"\S")
+    model: str = Field(min_length=1)
+    usage: Usage
+    latency_ms: float = Field(ge=0)

@@ -1,12 +1,14 @@
 # Chỉ mục tài liệu
 
-## Đang có hiệu lực
+## Tài liệu trung tâm
 
 1. [Chiến lược triển khai từ nhỏ đến lớn](00-chien-luoc-trien-khai-tu-nho-den-lon.md)
-2. [Phân công Giai đoạn 1](01-phan-cong-giai-doan-1.md)
-3. [API Contract G1](contracts-g1.md)
+2. [API Contract G1](contracts-g1.md)
+3. [Hồ sơ phân công và nghiệm thu Giai đoạn 1](01-phan-cong-giai-doan-1.md)
 
-Khi nội dung mâu thuẫn, ưu tiên theo thứ tự: contract đã khóa cho code hiện tại → kế hoạch G1 → chiến lược tổng thể.
+Chiến lược là roadmap đang có hiệu lực (hiện chuyển sang G2). Contract là source
+of truth của code/runtime G1. File phân công G1 là hồ sơ nghiệm thu đã hoàn tất,
+không phải danh sách task hiện tại.
 
 ## Nhóm tài liệu
 

@@ -10,10 +10,39 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 08/09/2026 |
-| Phiên bản | `v1.0` |
-| Trạng thái | Sẵn sàng để nhóm xác nhận ownership và bắt đầu G1 |
+| Phiên bản | `v1.2` |
+| Trạng thái | `G1_VERIFIED_ON_INTEGRATION` |
 | Phạm vi | Web + Core Backend + PostgreSQL + AI Service Mock |
 | Ngoài phạm vi | RAG, model local, fine-tune, Case, memory dài hạn, queue, Socket.IO |
+| Thay đổi lần này | Ghi nhận code của Tú, Minh và Hoan đã tích hợp; checklist G1 đã được CI kiểm tra trên môi trường sạch |
+
+## Tiến độ thực thi G1
+
+- [x] Khóa API contract G1.
+- [x] Tạo và đồng bộ baseline cho ba branch.
+- [x] Sắp xếp tài liệu vào `docs/`.
+- [x] Hoan: Mock AI Service và failure modes.
+- [x] Hoan: Compose/config/runbook/smoke AI.
+- [x] Tú: Web React gọi Core API thật.
+- [x] Minh: Core Backend, PostgreSQL và migration.
+- [x] Cả nhóm: integration Web → Backend → AI → PostgreSQL.
+- [x] Cả nhóm: nghiệm thu đủ G1-01 đến G1-12.
+
+### Bằng chứng nghiệm thu
+
+GitHub Actions run
+[`34197723998`](https://github.com/DOMEMON/llm-hanh-chinh-cong/actions/runs/34197723998)
+đã pass 5/5 job tại commit `4b64f6f` trên `g1/integration`:
+
+- Web: 9 test, lint, production build và Playwright browser smoke;
+- AI Service: 15 test, lint và lockfile check;
+- Backend: 58 test với PostgreSQL 16 và migration từ database sạch;
+- repository hygiene/secret-pattern gate;
+- full Compose smoke, API smoke và browser smoke.
+
+API message round-trip là 56,33 ms với Mock AI; Playwright smoke hoàn tất trong
+2,0 giây. Hai số này chỉ là baseline của môi trường CI, không phải SLA hoặc
+benchmark model thật. G1 đã đạt trên nhánh tích hợp nhưng chưa merge vào `main`.
 
 ---
 
@@ -107,7 +136,10 @@ LLM/
 
 Không tạo ba repository rời ở G1. Tách bằng folder, container và API contract là đủ.
 
-## 5. API contract phải khóa trước khi chia nhánh
+## 5. Contract G1 đã khóa – bản tóm tắt
+
+[`contracts-g1.md`](contracts-g1.md) là source of truth cho runtime G1. Phần
+dưới chỉ tóm tắt để hiểu phân công; nếu có khác biệt thì ưu tiên contract.
 
 ### 5.1. Quy ước chung
 
@@ -481,6 +513,8 @@ Hoan cũng giữ docs/contracts-g1.md, .env.example, compose.yaml, README/runboo
 
 ### Checkpoint 0 – Khóa contract trước khi code sâu
 
+**Kết quả: PASS.** Contract v1.2 phản ánh đúng implementation đã kiểm tra.
+
 Cả ba cùng xác nhận:
 
 - endpoint và JSON schema;
@@ -493,6 +527,8 @@ Hoan ghi bản chốt vào `docs/contracts-g1.md`. Sau thời điểm này, thay
 
 ### Checkpoint 1 – Ba nhánh chạy độc lập
 
+**Kết quả: PASS.** Code của cả ba owner đã được review và đưa vào nhánh tích hợp.
+
 ```text
 Tú: Web chạy với temporary API stub cùng schema
 Minh: Backend tests chạy với AI client giả cùng schema
@@ -503,6 +539,10 @@ Stub chỉ phục vụ phát triển song song và phải bị loại khỏi hap
 
 ### Checkpoint 2 – Ghép Backend với AI Service
 
+**Kết quả: PASS.** Backend integration tests kiểm tra success, error, timeout,
+persistence, request ID và idempotency; live API smoke kiểm tra happy path,
+idempotency và persistence xuyên service.
+
 Minh và Hoan chứng minh:
 
 - success lưu hai messages;
@@ -511,6 +551,9 @@ Minh và Hoan chứng minh:
 - schema thực tế khớp contract.
 
 ### Checkpoint 3 – Ghép Web với Core Backend
+
+**Kết quả: PASS.** Playwright kiểm tra login/cookie/CORS, tạo chat, gửi message,
+reload history, logout và user isolation trên full Compose stack.
 
 Tú và Minh chứng minh:
 
@@ -521,7 +564,10 @@ Tú và Minh chứng minh:
 
 ### Checkpoint 4 – Cả nhóm nghiệm thu G1
 
-Chạy checklist mục 12 trên môi trường sạch và quay một demo ngắn.
+**Kết quả: PASS.** Checklist mục 12 có bằng chứng tự động hoặc review phạm vi.
+
+Checklist đã chạy trên full Compose từ môi trường sạch; Playwright browser
+smoke là demo thực thi tự động. Video thủ công chỉ quay khi mentor yêu cầu.
 
 ## 11. Phân chia ownership file
 
@@ -542,51 +588,56 @@ Không sửa file thuộc owner khác mà không báo trước. Nếu cần thay
 | Tú | `g1/frontend-tu` |
 | Minh | `g1/backend-minh` |
 | Hoan | `g1/ai-integration-hoan` |
+| Tích hợp G1 | `g1/integration` |
 
 Quy trình:
 
 ```text
-main (baseline chung)
-├── g1/frontend-tu
-├── g1/backend-minh
-└── g1/ai-integration-hoan
+g1/frontend-tu ────────┐
+g1/backend-minh ───────┼→ g1/integration (CI xanh) → PR → main
+g1/ai-integration-hoan ┘
 ```
 
-- Cả ba branch phải bắt đầu từ cùng baseline mới nhất của `main`.
-- Mỗi người commit/push vào branch của mình và mở pull request về `main`.
-- Không merge cả ba nhánh một lần vào cuối G1; ghép từng lát nhỏ khi contract test pass.
-- Khi `main` nhận thay đổi tích hợp, các thành viên cập nhật branch của mình từ `main` trước khi tiếp tục.
+- Ba branch owner bắt đầu từ cùng baseline và đã được ghép/review trên
+  `g1/integration`.
+- Pull request duy nhất của lát cắt hoàn chỉnh đi từ `g1/integration` về `main`;
+  không merge từng branch owner trực tiếp sau khi integration đã chốt.
+- Chỉ merge PR khi toàn bộ gate CI xanh và nhóm đã review diff.
+- Sau khi `main` nhận G1, tạo tag baseline rồi mới mở branch G2.
 - Không dùng force-push lên `main` hoặc branch của thành viên khác.
 
 ## 12. Checklist nghiệm thu G1
 
-| ID | Test | Kết quả cần có |
-|---|---|---|
-| G1-01 | Dựng từ môi trường sạch | Tất cả service healthy |
-| G1-02 | Login demo | Có session cookie và `/me` đúng |
-| G1-03 | Tạo conversation | Conversation thuộc user hiện tại |
-| G1-04 | Gửi message | Lưu user và assistant message |
-| G1-05 | Refresh | History vẫn còn và đúng thứ tự |
-| G1-06 | User isolation | User A không xem/sửa dữ liệu User B |
-| G1-07 | Duplicate retry | Không tạo trùng user message |
-| G1-08 | AI error | User message không bị mất, UI báo lỗi |
-| G1-09 | AI timeout | Backend timeout có kiểm soát, UI retry được |
-| G1-10 | Logout | Session hết hiệu lực và UI về login |
-| G1-11 | Secret check | Không có secret thật trong repo/log |
-| G1-12 | Scope check | Không kéo RAG/Case/queue/model local vào G1 |
+| ID | Test | Kết quả cần có | Kết quả/Bằng chứng |
+|---|---|---|---|
+| G1-01 | Dựng từ môi trường sạch | Tất cả service healthy | **PASS** – full Compose smoke |
+| G1-02 | Login demo | Có session cookie và `/me` đúng | **PASS** – API + browser smoke |
+| G1-03 | Tạo conversation | Conversation thuộc user hiện tại | **PASS** – API + browser smoke |
+| G1-04 | Gửi message | Lưu user và assistant message | **PASS** – Backend + API smoke |
+| G1-05 | Refresh | History vẫn còn và đúng thứ tự | **PASS** – API + browser smoke |
+| G1-06 | User isolation | User A không xem/sửa dữ liệu User B | **PASS** – Backend + API/browser smoke |
+| G1-07 | Duplicate retry | Không tạo trùng user message | **PASS** – Backend + API smoke |
+| G1-08 | AI error | User message không bị mất, UI báo lỗi | **PASS** – `ai-service/tests/test_api.py`, `backend/tests/test_api.py`, `web/src/App.test.tsx` |
+| G1-09 | AI timeout | Backend timeout có kiểm soát, UI retry được | **PASS** – `ai-service/tests/test_api.py`, `backend/tests/test_api.py`, `web/src/App.test.tsx` |
+| G1-10 | Logout | Session hết hiệu lực và UI về login | **PASS** – API + browser smoke |
+| G1-11 | Secret check | Không có secret thật trong repo/log | **PASS** – repository hygiene gate |
+| G1-12 | Scope check | Không kéo RAG/Case/queue/model local vào G1 | **PASS** – implementation scope review |
 
 G1 chỉ được đánh dấu hoàn thành khi `G1-01` đến `G1-12` đều pass hoặc có ngoại lệ được mentor chấp nhận và ghi lại.
 
 ## 13. Kịch bản demo ngắn
 
 ```text
-1. docker compose up --build
+1. docker compose --profile full up --build --detach --wait
 2. Mở web và đăng nhập bằng user A
 3. Tạo conversation, gửi hai tin nhắn và nhận Mock AI response
 4. Refresh để chứng minh history từ PostgreSQL
 5. Đăng xuất, đăng nhập user B và chứng minh không thấy history user A
-6. Bật Mock error/timeout profile và chứng minh message không mất, UI báo lỗi/retry
+6. Đặt MOCK_MODE=error hoặc MOCK_MODE=timeout, chạy
+   docker compose up --build --detach --force-recreate ai-service, rồi chứng
+   minh message không mất và UI báo lỗi/retry
 7. Hiển thị log request_id và latency cơ bản
+8. Trả MOCK_MODE=success và recreate AI Service sau demo
 ```
 
 ## 14. Quy tắc dùng AI coding agent cho cả nhóm
@@ -601,10 +652,10 @@ G1 chỉ được đánh dấu hoàn thành khi `G1-01` đến `G1-12` đều pa
 
 ## 15. Điểm dừng và bước tiếp theo
 
-Sau khi G1 pass:
+G1 đã pass trên `g1/integration`. Việc còn lại để đóng mốc:
 
-- đóng băng một tag/demo baseline;
-- ghi latency và lỗi còn lại;
+- review pull request về `main`, chưa tự merge khi nhóm chưa xác nhận;
+- sau khi merge, tạo tag/demo baseline và lưu link CI;
 - không tiếp tục trang trí UI;
 - chuyển sang G2: snapshot 2–3 thủ tục công khai, gold set 30–50 câu và RAG tối giản có trích nguồn.
 

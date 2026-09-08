@@ -10,14 +10,31 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 08/09/2026 |
-| Phiên bản | `v1.3` |
-| Trạng thái | Đang thực thi Giai đoạn 1 trên ba branch của nhóm |
+| Phiên bản | `v1.4` |
+| Trạng thái | `G1_VERIFIED_ON_INTEGRATION`; chuẩn bị review PR và chuyển sang G2 |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
-| Thay đổi lần này | Bắt đầu triển khai G1 trên ba branch; gom toàn bộ tài liệu vào `docs/` và triển khai phần Hoan: Mock AI Service, Compose, cấu hình, test và smoke test |
+| Thay đổi lần này | Ghi nhận G1 đã chạy end-to-end; chuyển trọng tâm hiện tại sang dữ liệu công khai, gold set và RAG tối giản của G2 |
 
 Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](parked/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; sơ đồ nằm trong [`architecture/`](architecture/README.md).
 
-Tài liệu thực thi đang dùng cho G1: [Phân công Giai đoạn 1 – Tú, Minh, Hoan](01-phan-cong-giai-doan-1.md).
+Hồ sơ thực thi và nghiệm thu G1: [Phân công Giai đoạn 1 – Tú, Minh, Hoan](01-phan-cong-giai-doan-1.md).
+Trọng tâm đang làm là G2 trong mục **NOW** của tài liệu này.
+
+### Bằng chứng hoàn thành G1
+
+GitHub Actions run
+[`34197723998`](https://github.com/DOMEMON/llm-hanh-chinh-cong/actions/runs/34197723998)
+đã pass 5/5 job tại commit `4b64f6f` trên `g1/integration`:
+
+- 9 test Web, lint và production build;
+- 15 test AI Service, lint và lockfile check;
+- 58 test Backend với PostgreSQL 16;
+- repository hygiene/secret-pattern gate;
+- build bốn container từ môi trường sạch, API smoke và Playwright browser smoke.
+
+API message round-trip với Mock AI trong run này là 56,33 ms. Đây là baseline
+kỹ thuật CI, không phải SLA và không phản ánh tốc độ hay chất lượng model thật.
+Nhánh chưa được merge vào `main`; bước tiếp theo là review pull request.
 
 ## Cách dùng file này
 
@@ -158,11 +175,13 @@ Các nguyên tắc bắt buộc:
 5. Cùng một bộ `D1_PUBLIC_DEMO` phải được dùng để so sánh hosted và local; không thay câu hỏi giữa hai lần benchmark.
 6. Hosted API là scaffolding/baseline, không phải artifact cuối nếu tiêu chí nghiệm thu yêu cầu lightweight self-hosted.
 
-AI Service phải cho phép đổi provider bằng cấu hình mà không sửa Web/Core Backend:
+AI Service giữ provider boundary để sau này đổi provider mà không sửa Web/Core
+Backend. Runtime G1 hiện chỉ triển khai `mock`; `openai` và `local` là adapter
+tương lai, chưa thể bật chỉ bằng cách đổi biến môi trường:
 
 ```env
 LLM_PROVIDER=mock
-# mock | openai | local
+# G1 chỉ hỗ trợ mock; openai/local thuộc G2/G3 nếu được triển khai và phê duyệt.
 ```
 
 ---
@@ -223,7 +242,7 @@ Login/demo identity
 → POST message
 → Backend lưu user message
 → Backend gọi AI Service
-→ AI Service gọi mock/approved provider
+→ AI Service gọi MockProvider
 → Backend lưu assistant message
 → Web hiển thị answer
 → refresh vẫn còn history
@@ -250,7 +269,7 @@ Backend:
 AI Service:
 
 - `POST /internal/v1/generate`;
-- provider adapter `mock | hosted | local`;
+- provider boundary ổn định; G1 chỉ triển khai adapter `mock`;
 - không để Web gọi provider trực tiếp;
 - secret chỉ nằm ở server.
 
@@ -279,16 +298,19 @@ Public backend:
 ```text
 POST /api/v1/auth/login
 POST /api/v1/auth/logout
+GET  /api/v1/auth/me
 GET  /api/v1/conversations
 POST /api/v1/conversations
 GET  /api/v1/conversations/{id}/messages
 POST /api/v1/conversations/{id}/messages
+GET  /health
 ```
 
 Internal AI:
 
 ```text
 POST /internal/v1/generate
+GET  /health
 ```
 
 Request giữa Backend và AI:
@@ -309,14 +331,18 @@ Response:
 {
   "request_id": "uuid",
   "text": "...",
-  "provider": "mock_or_approved_hosted",
-  "model": "configured-model",
-  "usage": {},
+  "provider": "mock",
+  "model": "mock-v1",
+  "usage": {"input_tokens": 0, "output_tokens": 0},
   "latency_ms": 0
 }
 ```
 
 ### 7.5. Gate G1
+
+**Trạng thái: PASS trên `g1/integration`.** Bằng chứng là run CI nêu ở đầu tài
+liệu; browser smoke là demo thực thi tự động. Video trình bày riêng có thể quay
+khi báo cáo mentor nhưng không còn là điều kiện kỹ thuật chưa kiểm tra.
 
 - Một command/runbook dựng được toàn bộ môi trường dev.
 - User đăng nhập/demo identity, gửi câu hỏi và nhận answer.
@@ -324,7 +350,7 @@ Response:
 - User A không xem được history User B.
 - Provider lỗi/timeout không làm mất user message.
 - Web, Backend và AI Service có thể thay độc lập qua contract.
-- Có video/demo ngắn và log latency.
+- Có browser smoke tự động và log latency; video trình bày quay thêm nếu mentor cần.
 
 Đây là gate kỹ thuật, chưa phải gate độ chính xác hành chính.
 
@@ -577,23 +603,24 @@ Chỉ bắt đầu khi core answer + local model + domain baseline đã đạt g
 
 ## 13. Bảng Now – Next – Later – Parked
 
-### NOW – Chỉ làm các việc này
+### NOW – Đóng G1 và bắt đầu G2
 
-1. Mang scope Giai đoạn 1 hỏi lại mentor.
-2. Khóa contract Web ↔ Backend ↔ AI.
-3. Dựng UI chat tối giản.
-4. Dựng backend lưu users/conversations/messages.
-5. Dựng AI Service với mock/approved hosted adapter.
-6. Tích hợp end-to-end và demo mỗi ngày.
+1. Review pull request `g1/integration` → `main`; chỉ merge khi cả nhóm đồng ý.
+2. Sau khi merge, gắn tag baseline G1 và giữ lại link CI/demo.
+3. Chọn 2–3 thủ tục công khai từ nguồn chính thức; lưu snapshot có version,
+   ngày lấy và phạm vi áp dụng.
+4. Tạo 30–50 tình huống giả với expected points và gold source; tách tập kiểm
+   thử khỏi dữ liệu dùng để chỉnh prompt.
+5. Làm exact/keyword retrieval tối thiểu và trả source thật hoặc
+   `INSUFFICIENT_DATA`.
+6. Chạy baseline, đo riêng retrieval, answer, citation và latency.
 
-### NEXT – Sau khi G1 đạt
+### NEXT – Sau baseline đầu của G2
 
-1. Chọn 2–3 thủ tục công khai từ nguồn chính thức và tạo snapshot có version/ngày lấy.
-2. Tạo 30–50 tình huống giả cùng gold source/expected points.
-3. Exact/keyword retrieval và source output.
-4. Chạy hosted baseline nếu được duyệt.
-5. Đo retrieval, answer, citation và latency.
-6. Nhận, kiểm kê và phân loại dataset công ty nhưng chưa tự động đưa vào pipeline bên ngoài.
+1. Chạy hosted baseline nếu công ty phê duyệt rõ dữ liệu được phép gửi.
+2. Nhận, kiểm kê và phân loại dataset công ty; không tự động đưa D2 ra provider ngoài.
+3. Phân tích lỗi để quyết định có cần embedding/vector search hay chưa.
+4. Chốt ngưỡng Gate G2 cùng mentor từ kết quả baseline, không tự chọn phần trăm đẹp.
 
 ### LATER – Sau khi G2 đạt
 
@@ -615,23 +642,23 @@ Chỉ bắt đầu khi core answer + local model + domain baseline đã đạt g
 - Speculative decoding, autoscaling, Kubernetes.
 - Dashboard màu mè và các trang phụ.
 
-## 14. Phân công ba người ở Giai đoạn 1
+## 14. Ownership G1 đã hoàn tất và chuyển giao sang G2
 
 | Người | Ownership | Deliverable tích hợp |
 |---|---|---|
 | A – Frontend | Login/demo identity, conversation list, chat và error/loading | Gọi Core API thật, không dùng data mock sau khi tích hợp |
 | B – Backend | DB schema, auth/session tối thiểu, conversation/message APIs | Lưu history và gọi AI Service thật |
-| C – AI/Integration | AI Service contract, provider adapter, prompt và telemetry | Mock/hosted/local thay qua config |
+| C – AI/Integration | AI Service contract, provider boundary và telemetry | Mock G1 chạy sau contract ổn định |
 
 Cả nhóm:
 
-- khóa JSON contracts cùng nhau trước khi code;
-- tích hợp hằng ngày;
-- một branch/main luôn chạy được;
+- giữ JSON contracts đồng bộ với consumer;
+- tích hợp hằng ngày trên branch tích hợp;
+- giữ `g1/integration` chạy xanh cho đến khi PR vào `main` được duyệt;
 - review chéo và ghi bug chung;
 - không để mỗi người làm “module hoàn hảo” hai tuần rồi mới ghép.
 
-Khi sang Giai đoạn 2:
+Trong Giai đoạn 2:
 
 - A tiếp tục UX/source display;
 - B nhận data/retrieval/backend;
@@ -670,7 +697,7 @@ Giới hạn công việc:
 
 - mỗi người tối đa một task chính đang làm;
 - task nên hoàn tất/tích hợp trong 1–2 ngày;
-- cuối ngày main branch phải chạy hoặc biết blocker cụ thể;
+- cuối ngày branch tích hợp phải chạy; `main` chỉ nhận thay đổi đã review;
 - demo end-to-end ít nhất mỗi tuần, tốt hơn là mỗi 1–2 ngày ở giai đoạn đầu.
 
 ## 17. Tiêu chí đánh giá theo từng mốc
@@ -715,16 +742,16 @@ Giới hạn công việc:
 11. Hosted và local phải được benchmark trên cùng một gold set D1 trước khi quyết định model hoặc fine-tune.
 ```
 
-## 20. Việc làm trong 48 giờ tiếp theo
+## 20. Việc làm tiếp theo
 
-1. Cả nhóm đọc và xác nhận ownership trong [tài liệu phân công G1](01-phan-cong-giai-doan-1.md).
-2. Khóa `docs/contracts-g1.md` trước khi code sâu.
-3. Tạo repo/folder cho `web`, `backend`, `ai-service` và `infra`.
-4. Tú dựng Web; Minh dựng Core Backend/PostgreSQL; Hoan dựng Mock AI/Compose theo contract chung.
-5. Ghép Backend ↔ AI trước, sau đó ghép Web ↔ Backend.
-6. Chạy đủ checklist G1-01 đến G1-12 trên môi trường sạch.
-7. Quay demo ngắn; ghi lại lỗi và latency.
-8. Sau khi G1 đạt mới tạo `data/demo_public/` và bắt đầu RAG tối giản ở G2.
+1. Cả nhóm review diff và bằng chứng CI của pull request G1.
+2. Merge vào `main` khi được chấp thuận, rồi tạo tag baseline G1.
+3. Quay demo ngắn cho mentor nếu cần; dùng số 56,33 ms đúng với chú thích
+   “Mock CI baseline”, không gọi đó là SLA/model benchmark.
+4. Tạo `data/demo_public/` cho 2–3 thủ tục công khai có nguồn chính thức.
+5. Khóa schema snapshot và gold set 30–50 câu trước khi tối ưu retrieval.
+6. Tích hợp exact/keyword retrieval và source output sau cùng API hiện có.
+7. Chạy baseline G2 rồi mới quyết định embedding, reranker hay model local.
 
 ## 21. Câu trình bày với mentor
 
@@ -735,7 +762,7 @@ Giới hạn công việc:
 Chiến lược này được xem là hoạt động đúng khi:
 
 - team luôn biết duy nhất mốc nào đang làm;
-- main branch có vertical slice chạy được sớm;
+- `g1/integration` đã có vertical slice chạy xanh; `main` nhận nó sau PR review;
 - mỗi phase tạo một demo và báo cáo đo lường;
 - không triển khai feature parked nếu chưa có trigger;
 - local lightweight vẫn được hoàn thành, không bị hosted API thay thế;

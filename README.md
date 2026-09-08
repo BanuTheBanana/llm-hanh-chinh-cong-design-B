@@ -1,10 +1,11 @@
 # Trợ lý hành chính công – LLM lightweight
 
-Repository của nhóm Tú, Minh và Hoan cho hệ thống hỏi đáp hành chính công.
+Monorepo của nhóm Tú, Minh và Hoan. Sản phẩm được triển khai theo các
+lát cắt nhỏ có gate; không dựng toàn bộ RAG/model/memory cùng lúc.
 
-## Trạng thái hiện tại
+## Trạng thái
 
-Nhóm đang triển khai **Giai đoạn 1 – Technical Vertical Slice**:
+**Giai đoạn 1 – Technical Vertical Slice đã pass trên `g1/integration`.**
 
 ```text
 React Web → FastAPI Core Backend → FastAPI Mock AI Service
@@ -12,40 +13,75 @@ React Web → FastAPI Core Backend → FastAPI Mock AI Service
               PostgreSQL
 ```
 
-Giai đoạn này kiểm tra luồng kỹ thuật, đăng nhập demo, conversation, message, history, user isolation và xử lý lỗi. Chưa triển khai RAG, Qwen, fine-tune, Case, queue hoặc Socket.IO.
+GitHub Actions run
+[`34197723998`](https://github.com/DOMEMON/llm-hanh-chinh-cong/actions/runs/34197723998)
+đã pass 5/5 job tại commit `4b64f6f`:
 
-## Tài liệu bắt buộc đọc
+- 9 Web unit/component test, lint và production build;
+- 15 AI Service test, lint và lockfile check;
+- 58 Backend test trên PostgreSQL 16;
+- repository hygiene/secret-pattern gate;
+- build bốn container từ môi trường sạch, API smoke và Playwright browser smoke.
+
+API message round-trip trong run này là **56,33 ms** với Mock AI; đây chỉ là
+baseline kỹ thuật CI, không phải SLA hay benchmark model thật.
+
+G1 chưa có RAG, Qwen, fine-tune, Case, memory dài hạn, queue hay Socket.IO.
+Giai đoạn 2 mới bắt đầu dữ liệu thủ tục công khai và RAG tối giản.
+
+## Chạy nhanh G1
+
+Yêu cầu Docker Engine/Desktop và Docker Compose v2:
+
+```powershell
+Copy-Item .env.example .env
+docker compose --profile full up --build --detach --wait
+python scripts/smoke-e2e.py
+```
+
+Mở `http://localhost:3000`. Dừng stack mà vẫn giữ volume local:
+
+```powershell
+docker compose --profile full down
+```
+
+Chỉ dùng dữ liệu giả `D0_SYSTEM_SMOKE`; không nhập PII hay dữ liệu công ty
+vào bản G1. Xem runbook riêng trong [`web/`](web/README.md),
+[`backend/`](backend/README.md) và [`ai-service/`](ai-service/README.md).
+
+## Tài liệu trung tâm
 
 1. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
-2. [Phân công Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
+2. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
 3. [API contract G1](docs/contracts-g1.md)
 
 ## Cấu trúc repository
 
 ```text
 .
-├── web/                 # Tú – React + TypeScript + Vite
-├── backend/             # Minh – FastAPI + PostgreSQL
-├── ai-service/          # Hoan – FastAPI + MockProvider
-├── infra/docker/        # Hạ tầng/container bổ trợ
-├── scripts/             # Smoke test và script phát triển
+├── web/                 # React/TypeScript, Vitest, Playwright, Nginx
+├── backend/             # FastAPI, PostgreSQL, SQLAlchemy, Alembic
+├── ai-service/          # FastAPI, provider interface, MockProvider
+├── infra/docker/        # Ghi chú hạ tầng bổ trợ
+├── scripts/             # Smoke và repository hygiene checks
 ├── docs/
-│   ├── 00-chien-luoc-trien-khai-tu-nho-den-lon.md
-│   ├── 01-phan-cong-giai-doan-1.md
-│   ├── contracts-g1.md
 │   ├── architecture/    # Sơ đồ tham khảo
-│   ├── archive/         # Tài liệu cũ, chỉ giữ lịch sử
+│   ├── archive/         # Tài liệu cũ
 │   └── parked/          # Target architecture chưa triển khai
-├── compose.yaml         # Sẽ được Hoan bổ sung trong G1
-└── .env.example         # Danh sách biến môi trường, không có secret thật
+├── .github/workflows/   # Năm gate CI G1
+├── compose.yaml         # Full G1 stack và health dependencies
+└── .env.example         # Cấu hình demo, không có secret thật
 ```
 
-## Branch G1
+## Branch
 
-| Thành viên | Branch | Phạm vi chính |
-|---|---|---|
-| Tú | `g1/frontend-tu` | `web/**` |
-| Minh | `g1/backend-minh` | `backend/**` |
-| Hoan | `g1/ai-integration-hoan` | `ai-service/**`, Compose, contract và integration |
+| Vai trò | Branch |
+|---|---|
+| Tích hợp đã pass CI | `g1/integration` |
+| Lịch sử Frontend của Tú | `g1/frontend-tu` |
+| Lịch sử Backend của Minh | `g1/backend-minh` |
+| Lịch sử AI/Integration của Hoan | `g1/ai-integration-hoan` |
 
-Không push trực tiếp feature lên `main`. Pull request phải nhỏ, chạy test và không tự thay contract chung.
+Nhánh tạo nhầm `feature/frontend-tu` đã bị xóa sau khi xác nhận tree trùng
+với `g1/frontend-tu`. Chưa merge `g1/integration` vào `main` cho đến khi nhóm
+review pull request.
