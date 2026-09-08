@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     log_level: str = "INFO"
     llm_provider: str = "mock"
+    grounded_provider: str = "template"
     mock_mode: MockMode = "success"
     mock_latency_ms: int = Field(default=10, ge=0, le=60_000)
     mock_timeout_seconds: float = Field(default=5.0, gt=0, le=300)

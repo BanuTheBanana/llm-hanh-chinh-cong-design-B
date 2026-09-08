@@ -7,13 +7,18 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 SECRET_PATTERNS = {
-    "private key": re.compile(rb"-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----"),
-    "GitHub token": re.compile(rb"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,})\b"),
+    "private key": re.compile(
+        rb"-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----"
+    ),
+    "GitHub token": re.compile(
+        rb"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,})\b"
+    ),
     "OpenAI API key": re.compile(rb"\bsk-(?:proj-|svcacct-)?[A-Za-z0-9_-]{20,}\b"),
+    "Groq API key": re.compile(rb"\bgsk_[A-Za-z0-9_-]{20,}\b"),
     "AWS access key": re.compile(rb"\bAKIA[0-9A-Z]{16}\b"),
     "Google API key": re.compile(rb"\bAIza[0-9A-Za-z_-]{35}\b"),
+    "Google/Gemini credential": re.compile(rb"\bAQ\.[0-9A-Za-z_-]{20,}\b"),
     "Slack token": re.compile(rb"\bxox[baprs]-[0-9A-Za-z-]{20,}\b"),
 }
 
@@ -24,7 +29,9 @@ def repository_paths() -> list[Path]:
         check=True,
         capture_output=True,
     )
-    return sorted({Path(item.decode("utf-8")) for item in result.stdout.split(b"\0") if item})
+    return sorted(
+        {Path(item.decode("utf-8")) for item in result.stdout.split(b"\0") if item}
+    )
 
 
 def main() -> int:
@@ -43,7 +50,9 @@ def main() -> int:
             # A tracked file staged for deletion is not present in the candidate tree.
             continue
         except OSError as error:
-            findings.append(f"{path}: cannot inspect tracked file ({type(error).__name__})")
+            findings.append(
+                f"{path}: cannot inspect tracked file ({type(error).__name__})"
+            )
             continue
         if b"\0" in data or len(data) > 5_000_000:
             continue
@@ -57,7 +66,9 @@ def main() -> int:
             print(f"- {finding}", file=sys.stderr)
         return 1
 
-    print(f"PASS - inspected {len(paths)} repository files; no common secret material found.")
+    print(
+        f"PASS - inspected {len(paths)} repository files; no common secret material found."
+    )
     return 0
 
 

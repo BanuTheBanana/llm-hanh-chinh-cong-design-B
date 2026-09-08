@@ -1,0 +1,10 @@
+{
+  "schema_version": "g2.eval-suite.v1",
+  "suite_id": "g2-offline-smoke-v1",
+  "usage": "D0_SYSTEM_SMOKE",
+  "corpus_version": "synthetic-v1",
+  "prompt_version": "g2-grounded-v2",
+  "cases_file": "cases.jsonl",
+  "cases_sha256": "d25f90c55d441691c4ec5321a1c76a4b7fab03c1f5ee09fef8147d122d48babf",
+  "allowed_splits": ["DEV"]
+}

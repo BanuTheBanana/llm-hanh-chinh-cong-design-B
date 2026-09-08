@@ -28,7 +28,9 @@ API message round-trip trong run này là **56,33 ms** với Mock AI; đây ch�
 baseline kỹ thuật CI, không phải SLA hay benchmark model thật.
 
 G1 chưa có RAG, Qwen, fine-tune, Case, memory dài hạn, queue hay Socket.IO.
-Giai đoạn 2 mới bắt đầu dữ liệu thủ tục công khai và RAG tối giản.
+Giai đoạn 2 đã có nền móng offline của Hoan: grounded API v2, citation guard và
+evaluation fixture. Contract đang chờ Tú/Minh review; dữ liệu thủ tục, RAG và
+hosted provider chưa được tích hợp.
 
 ## Chạy nhanh G1
 
@@ -53,9 +55,12 @@ vào bản G1. Xem runbook riêng trong [`web/`](web/README.md),
 ## Tài liệu trung tâm
 
 1. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
-2. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
-3. [API contract G1](docs/contracts-g1.md)
-4. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
+2. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
+3. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
+4. [Grounded API contract G2](docs/contracts-g2.md)
+5. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
+6. [API contract G1](docs/contracts-g1.md)
+7. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
 
 ## Cấu trúc repository
 
@@ -64,10 +69,12 @@ vào bản G1. Xem runbook riêng trong [`web/`](web/README.md),
 ├── web/                 # React/TypeScript, Vitest, Playwright, Nginx
 ├── backend/             # FastAPI, PostgreSQL, SQLAlchemy, Alembic
 ├── ai-service/          # FastAPI, provider interface, MockProvider
+├── evaluation/          # Fixture và report evaluation G2 offline
 ├── infra/docker/        # Ghi chú hạ tầng bổ trợ
 ├── scripts/             # Smoke và repository hygiene checks
 ├── docs/
 │   ├── architecture/    # Sơ đồ tham khảo
+│   ├── giai-doan-2/     # Kế hoạch thực thi G2 hiện tại
 │   ├── archive/         # Tài liệu cũ
 │   └── parked/          # Target architecture chưa triển khai
 ├── .github/workflows/   # Năm gate CI G1

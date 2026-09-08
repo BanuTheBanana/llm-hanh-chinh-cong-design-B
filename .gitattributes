@@ -1,0 +1,3 @@
+# Evaluation manifests hash fixture bytes, so JSONL line endings must be stable
+# across Windows and Linux checkouts.
+evaluation/fixtures/**/*.jsonl text eol=lf

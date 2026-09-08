@@ -26,6 +26,21 @@ class ProviderTimeoutError(ProviderError):
     public_message = "AI Service timed out. Please try again."
 
 
+class ProviderRateLimitError(ProviderError):
+    code = "AI_PROVIDER_RATE_LIMITED"
+    public_message = "AI provider rate limit was reached. Please try again later."
+
+
+class ProviderResponseError(ProviderError):
+    code = "AI_PROVIDER_INVALID_RESPONSE"
+    public_message = "AI provider returned an invalid response."
+
+
+class ProviderPolicyError(ProviderError):
+    code = "AI_PROVIDER_DATA_NOT_ALLOWED"
+    public_message = "The configured AI provider is not approved for this data classification."
+
+
 class UnsupportedProviderError(ProviderError):
     code = "AI_PROVIDER_UNAVAILABLE"
     public_message = "The configured AI provider is unavailable."
