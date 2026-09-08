@@ -1,22 +1,29 @@
 # API Contract G1
 
-> Trạng thái: `FROZEN_FOR_G1`  
-> Cập nhật: 08/09/2026  
-> Owner ghi nhận: Hoan; Tú và Minh cùng review.
+> Trạng thái: `VERIFIED_ON_G1_INTEGRATION`<br>
+> Phiên bản: `v1.2`<br>
+> Cập nhật: 08/09/2026<br>
+> Runtime đã kiểm tra: commit `4b64f6f`, GitHub Actions run
+> [`34197723998`](https://github.com/DOMEMON/llm-hanh-chinh-cong/actions/runs/34197723998)<br>
+> Owner ghi nhận: Hoan; Web của Tú và Backend của Minh là consumer.
 
-Contract này là điểm nối giữa Web, Core Backend và AI Service. Muốn thay đổi phải báo cả ba thành viên và cập nhật consumer liên quan trong cùng pull request hoặc theo kế hoạch tương thích đã thống nhất.
+Đây là contract duy nhất giữa Web, Core Backend và AI Service trong G1.
+Không tạo bản sao trong folder service. Thay đổi schema phải cập nhật consumer,
+test và tài liệu trong cùng pull request hoặc có kế hoạch tương thích.
 
 ## Quy ước chung
 
-- Web: `http://localhost:3000`.
-- Core API: `http://localhost:8000/api/v1`.
-- AI internal API trong Compose: `http://ai-service:8001/internal/v1`.
-- ID: UUID string.
+- Web mặc định: `http://localhost:3000`.
+- Public Core API mặc định: `http://localhost:8000/api/v1`.
+- AI Service origin trong Compose: `http://ai-service:8001`.
+- Internal generate route: `/internal/v1/generate`.
+- ID và `request_id`: UUID string.
 - Timestamp: ISO 8601 UTC.
-- Web gửi cookie bằng `credentials: include`.
-- G1 dùng response synchronous, chưa dùng Socket.IO.
+- Web luôn gửi cookie bằng `credentials: "include"`.
+- G1 dùng response synchronous, chưa có Socket.IO/queue.
+- Input model từ chối field dư.
 
-Lỗi chuẩn:
+Lỗi public chuẩn:
 
 ```json
 {
@@ -27,6 +34,10 @@ Lỗi chuẩn:
   }
 }
 ```
+
+Với request đi vào application handler, Core Backend cũng trả `X-Request-ID`
+cùng giá trị và `Cache-Control: no-store`. CORS preflight bị middleware từ chối
+là ngoại lệ: browser có thể nhận plain-text error mà không có hai header này.
 
 ## Public Core API
 
@@ -41,17 +52,41 @@ POST /api/v1/conversations/{conversation_id}/messages
 GET  /health
 ```
 
-### Login demo
+### Authentication demo
+
+Login request, `display_name` được trim và có 1–100 ký tự:
 
 ```json
-{
-  "display_name": "Hoan"
-}
+{"display_name": "Hoan"}
 ```
 
-Backend đặt opaque session cookie `HttpOnly`, `SameSite=Lax`. Frontend không gửi `user_id` để chứng minh danh tính.
+`POST /auth/login` trả `200`:
+
+```json
+{"id": "uuid", "display_name": "Hoan"}
+```
+
+Backend tạo opaque session token ngẫu nhiên, database chỉ lưu hash, và đặt
+cookie `g1_session`, `HttpOnly`, `SameSite=Lax`, Path `/`. `Secure` phụ thuộc
+environment. Frontend không gửi `user_id` để chứng minh danh tính.
+
+- `GET /auth/me`: `200` với schema user trên hoặc `401 UNAUTHORIZED`.
+- `POST /auth/logout`: `204`, body rỗng; gọi lặp lại vẫn an toàn.
+
+Login bằng tên không xác minh con người thật. Cùng một `display_name` ánh xạ
+vào cùng demo user và có thể thấy lại lịch sử của user đó; bất kỳ ai biết tên
+đều có thể nhập lại. Đây không phải authentication và tuyệt đối không dùng với
+PII/dữ liệu thật.
 
 ### Conversation
+
+`POST /conversations` nhận `{}` hoặc title 1–200 ký tự:
+
+```json
+{"title": "Cuộc trò chuyện mới"}
+```
+
+Response `201`:
 
 ```json
 {
@@ -62,7 +97,15 @@ Backend đặt opaque session cookie `HttpOnly`, `SameSite=Lax`. Frontend không
 }
 ```
 
-### Gửi message
+`GET /conversations` trả array trực tiếp, conversation mới cập nhật đứng
+trước. G1 chưa phân trang.
+
+### Message
+
+`GET /conversations/{id}/messages` trả array cũ trước, bao gồm cả
+`pending | completed | failed`.
+
+Request gửi message; `content` sau trim có 1–10.000 ký tự:
 
 ```json
 {
@@ -71,7 +114,7 @@ Backend đặt opaque session cookie `HttpOnly`, `SameSite=Lax`. Frontend không
 }
 ```
 
-Response:
+Response thành công `200`:
 
 ```json
 {
@@ -94,7 +137,33 @@ Response:
 }
 ```
 
-`client_message_id` là idempotency key trong phạm vi conversation. Khi AI lỗi, user message vẫn được giữ và Core API trả lỗi chuẩn.
+Quy tắc idempotency:
+
+- `client_message_id` unique trong một conversation;
+- retry cùng ID và cùng content sau khi thành công trả lại cặp đã lưu,
+  không gọi AI lại;
+- cùng ID nhưng content khác trả `409 IDEMPOTENCY_CONFLICT`;
+- retry failed turn mới nhất tái sử dụng user message; failed turn cũ sau khi đã
+  có turn mới trả `409 RETRY_OUT_OF_ORDER`;
+- khi AI lỗi/timeout, user message vẫn được lưu `failed`, không bịa
+  assistant message thành công.
+
+## Public error codes
+
+| HTTP | Code | Ý nghĩa cho client |
+|---:|---|---|
+| 401 | `UNAUTHORIZED` | Đăng nhập lại và xóa workspace UI |
+| 403 | `FORBIDDEN_ORIGIN` | Origin browser không khớp `WEB_ORIGIN` |
+| 404 | `NOT_FOUND` | Conversation không tồn tại hoặc không thuộc user |
+| 404/405 | `HTTP_ERROR` | Route không tồn tại hoặc HTTP method không được hỗ trợ |
+| 409 | `MESSAGE_IN_PROGRESS` | Conversation đang xử lý turn khác |
+| 409 | `IDEMPOTENCY_CONFLICT` | ID cũ bị dùng với content khác |
+| 409 | `RETRY_OUT_OF_ORDER` | Không retry failed turn cũ sau turn mới |
+| 422 | `VALIDATION_ERROR` | Input sai/rỗng/quá dài/có field dư |
+| 500 | `INTERNAL_ERROR` | Lỗi Core; tra log bằng request ID |
+| 502 | `AI_SERVICE_ERROR` | Network/HTTP/schema AI không hợp lệ |
+| 503 | `DATABASE_UNAVAILABLE` | Health không truy cập được DB |
+| 504 | `AI_SERVICE_TIMEOUT` | AI vượt deadline; UI cho retry |
 
 ## Internal AI API
 
@@ -103,7 +172,7 @@ POST /internal/v1/generate
 GET  /health
 ```
 
-Request:
+Generate request:
 
 ```json
 {
@@ -115,6 +184,16 @@ Request:
 }
 ```
 
+Ràng buộc:
+
+- 1–100 messages; Backend gửi tối đa 100 message gần nhất theo thứ tự;
+- role: `system | user | assistant`;
+- content không blank, tối đa 16.000 ký tự;
+- `max_output_tokens`: integer 1–4.096.
+
+Core G1 lấy `max_output_tokens` từ `LLM_MAX_OUTPUT_TOKENS`, mặc định 300 và
+cũng bị giới hạn 1–4.096.
+
 Response:
 
 ```json
@@ -123,21 +202,66 @@ Response:
   "text": "Đây là phản hồi mô phỏng cho câu hỏi của bạn.",
   "provider": "mock",
   "model": "mock-v1",
-  "usage": {
-    "input_tokens": 0,
-    "output_tokens": 0
-  },
+  "usage": {"input_tokens": 0, "output_tokens": 0},
   "latency_ms": 10
 }
 ```
 
-Mock modes: `success | error | timeout`, được điều khiển bằng cấu hình hoặc test override, không dùng câu lệnh bí mật trong prompt.
+`provider` là string không blank để tương thích adapter tương lai; implementation
+G1 chỉ chấp nhận `LLM_PROVIDER=mock`. Mock modes `success | error | timeout`
+được điều khiển bằng environment/test override, không bằng câu lệnh bí mật
+trong prompt.
 
-## Quy tắc bảo mật và ownership
+### Internal AI error codes
+
+| HTTP | Code | Ý nghĩa với Core Backend |
+|---:|---|---|
+| 422 | `VALIDATION_ERROR` | Request nội bộ sai schema/giới hạn |
+| 503 | `AI_PROVIDER_ERROR` | Provider chạy nhưng trả lỗi có kiểm soát |
+| 503 | `AI_PROVIDER_UNAVAILABLE` | Provider cấu hình chưa được triển khai |
+| 504 | `AI_SERVICE_TIMEOUT` | Provider vượt thời gian chờ |
+
+Core giữ lỗi 504 thành public `504 AI_SERVICE_TIMEOUT`. Network error, HTTP
+error khác 504, JSON/schema sai hoặc request ID không khớp được chuẩn hóa thành
+public `502 AI_SERVICE_ERROR`.
+
+## Health contracts
+
+Core Backend, chỉ phụ thuộc database:
+
+```json
+{"status": "ok"}
+```
+
+AI Service:
+
+```json
+{"status": "ok", "service": "ai-service", "provider": "mock"}
+```
+
+## Cấu hình nối service
+
+- `AI_SERVICE_URL` là origin, ví dụ `http://ai-service:8001`; không kèm
+  `/internal/v1` hay `/generate`.
+- Backend nối chính xác `/internal/v1/generate`.
+- `AI_REQUEST_TIMEOUT_SECONDS` điều khiển deadline của Backend.
+- `LLM_MAX_OUTPUT_TOKENS` điều khiển giới hạn output Core gửi sang AI Service.
+- `WEB_ORIGIN` phải khớp chính xác scheme/host/port mà browser mở.
+- Web chỉ đọc `VITE_API_BASE_URL`; không gọi AI Service trực tiếp.
+- Nếu đổi `WEB_PORT` hoặc `BACKEND_PORT`, phải đổi đồng bộ `WEB_ORIGIN` và
+  `VITE_API_BASE_URL` vì các URL trên chỉ là default local.
+
+PostgreSQL trong Compose dùng `POSTGRES_DB`, `POSTGRES_USER` và
+`POSTGRES_PASSWORD` để tạo database; Backend nhận chính các giá trị này qua
+`DB_NAME`, `DB_USER`, `DB_PASSWORD`, với host `postgres` và port `5432`.
+`DATABASE_URL` là override tùy chọn, được ưu tiên khi khác rỗng; nếu đặt thì
+người vận hành chịu trách nhiệm để DSN trỏ đúng database.
+
+## Bảo mật và ownership
 
 - Core Backend lấy user từ session, không tin `user_id` từ client.
-- Mọi conversation/message query phải kiểm tra ownership.
-- Web không gọi AI Service trực tiếp.
+- Mọi conversation/message query kiểm tra ownership; cross-user trả 404 để
+  không rò sự tồn tại.
 - AI Service không truy cập PostgreSQL ứng dụng trong G1.
-- Không log session token, secret hoặc dữ liệu nhạy cảm.
+- Không log session token, secret, request body, DSN hay exception text.
 - G1 chỉ dùng dữ liệu giả `D0_SYSTEM_SMOKE`.

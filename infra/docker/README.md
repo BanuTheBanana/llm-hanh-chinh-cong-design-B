@@ -13,8 +13,8 @@ Compose dùng profile để ba thành viên có thể làm song song:
 | `docker compose --profile full up --build -d` | Thêm `backend`, `web` | Kiểm thử end-to-end |
 
 `postgres` và `ai-service` không nằm trong profile nên luôn sẵn sàng làm dependency.
-`backend` và `web` nằm trong profile vì hai module có thể chưa có code/Dockerfile khi
-Hoan bắt đầu. Không cần tạo container placeholder và không cần đổi contract.
+`backend` và `web` nằm trong profile để vẫn có thể chạy từng lát; hiện cả hai đã có
+code, Dockerfile và đã pass full-stack CI.
 
 ## Khởi động lần đầu
 
@@ -25,9 +25,9 @@ PowerShell:
 ```powershell
 Copy-Item .env.example .env
 docker compose config --quiet
-docker compose up --build -d
+docker compose --profile full up --build --detach --wait
 docker compose ps
-pwsh -File scripts/smoke-ai.ps1
+python scripts/smoke-e2e.py
 ```
 
 Nếu máy dùng Windows PowerShell 5 thay vì PowerShell 7:
@@ -73,8 +73,10 @@ AI_SERVICE_PORT=18001
 Service DNS/port trong container (`postgres:5432`, `ai-service:8001`) không thay đổi.
 Các port host mặc định chỉ bind vào `127.0.0.1`, không công bố service ra mạng LAN.
 
-Khi đổi `POSTGRES_USER`, `POSTGRES_PASSWORD` hoặc `POSTGRES_DB`, phải cập nhật đồng
-thời `DATABASE_URL` trong `.env` để thông tin kết nối luôn khớp.
+Backend trong Compose nhận `DB_NAME`, `DB_USER` và `DB_PASSWORD` từ chính nhóm
+`POSTGRES_*`, nên thay đổi được đồng bộ tự động. `DATABASE_URL` là override tùy
+chọn; nếu tự đặt DSN này thì nó được ưu tiên và người vận hành phải bảo đảm nó
+trỏ đúng database.
 
 ## Kiểm thử các Mock mode
 
