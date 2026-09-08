@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1130" viewBox="0 0 1920 1130" role="img" aria-labelledby="diagram-title diagram-description">
+<title id="diagram-title">Kiến trúc tổng quan</title>
+<desc id="diagram-description">Bản báo cáo mentor • Phạm vi: hỏi đáp và hướng dẫn thủ tục hành chính công • Định hướng đề xuất v0.2</desc>
+<defs>
+<marker id="arrow-147D66" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#147D66"/></marker>
+<marker id="arrow-536C90" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#536C90"/></marker>
+<marker id="arrow-7143AD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7143AD"/></marker>
+</defs>
+<rect id="canvas" x="0" y="0" width="1920" height="1130" rx="0" fill="#F5F7FB" stroke="#F5F7FB" stroke-width="0"/>
+<text id="brand" x="55" y="37.0" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#56677F" text-anchor="start" dominant-baseline="central">LUẬT ĐÚNG LÚC  /  TRỢ LÝ HÀNH CHÍNH CÔNG</text>
+<text id="title" x="55" y="85.5" font-family="Segoe UI, Arial, sans-serif" font-size="39" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Kiến trúc tổng quan</text>
+<text id="subtitle" x="58" y="132.0" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Bản báo cáo mentor • Phạm vi: hỏi đáp và hướng dẫn thủ tục hành chính công • Định hướng đề xuất v0.2</text>
+<rect id="section-0" x="40" y="172" width="1840" height="538" rx="16" fill="#FFFFFF" stroke="#DCE4EF" stroke-width="1.2"/>
+<text id="section-title-0" x="64" y="200.0" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#56677F" text-anchor="start" dominant-baseline="central">A  /  PHỤC VỤ NGƯỜI DÙNG</text>
+<text id="section-sub-0" x="64" y="227.0" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Backend điều phối; dữ liệu được lưu theo người dùng, cuộc hội thoại và hồ sơ thủ tục.</text>
+<rect id="section-1" x="40" y="742" width="1840" height="260" rx="16" fill="#FFFFFF" stroke="#DCE4EF" stroke-width="1.2"/>
+<text id="section-title-1" x="64" y="770.0" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#56677F" text-anchor="start" dominant-baseline="central">B  /  TRI THỨC &amp; HUẤN LUYỆN</text>
+<text id="section-sub-1" x="64" y="797.0" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Cập nhật thủ tục qua kho dữ liệu; phát hành model qua một pipeline offline riêng.</text>
+<path id="edge-0" d="M 405 338.0 L 505 338.0" fill="none" stroke="#536C90" stroke-width="2" marker-end="url(#arrow-536C90)"/>
+<path id="edge-1" d="M 925 338.0 L 1025 338.0" fill="none" stroke="#536C90" stroke-width="2" marker-end="url(#arrow-536C90)"/>
+<path id="edge-2" d="M 1250.0 416 L 1250 442 L 1059 442 L 1059.0 470" fill="none" stroke="#536C90" stroke-width="2" marker-end="url(#arrow-536C90)"/>
+<path id="edge-3" d="M 1255 566.0 L 1455 566.0" fill="none" stroke="#7143AD" stroke-width="2" marker-end="url(#arrow-7143AD)" marker-start="url(#arrow-7143AD)"/>
+<path id="edge-4" d="M 695 566.0 L 495 566.0" fill="none" stroke="#147D66" stroke-width="2" marker-end="url(#arrow-147D66)" marker-start="url(#arrow-147D66)" stroke-dasharray="7 5"/>
+<path id="edge-5" d="M 589.0 416 L 589 444 L 432 444 L 432.0 470" fill="none" stroke="#147D66" stroke-width="2" marker-end="url(#arrow-147D66)" stroke-dasharray="7 5"/>
+<path id="edge-6" d="M 975.0 823 L 975.0 662" fill="none" stroke="#147D66" stroke-width="2" marker-end="url(#arrow-147D66)" marker-start="url(#arrow-147D66)"/>
+<path id="edge-7" d="M 1255 498.8 L 1340 499 L 1340 445 L 1639 445 L 1639.0 416" fill="none" stroke="#536C90" stroke-width="2" marker-end="url(#arrow-536C90)"/>
+<path id="edge-8" d="M 1695.0 260 L 1695 240 L 240 240 L 240.0 260" fill="none" stroke="#536C90" stroke-width="2" marker-end="url(#arrow-536C90)"/>
+<path id="edge-9" d="M 560 899.5 L 695 899.5" fill="none" stroke="#147D66" stroke-width="2" marker-end="url(#arrow-147D66)" stroke-dasharray="7 5"/>
+<path id="edge-10" d="M 1657.0 823 L 1657 715 L 1645 715 L 1645.0 662" fill="none" stroke="#7143AD" stroke-width="2" marker-end="url(#arrow-7143AD)" stroke-dasharray="7 5"/>
+<rect id="web-box" x="75" y="260" width="330" height="156" rx="12" fill="#EDF4FF" stroke="#A9C5F4" stroke-width="1.5"/>
+<rect id="web-accent" x="75" y="278" width="5" height="120" rx="2" fill="#2455A4" stroke="#2455A4" stroke-width="0"/>
+<text id="web-eyebrow" x="97" y="285.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#2455A4" text-anchor="start" dominant-baseline="central">01 / GIAO DIỆN</text>
+<text id="web-title-0" x="97" y="317.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Web / người dùng</text>
+<text id="web-body-0" x="97" y="349.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Chat · lịch sử · hồ sơ</text>
+<text id="web-body-1" x="97" y="373.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Nguồn tham khảo · upload</text>
+<rect id="api-box" x="505" y="260" width="420" height="156" rx="12" fill="#EDF4FF" stroke="#A9C5F4" stroke-width="1.5"/>
+<rect id="api-accent" x="505" y="278" width="5" height="120" rx="2" fill="#2455A4" stroke="#2455A4" stroke-width="0"/>
+<text id="api-eyebrow" x="527" y="285.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#2455A4" text-anchor="start" dominant-baseline="central">02 / TIẾP NHẬN &amp; ĐỊNH DANH</text>
+<text id="api-title-0" x="527" y="317.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Backend / API</text>
+<text id="api-body-0" x="527" y="349.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Session + quyền conversation/case</text>
+<text id="api-body-1" x="527" y="373.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Lưu message + outbox trước queue</text>
+<rect id="queue-box" x="1025" y="260" width="450" height="156" rx="12" fill="#EDF4FF" stroke="#A9C5F4" stroke-width="1.5"/>
+<rect id="queue-accent" x="1025" y="278" width="5" height="120" rx="2" fill="#2455A4" stroke="#2455A4" stroke-width="0"/>
+<text id="queue-eyebrow" x="1047" y="285.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#2455A4" text-anchor="start" dominant-baseline="central">03 / ĐIỀU PHỐI TẢI</text>
+<text id="queue-title-0" x="1047" y="317.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Queue + Conversation Worker</text>
+<text id="queue-body-0" x="1047" y="349.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Tuần tự trong mỗi conversation</text>
+<text id="queue-body-1" x="1047" y="373.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Song song giữa các conversation</text>
+<rect id="socket-box" x="1555" y="260" width="280" height="156" rx="12" fill="#EDF4FF" stroke="#A9C5F4" stroke-width="1.5"/>
+<rect id="socket-accent" x="1555" y="278" width="5" height="120" rx="2" fill="#2455A4" stroke="#2455A4" stroke-width="0"/>
+<text id="socket-eyebrow" x="1577" y="285.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#2455A4" text-anchor="start" dominant-baseline="central">06 / REALTIME</text>
+<text id="socket-title-0" x="1577" y="317.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Socket.IO</text>
+<text id="socket-body-0" x="1577" y="349.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Trạng thái tức thời</text>
+<text id="socket-body-1" x="1577" y="373.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Gửi answer đã duyệt</text>
+<rect id="memory-box" x="75" y="470" width="420" height="192" rx="12" fill="#EDF8F4" stroke="#A0CFC0" stroke-width="1.5"/>
+<rect id="memory-accent" x="75" y="488" width="5" height="156" rx="2" fill="#147D66" stroke="#147D66" stroke-width="0"/>
+<text id="memory-eyebrow" x="97" y="495.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#147D66" text-anchor="start" dominant-baseline="central">DỮ LIỆU CÁ NHÂN &amp; TRẠNG THÁI</text>
+<text id="memory-title-0" x="97" y="527.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">PostgreSQL / bộ nhớ</text>
+<text id="memory-body-0" x="97" y="559.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">User · session · conversation · case</text>
+<text id="memory-body-1" x="97" y="583.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Messages · facts · summary · audit</text>
+<text id="memory-body-2" x="97" y="607.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Lưu lâu dài; truy xuất đúng hồ sơ</text>
+<rect id="orch-box" x="695" y="470" width="560" height="192" rx="12" fill="#FFF7E8" stroke="#E6C68D" stroke-width="1.5"/>
+<rect id="orch-accent" x="695" y="488" width="5" height="156" rx="2" fill="#A86A12" stroke="#A86A12" stroke-width="0"/>
+<text id="orch-eyebrow" x="717" y="495.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#A86A12" text-anchor="start" dominant-baseline="central">04 / CÁC MODULE TRONG BACKEND</text>
+<text id="orch-title-0" x="717" y="527.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Luồng xử lý nghiệp vụ</text>
+<text id="orch-body-0" x="717" y="559.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Context Builder + Case Card Validator</text>
+<text id="orch-body-1" x="717" y="583.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Procedure Engine + Answer Verifier</text>
+<text id="orch-body-2" x="717" y="607.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Hỏi thêm nếu thiếu; duyệt rồi mới gửi</text>
+<rect id="qwen-box" x="1455" y="470" width="380" height="192" rx="12" fill="#F3EEFC" stroke="#C5B2E9" stroke-width="1.5"/>
+<rect id="qwen-accent" x="1455" y="488" width="5" height="156" rx="2" fill="#7143AD" stroke="#7143AD" stroke-width="0"/>
+<text id="qwen-eyebrow" x="1477" y="495.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#7143AD" text-anchor="start" dominant-baseline="central">05 / LLM 1.7B–4B · Q4/Q5 SAU EVAL</text>
+<text id="qwen-title-0" x="1477" y="527.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Qwen lightweight</text>
+<text id="qwen-body-0" x="1477" y="559.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Hiểu yêu cầu / trích Case Card</text>
+<text id="qwen-body-1" x="1477" y="583.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Diễn giải / tóm tắt theo dữ liệu</text>
+<text id="qwen-body-2" x="1477" y="607.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Một runtime dùng chung</text>
+<rect id="ingest-box" x="75" y="823" width="485" height="153" rx="12" fill="#F1F4F8" stroke="#C1CBD8" stroke-width="1.5"/>
+<rect id="ingest-accent" x="75" y="841" width="5" height="117" rx="2" fill="#50627B" stroke="#50627B" stroke-width="0"/>
+<text id="ingest-eyebrow" x="97" y="848.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#50627B" text-anchor="start" dominant-baseline="central">NGUỒN THỦ TỤC CHÍNH THỨC</text>
+<text id="ingest-title-0" x="97" y="880.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Công ty / admin dữ liệu</text>
+<text id="ingest-body-0" x="97" y="912.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Import → chuẩn hóa → review → index</text>
+<text id="ingest-body-1" x="97" y="936.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Kiểm thử → publish phiên bản</text>
+<rect id="rag-box" x="695" y="823" width="560" height="153" rx="12" fill="#EDF8F4" stroke="#A0CFC0" stroke-width="1.5"/>
+<rect id="rag-accent" x="695" y="841" width="5" height="117" rx="2" fill="#147D66" stroke="#147D66" stroke-width="0"/>
+<text id="rag-eyebrow" x="717" y="848.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#147D66" text-anchor="start" dominant-baseline="central">KHO TRI THỨC NGHIỆP VỤ</text>
+<text id="rag-title-0" x="717" y="880.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Procedure Store + RAG</text>
+<text id="rag-body-0" x="717" y="912.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Thủ tục có phiên bản + điều kiện + nguồn</text>
+<text id="rag-body-1" x="717" y="936.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Tìm đúng đối tượng, nơi và thời điểm</text>
+<rect id="train-box" x="1390" y="823" width="445" height="153" rx="12" fill="#F3EEFC" stroke="#C5B2E9" stroke-width="1.5"/>
+<rect id="train-accent" x="1390" y="841" width="5" height="117" rx="2" fill="#7143AD" stroke="#7143AD" stroke-width="0"/>
+<text id="train-eyebrow" x="1412" y="848.5" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#7143AD" text-anchor="start" dominant-baseline="central">OFFLINE / TÀI NGUYÊN CÔNG TY</text>
+<text id="train-title-0" x="1412" y="880.5" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">Fine-tune → nén → đánh giá</text>
+<text id="train-body-0" x="1412" y="912.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Dữ liệu được phép + gold/SFT</text>
+<text id="train-body-1" x="1412" y="936.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Đạt quality gate → phát hành model</text>
+<rect id="el-bg-0" x="423.0" y="312" width="64.0" height="26" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text id="el-text-0" x="455.0" y="325.0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#536C90" text-anchor="middle" dominant-baseline="central">HTTPS</text>
+<rect id="el-bg-1" x="921.0" y="312" width="108.0" height="26" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text id="el-text-1" x="975.0" y="325.0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#536C90" text-anchor="middle" dominant-baseline="central">Sau commit</text>
+<rect id="el-bg-3" x="1261.4" y="531" width="187.20000000000002" height="26" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text id="el-text-3" x="1355.0" y="544.0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#7143AD" text-anchor="middle" dominant-baseline="central">Gọi model / kết quả</text>
+<rect id="el-bg-4" x="501.4" y="535" width="187.20000000000002" height="26" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text id="el-text-4" x="595.0" y="548.0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#147D66" text-anchor="middle" dominant-baseline="central">Đọc / ghi đúng case</text>
+<rect id="el-bg-6" x="890.2" y="707" width="169.60000000000002" height="26" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text id="el-text-6" x="975.0" y="720.0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#147D66" text-anchor="middle" dominant-baseline="central">Schema + evidence</text>
+<rect id="el-bg-7" x="1407.0" y="432" width="196.0" height="26" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text id="el-text-7" x="1505.0" y="445.0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#536C90" text-anchor="middle" dominant-baseline="central">Đã kiểm tra + đã lưu</text>
+<rect id="el-bg-8" x="811.8" y="227" width="310.40000000000003" height="26" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text id="el-text-8" x="967.0" y="240.0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#536C90" text-anchor="middle" dominant-baseline="central">Cập nhật trạng thái / trả kết quả</text>
+<rect id="el-bg-9" x="586.2" y="865" width="81.60000000000001" height="26" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text id="el-text-9" x="627.0" y="878.0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#147D66" text-anchor="middle" dominant-baseline="central">Publish</text>
+<rect id="el-bg-10" x="1652.8" y="702" width="134.4" height="26" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"/>
+<text id="el-text-10" x="1720.0" y="715.0" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#7143AD" text-anchor="middle" dominant-baseline="central">Model version</text>
+<text id="note-0-0" x="65" y="1033.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">Màu: xanh dương = hệ thống/API    •    xanh lá = dữ liệu/RAG    •    tím = model    •    vàng = kiểm tra &amp; quy tắc</text>
+<text id="note-1-0" x="65" y="1067.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#56677F" text-anchor="start" dominant-baseline="central">MVP: Docker Compose + cấu hình môi trường + theo dõi chất lượng. Các khối logic có thể dùng chung một backend/worker.</text>
+<text id="note-2-0" x="65" y="1099.0" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#172B4D" text-anchor="start" dominant-baseline="central">LLM là một thành phần của sản phẩm; lịch sử và ngữ cảnh được backend lưu, kiểm tra và nạp lại khi người dùng quay về.</text>
+</svg>

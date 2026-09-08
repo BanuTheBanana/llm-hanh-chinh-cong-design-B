@@ -1,0 +1,19 @@
+# Local environment secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# JavaScript
+node_modules/
+dist/
+
+# Local runtime data
+data/
+uploads/
+models/
+logs/
