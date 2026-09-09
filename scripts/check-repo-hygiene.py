@@ -22,6 +22,17 @@ SECRET_PATTERNS = {
     "Slack token": re.compile(rb"\bxox[baprs]-[0-9A-Za-z-]{20,}\b"),
 }
 
+FORBIDDEN_DATA_SUFFIXES = {".xls", ".xlsx", ".xlsm"}
+FORBIDDEN_DATA_ROOTS = {
+    Path("dataset"),
+    Path("data/company_private"),
+    Path("data/gold"),
+}
+
+
+def is_below(path: Path, root: Path) -> bool:
+    return path == root or root in path.parents
+
 
 def repository_paths() -> list[Path]:
     result = subprocess.run(
@@ -43,6 +54,10 @@ def main() -> int:
             findings.append(f"{path}: local environment file is tracked")
         if path.suffix.lower() in {".key", ".p12", ".pfx"}:
             findings.append(f"{path}: private credential file type is tracked")
+        if path.suffix.lower() in FORBIDDEN_DATA_SUFFIXES:
+            findings.append(f"{path}: spreadsheet source data must not be tracked")
+        if any(is_below(path, root) for root in FORBIDDEN_DATA_ROOTS):
+            findings.append(f"{path}: private or derived company data path is tracked")
 
         try:
             data = path.read_bytes()

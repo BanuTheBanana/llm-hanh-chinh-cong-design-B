@@ -10,10 +10,10 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v2.1` |
-| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_COMPLETED_SYNTHETIC_SCOPE`; `G3_DATA_AUDIT_AND_LOCAL_BASELINE` |
+| Phiên bản | `v2.2` |
+| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_COMPLETED_SYNTHETIC_SCOPE`; `G3_C1_TOOLING_READY_REVIEW_REQUIRED` |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
-| Thay đổi lần này | Đã nhận và audit workbook công ty; G3 ưu tiên governance → preprocessing → RAG baseline → Qwen3-1.7B local zero-shot → chỉ QLoRA khi model là bottleneck |
+| Thay đổi lần này | Đã thay script data thử nghiệm bằng parser/validator deterministic đúng `g3-data-v1`; output và gold thật tiếp tục private, mọi procedure/gold vẫn chờ review con người |
 
 Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](parked/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; sơ đồ nằm trong [`architecture/`](architecture/README.md).
 
@@ -24,7 +24,8 @@ Hồ sơ G2: [Phân công Giai đoạn 2](giai-doan-2/02-phan-cong-giai-doan-2.m
 
 Hồ sơ G3: [Audit dataset công ty](giai-doan-3/01-audit-dataset-cong-ty.md) và
 [data contract Tú–Minh](giai-doan-3/02-contract-data-g3.md), sau đó đọc
-[chiến lược/phân công G3](giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md).
+[chiến lược/phân công G3](giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md) và
+[hướng dẫn pipeline dữ liệu](giai-doan-3/04-huong-dan-pipeline-data-tu.md).
 
 Contract `g3-data-v1` là ranh giới đã khóa: Tú tạo private JSONL đúng schema,
 Minh chỉ ingest record đủ review gate. Mọi thay đổi field/enum/nullability phải
@@ -652,9 +653,11 @@ Chỉ bắt đầu khi core answer + local model + domain baseline đã đạt g
    nội bộ lên GitHub.
 3. Lập inventory: format, dung lượng, license/quyền dùng, PII, phiên bản, phạm vi
    thủ tục, nơi lưu và người duyệt nghiệp vụ.
-4. Preprocess deterministic, xử lý duplicate/provenance và tạo approved subset.
-5. Ingest RAG, tạo gold DEV/TEST rồi chạy Qwen3-1.7B local non-thinking zero-shot.
-6. Đo riêng data, retrieval, generation, citation, latency và peak VRAM.
+4. Chạy pipeline G3-C1 local trên workbook thật; parser/validator đã sẵn sàng và
+   đã qua test hư cấu, nhưng chưa thay cho review nghiệp vụ.
+5. Người nghiệp vụ xử lý conflict/provenance, duyệt approved subset và gold TEST.
+6. Ingest RAG rồi chạy Qwen3-1.7B local non-thinking zero-shot.
+7. Đo riêng data, retrieval, generation, citation, latency và peak VRAM.
 
 ### NEXT – Quyết định cải tiến sau zero-shot
 

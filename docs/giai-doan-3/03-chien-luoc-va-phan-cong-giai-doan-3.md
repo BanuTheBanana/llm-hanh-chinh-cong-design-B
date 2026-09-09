@@ -5,8 +5,8 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.0` |
-| Trạng thái | `G3_READY_TO_START_CHECKPOINT_0` |
+| Phiên bản | `v1.1` |
+| Trạng thái | `G3_C1_TOOLING_READY_HUMAN_REVIEW_REQUIRED` |
 | Baseline | `main`, tag `g2-v1.0.0` |
 | Nhánh tích hợp | `g3/integration` |
 | Model baseline đề xuất | `Qwen/Qwen3-1.7B`, local, non-thinking |
@@ -433,6 +433,18 @@ Không ai cần chờ hoàn toàn:
 | G3-A03 | Hoan | Fine-tune decision | I01 | ADR |
 | G3-A04 | Hoan | QLoRA experiment nếu được duyệt | A03=`START_QLORA` | Adapter + ablation |
 
+### Trạng thái phần Tú sau đợt sửa 09/09/2026
+
+| Task | Trạng thái | Bằng chứng/việc còn lại |
+|---|---|---|
+| G3-D01 – parser/validator | `TECHNICALLY_COMPLETE` | Test hư cấu chứng minh schema, reference, PII, conflict và deterministic; cần Tú chạy local trên workbook thật |
+| G3-D02 – conflict/provenance | `BLOCKED_HUMAN_REVIEW` | Bốn nhóm conflict và nguồn/hiệu lực phải do người nghiệp vụ quyết định |
+| G3-D03 – gold DEV/TEST | `DRAFT_GENERATOR_COMPLETE` | Gold đúng schema và split theo procedure; Hoan/người thứ hai phải duyệt expected point/citation rồi khóa TEST |
+
+Chi tiết lệnh chạy và ranh giới bảo mật nằm trong
+[hướng dẫn pipeline phần Tú](04-huong-dan-pipeline-data-tu.md). Không được coi
+`PENDING_REVIEW` hoặc gold draft là corpus đã sẵn sàng ingest.
+
 ## 10. Review chéo
 
 | Artifact | Author | Reviewer |
@@ -459,9 +471,11 @@ G3 chỉ hoàn thành khi:
 
 ## 12. Việc bắt đầu ngay
 
-1. Tú làm `G3-D01`: mapping, PII removal và conflict register.
+1. Tú chạy công cụ `G3-D01` trên máy local, giữ output private và bàn giao báo cáo
+   count/hash; implementation parser/validator đã hoàn tất.
 2. Minh làm `G3-R01`: importer từ normalized fixture theo schema khóa.
 3. Hoan làm `G3-A01`: local model server spike và provider adapter.
-4. Cả nhóm hỏi công ty bảy câu governance trong file audit.
-5. Chưa tải model hoặc train bằng dataset công ty trên cloud ngoài khi chưa có
+4. Người nghiệp vụ xử lý `G3-D02`; Hoan/người thứ hai review gold `G3-D03`.
+5. Cả nhóm hỏi công ty bảy câu governance trong file audit.
+6. Chưa tải model hoặc train bằng dataset công ty trên cloud ngoài khi chưa có
    xác nhận chính sách.
