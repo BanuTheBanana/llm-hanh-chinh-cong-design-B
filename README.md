@@ -75,6 +75,13 @@ docker compose -f compose.yaml -f compose.g2.yaml --profile full up --build --de
 python scripts/smoke-g2.py
 ```
 
+Khi chạy overlay Qwen local của G3, dùng smoke tương ứng (không dùng smoke G2 vốn
+khóa `provider=template`):
+
+```powershell
+python scripts/smoke-g3-local.py
+```
+
 Mở `http://localhost:3000` và hỏi về “khai sinh Sao Mai”, “căn cước Ánh Trăng”
 hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong một câu hỏi dài tự nhiên.
 Đây là dataset D0 giả có cảnh báo rõ, không phải hướng dẫn hành chính thực tế. Readiness G2 ở
@@ -86,13 +93,14 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 2. [Chiến lược và phân công Giai đoạn 3](docs/giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md)
 3. [Audit dataset công ty](docs/giai-doan-3/01-audit-dataset-cong-ty.md)
 4. [Data contract G3 giữa Tú và Minh](docs/giai-doan-3/02-contract-data-g3.md)
-5. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
-6. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
-7. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
-8. [Grounded API contract G2](docs/contracts-g2.md)
-9. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
-10. [API contract G1](docs/contracts-g1.md)
-11. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
+5. [Runbook Qwen3-1.7B local](docs/giai-doan-3/04-runbook-qwen-local.md)
+6. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
+7. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
+8. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
+9. [Grounded API contract G2](docs/contracts-g2.md)
+10. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
+11. [API contract G1](docs/contracts-g1.md)
+12. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
 
 ## Cấu trúc repository
 
@@ -116,6 +124,7 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 ├── .github/workflows/   # Regression G1 + technical gates G2
 ├── compose.yaml         # Full G1 stack và health dependencies
 ├── compose.g2.yaml      # Overlay D0: ingest fixture + bật grounded RAG
+├── compose.g3.local.yaml # Overlay D0: thay template bằng Qwen local
 └── .env.example         # Cấu hình demo, không có secret thật
 ```
 

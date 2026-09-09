@@ -6,13 +6,14 @@
 2. [Chiến lược và phân công Giai đoạn 3](giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md)
 3. [Audit dataset công ty](giai-doan-3/01-audit-dataset-cong-ty.md)
 4. [Data contract G3 giữa Tú và Minh](giai-doan-3/02-contract-data-g3.md)
-5. [Chỉ mục Giai đoạn 3](giai-doan-3/README.md)
-6. [Kế hoạch và phân công Giai đoạn 2](giai-doan-2/02-phan-cong-giai-doan-2.md)
-7. [Chỉ mục Giai đoạn 2](giai-doan-2/README.md)
-8. [Grounded API Contract G2](contracts-g2.md)
-9. [API Contract G1](contracts-g1.md)
-10. [Hồ sơ phân công và nghiệm thu Giai đoạn 1](01-phan-cong-giai-doan-1.md)
-11. [Chỉ mục Giai đoạn 1](giai-doan-1/README.md)
+5. [Runbook Qwen3-1.7B local](giai-doan-3/04-runbook-qwen-local.md)
+6. [Chỉ mục Giai đoạn 3](giai-doan-3/README.md)
+7. [Kế hoạch và phân công Giai đoạn 2](giai-doan-2/02-phan-cong-giai-doan-2.md)
+8. [Chỉ mục Giai đoạn 2](giai-doan-2/README.md)
+9. [Grounded API Contract G2](contracts-g2.md)
+10. [API Contract G1](contracts-g1.md)
+11. [Hồ sơ phân công và nghiệm thu Giai đoạn 1](01-phan-cong-giai-doan-1.md)
+12. [Chỉ mục Giai đoạn 1](giai-doan-1/README.md)
 
 Chiến lược là roadmap đang có hiệu lực. Phân công G3 là task board hiện tại.
 G1/G2 đã nghiệm thu và tiếp tục được giữ làm regression baseline.
