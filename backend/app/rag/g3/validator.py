@@ -216,6 +216,21 @@ def load(dataset: Path, version: str, expected_rows: int = 42, production=False)
     for p in procedures.values():
         require(set(p["source_ids"]) <= sources.keys(), "BROKEN_SOURCE_REFERENCE")
         used_sources.update(p["source_ids"])
+        procedure_sources = [sources[source_id] for source_id in p["source_ids"]]
+        metadata_presence = {
+            "procedure_code": any(source["procedure_code"] for source in procedure_sources),
+            "issuing_authority": any(source["issuing_authority"] for source in procedure_sources),
+            "jurisdiction": any(value for value in p["jurisdiction"].values() if value != "VN"),
+            "effective_dates": any(
+                source["effective_from"] or source["effective_to"] for source in procedure_sources
+            ),
+            "public_url": any(source["public_url"] for source in procedure_sources),
+        }
+        for field, present in metadata_presence.items():
+            require(
+                present != (field in p["missing_fields"]),
+                "METADATA_MISSING_FIELD_MISMATCH",
+            )
         for field, section in SECTIONS.items():
             refs = p["field_evidence"][field]
             require(bool(p[field]) or field in p["missing_fields"], "MISSING_FIELD_UNDECLARED")

@@ -2,6 +2,9 @@
 
 import copy
 import json
+import os
+import unicodedata
+from pathlib import Path
 
 import pytest
 
@@ -127,6 +130,7 @@ def write_dataset(root, groups):
                 json.dumps(r, ensure_ascii=False) + "\n" for r in sorted(rows, key=lambda r: r[key])
             ),
             encoding="utf-8",
+            newline="\n",
         )
     return root
 
@@ -225,6 +229,20 @@ def test_review_production_gate(dataset):
     assert not load(dataset, VERSION, 2, production=True).accepted
 
 
+def test_metadata_missing_fields_must_match_source_data(tmp_path):
+    groups = fixture_groups()
+    groups[0][0]["procedure_code"] = None
+    with pytest.raises(CorpusError, match="METADATA_MISSING_FIELD_MISMATCH"):
+        load(write_dataset(tmp_path, groups), VERSION, 2)
+
+
+def test_query_is_normalized_without_mutating_dataset(dataset):
+    decomposed = "  " + unicodedata.normalize("NFD", "Lệ phí của Mẫu Alpha?") + "  "
+    result = retrieve(load(dataset, VERSION, 2), decomposed)
+    assert result["status"] == "ANSWER"
+    assert result["procedure_id"] == "fictional-alpha"
+
+
 def test_conflict(tmp_path):
     g = fixture_groups()
     g[1][0]["review"]["status"] = "QUARANTINED"
@@ -292,12 +310,23 @@ def test_encoding_and_duplicate_keys(dataset):
         load(dataset, VERSION, 2)
 
 
+def test_runtime_schema_matches_frozen_contract():
+    runtime = Path(__file__).parents[1] / "app/rag/g3/data-contract-v1.schema.json"
+    contract = Path(__file__).parents[2] / "docs/giai-doan-3/schema/data-contract-v1.schema.json"
+    assert runtime.read_bytes() == contract.read_bytes()
+
+
 def test_symlink(dataset, tmp_path):
     path = dataset / FILES[0][0]
     outside = tmp_path.parent / (tmp_path.name + "-outside.jsonl")
     outside.write_bytes(path.read_bytes())
     path.unlink()
-    path.symlink_to(outside)
+    try:
+        path.symlink_to(outside)
+    except OSError as error:
+        if os.name == "nt" and getattr(error, "winerror", None) == 1314:
+            pytest.skip("Windows symlink privilege is unavailable")
+        raise
     with pytest.raises(CorpusError, match="FILE_OUTSIDE_DATASET"):
         load(dataset, VERSION, 2)
 

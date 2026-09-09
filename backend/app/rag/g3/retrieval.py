@@ -1,6 +1,7 @@
 """Offline exact/alias/code routing plus BM25; internal IDs never become display labels."""
 
 import math
+import unicodedata
 from collections import Counter
 from time import perf_counter
 
@@ -41,8 +42,11 @@ def bm25(query, texts):
 def retrieve(data, query, top_k=5, procedure_id=None, category=None, as_of=None):
     require(isinstance(query, str) and 0 < len(query.strip()) <= 4000, "INVALID_QUERY")
     require(type(top_k) is int and 1 <= top_k <= 8, "INVALID_TOP_K")
-    scan(query)
-    q = " " + normalize(query) + " "
+    # User input need not already satisfy the producer's NFC/trim invariant.
+    # Normalize a copy before the PII tripwire and lexical retrieval.
+    normalized_query = unicodedata.normalize("NFC", query.strip())
+    scan(normalized_query)
+    q = " " + normalize(normalized_query) + " "
     fields = {
         field
         for field, phrases in INTENTS.items()
@@ -73,7 +77,8 @@ def retrieve(data, query, top_k=5, procedure_id=None, category=None, as_of=None)
         pool = exact
     elif not procedure_id:
         scores = bm25(
-            query, [" ".join([p["title"], *p["aliases"], p["category_label"]]) for p in pool]
+            normalized_query,
+            [" ".join([p["title"], *p["aliases"], p["category_label"]]) for p in pool],
         )
         pool = [p for p, score in zip(pool, scores) if score > 0]
     if len(pool) > 1:
@@ -120,7 +125,7 @@ def retrieve(data, query, top_k=5, procedure_id=None, category=None, as_of=None)
         ):
             continue
         usable.append(f)
-    scores = bm25(query, [f["text"] for f in usable])
+    scores = bm25(normalized_query, [f["text"] for f in usable])
     ranked = sorted(zip(scores, usable), key=lambda x: (-x[0], x[1]["fragment_id"]))
     selected, budget = [], 0
     for score, f in ranked[:top_k]:

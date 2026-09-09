@@ -14,6 +14,9 @@ contract G2 và code RAG hiện có. Raw Excel không được mở/parse/gửi 
   không in câu hỏi, title, text, source URI hay locator. `ingest` cố ý trả lỗi BLOCKED.
 - Schema gốc được giữ nguyên; dependency jsonschema đã cập nhật cả pyproject và uv.lock.
 - Test fixture được tạo bằng code hư cấu; không lấy nội dung Excel làm test.
+- Test khóa runtime schema phải giống byte-for-byte với contract trong `docs/`.
+- Fixture luôn ghi JSONL bằng LF trên Windows/Linux; test symlink chỉ skip khi Windows
+  không cấp quyền tạo symlink.
 - `.gitignore` chặn workbook/private data, repo hygiene chặn cả file force-add.
 
 Không sửa G1/G2 API, DB migrations hoặc provider. Chưa implement persistence,
@@ -21,29 +24,6 @@ activation/rollback D2 vì hash contract và G2→D2 projection chưa khóa.
 Fingerprint deterministic của năm JSONL phục vụ so sánh preflight, không phải bằng chứng
 idempotent DB ingest. `accepted_procedure_ids` chỉ là qua review gate cục bộ;
 `readiness=BLOCKED` mới là trạng thái tổng thể.
-
-## Áp dụng gói thay đổi vào repository thật (PowerShell)
-
-Chạy trong clone dự án của anh, không phải một thư mục ZIP không có Git:
-
-```powershell
-git status --short
-git fetch origin --tags
-git switch g3/rag-minh
-```
-
-Nếu branch chỉ tồn tại trên remote, dùng `git switch --track origin/g3/rag-minh`.
-Nếu chưa có branch cả local/remote, sau khi xác minh tag baseline:
-
-```powershell
-git show --no-patch g2-v1.0.0
-git switch -c g3/rag-minh g2-v1.0.0
-```
-
-Không reset hay ghi đè thay đổi đang làm. Gói ZIP bàn giao chỉ có file mới/thay đổi;
-so sánh trước khi chép cùng đường dẫn, nhất là `.gitignore`, pyproject, uv.lock và
-hygiene script. Không kèm Excel, company JSONL, secrets, venv hoặc Git history.
-Nếu baseline khác bản ZIP, review/merge từng diff thay vì thay toàn bộ backend.
 
 ## Cài và thử fixture
 
@@ -96,9 +76,10 @@ Dùng database PostgreSQL test riêng như backend/README.md, sau đó:
 
 ```powershell
 uv run --frozen pytest -q
-uv run --frozen ruff check app/rag/g3 tests/test_g3.py
+uv run --frozen ruff check .
+uv run --frozen ruff format --check .
 uv lock --check
 ```
 
 Không in connection URL có password. Full suite bao gồm test migration/DB G1/G2;
-không thể thay bằng 29 test G3 offline. Kết quả lượt bàn giao nằm trong TEST_REPORT.md.
+không thể thay bằng test G3 offline. Kết quả lượt bàn giao nằm trong TEST_REPORT.md.
