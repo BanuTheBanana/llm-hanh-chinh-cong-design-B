@@ -29,13 +29,18 @@ baseline kỹ thuật CI, không phải SLA hay benchmark model thật.
 
 G1 chưa có RAG, Qwen, fine-tune, Case, memory dài hạn, queue hay Socket.IO.
 
-**Checkpoint G2-I01 đã hoàn tất kỹ thuật trên `g2/integration` bằng dữ liệu giả
-D0:** Backend ingest/retrieve corpus version hóa, gọi grounded AI v2, kiểm tra
-binding/citation, lưu nguồn và Web hiển thị nguồn qua một Docker Compose overlay.
-Corpus phát triển hiện có 3 thủ tục hư cấu, 24 fragment và 33 câu hỏi DEV/TEST.
-Đây chưa phải nghiệm thu toàn bộ G2: dữ liệu công khai D1 mới có một spike đang
-chờ review chéo, chưa đủ 2–3 thủ tục/30–50 câu và hosted provider chưa được công
-ty phê duyệt.
+**Giai đoạn 2 đã hoàn tất theo phạm vi demo kỹ thuật bằng dữ liệu giả lập:**
+Backend ingest/retrieve corpus version hóa, gọi grounded AI v2, kiểm tra
+binding/citation, lưu nguồn và Web hiển thị nguồn qua Docker Compose overlay.
+Corpus `synthetic-demo-v1` có 3 thủ tục hư cấu, 24 fragment và 33 câu hỏi
+DEV/TEST; toàn bộ data gate, retrieval, API smoke và browser E2E đã pass.
+
+“Dataset v1” là số phiên bản, còn phân loại an toàn của nó vẫn là
+`D0_SYSTEM_SMOKE`. Dữ liệu thật công ty thuộc luồng riêng `D2_COMPANY_REAL`, chưa
+nằm trong repository và không phải điều kiện nghiệm thu G2. Xem
+[biên bản nghiệm thu G2](docs/giai-doan-2/NGHIEM-THU-G2.md). Kết quả này chỉ chứng
+minh hệ thống RAG chạy đúng trên dữ liệu giả, không chứng minh độ đúng hành chính
+ngoài đời.
 
 ## Chạy nhanh
 
@@ -73,11 +78,12 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 
 1. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
 2. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
-3. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
-4. [Grounded API contract G2](docs/contracts-g2.md)
-5. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
-6. [API contract G1](docs/contracts-g1.md)
-7. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
+3. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
+4. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
+5. [Grounded API contract G2](docs/contracts-g2.md)
+6. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
+7. [API contract G1](docs/contracts-g1.md)
+8. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
 
 ## Cấu trúc repository
 
@@ -108,7 +114,7 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 | Vai trò | Branch |
 |---|---|
 | Bản chính đã hoàn tất G1 | `main`, tag `g1-v1.0.0` |
-| Tích hợp checkpoint G2 đang review | `g2/integration` |
+| Bản G2 synthetic đã nghiệm thu | `g2/integration`, phát hành bằng tag `g2-v1.0.0` |
 | AI/evaluation G2 của Hoan | `g2/ai-eval-hoan` |
 | Nhánh dữ liệu Tú đã nhập | `data/frontend-tu` |
 | Nhánh RAG Minh đã nhập | `Minh-RAG_test` |

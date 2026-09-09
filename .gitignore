@@ -11,6 +11,7 @@ __pycache__/
 # JavaScript
 node_modules/
 dist/
+test-results/
 
 # Local runtime data. Public demo corpus is intentionally versioned for G2.
 data/*

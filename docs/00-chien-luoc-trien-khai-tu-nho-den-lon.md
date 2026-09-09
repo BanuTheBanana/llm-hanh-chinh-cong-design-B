@@ -10,16 +10,17 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.9` |
-| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_I01_D0_TECHNICAL_PASS`; G2/D1 chưa nghiệm thu |
+| Phiên bản | `v2.0` |
+| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_COMPLETED_SYNTHETIC_SCOPE` |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
-| Thay đổi lần này | Bổ sung corpus D0 hoàn chỉnh 3 thủ tục/33 câu để nhóm tiếp tục phát triển khi nguồn D1 khó truy cập; D1 và hosted vẫn giữ sau review/approval |
+| Thay đổi lần này | Chốt G2 theo phạm vi demo kỹ thuật bằng dataset v1 giả lập; dữ liệu công ty, D1 công khai và hosted/local model chuyển sang mốc tiếp theo |
 
 Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](parked/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; sơ đồ nằm trong [`architecture/`](architecture/README.md).
 
 Hồ sơ thực thi và nghiệm thu G1: [Phân công Giai đoạn 1 – Tú, Minh, Hoan](01-phan-cong-giai-doan-1.md).
-Kế hoạch thực thi hiện tại: [Phân công Giai đoạn 2 – Data, RAG và Hosted AI baseline](giai-doan-2/02-phan-cong-giai-doan-2.md).
-Trọng tâm đang làm là hoàn tất D1/Gate G2 trong mục **NOW**; lát cắt D0 đã chạy.
+Hồ sơ G2: [Phân công Giai đoạn 2](giai-doan-2/02-phan-cong-giai-doan-2.md) và
+[biên bản nghiệm thu](giai-doan-2/NGHIEM-THU-G2.md). Trọng tâm mới trong mục
+**NOW** là đóng release G2 và kiểm kê dataset thật của công ty trước khi ingest.
 
 ### Bằng chứng hoàn thành G1
 
@@ -368,38 +369,40 @@ G1 chưa cần tài liệu thủ tục thật. Nhóm tự tạo khoảng 10–20
 
 Các test này chỉ chứng minh **hệ thống chạy đúng**, không chứng minh câu trả lời hành chính đúng.
 
-## 8. Giai đoạn 2 – Domain/RAG baseline nhỏ
+## 8. Giai đoạn 2 – RAG baseline nhỏ bằng dữ liệu giả lập
 
 ### 8.1. Mục tiêu
 
-Biến chatbot kỹ thuật thành trợ lý có căn cứ trên một phạm vi nhỏ có thể đo:
+Biến chatbot kỹ thuật thành một lát cắt RAG có căn cứ, an toàn và đo được:
 
-- chọn 2–3 thủ tục đại diện;
-- trước mắt dùng snapshot dữ liệu công khai từ nguồn hành chính chính thức; chỉ dùng dữ liệu công ty khi đã phân loại và được phép;
-- tạo một gold set nhỏ khoảng 30–50 câu hỏi ban đầu;
+- dùng 3 thủ tục hư cấu có cảnh báo rõ;
+- giữ dữ liệu thật công ty ngoài repository cho tới khi được phân loại và cho phép;
+- tạo gold set 33 câu hỏi DEV/TEST;
 - trả câu trả lời kèm nguồn;
 - biết nói chưa đủ dữ liệu thay vì bịa nguồn.
 
-Số lượng trên là đề xuất khởi đầu, cần mentor duyệt.
+Phạm vi này đã được nghiệm thu kỹ thuật; không đại diện cho độ đúng nghiệp vụ.
 
-### 8.1.1. Nguồn dataset demo ban đầu
+### 8.1.1. Dataset demo đã chốt
 
-Chọn 2–3 thủ tục có trang công khai chính thức, ví dụ đăng ký khai sinh, cấp lại thẻ căn cước và đăng ký khai tử. Với mỗi nguồn phải lưu:
+Dataset v1 nằm tại `data/demo_synthetic` và được phân loại
+`D0_SYSTEM_SMOKE`. Với mỗi nguồn giả lập vẫn phải lưu đủ contract:
 
 ```json
 {
-  "procedure_id": "birth_registration_demo",
-  "title": "Đăng ký khai sinh",
-  "source_url": "https://official.example/...",
+  "procedure_id": "synthetic_birth_star",
+  "title": "[D0 GIẢ LẬP] Đăng ký khai sinh Sao Mai",
+  "source_url": "https://birth-star.fixture.invalid/procedure",
   "retrieved_at": "YYYY-MM-DD",
-  "jurisdiction": "phạm vi áp dụng",
-  "usage": "PUBLIC_DEMO_ONLY"
+  "jurisdiction": "Thành phố Demo",
+  "usage": "D0_SYSTEM_SMOKE"
 }
 ```
 
-Không coi snapshot demo là dữ liệu production luôn đúng. Thủ tục có thể thay đổi theo thời gian và địa phương; vì vậy phải khóa phiên bản, ngày lấy và phạm vi áp dụng.
+Không coi fixture là nguồn chính thức hoặc dữ liệu production. Mọi nội dung,
+địa danh, giấy tờ và mức phí trong corpus đều hư cấu.
 
-Từ các snapshot này, nhóm tự viết 30–50 tình huống giả, kèm:
+Từ các snapshot này, nhóm tạo 33 tình huống giả, kèm:
 
 - `procedure_id` đúng;
 - các ý bắt buộc trong câu trả lời;
@@ -413,7 +416,7 @@ Không dùng tên, CCCD, số điện thoại, hồ sơ hay tình huống thật
 
 ```text
 data/
-└── demo_public/
+└── demo_synthetic/
     ├── README.md
     ├── source_manifest.jsonl
     ├── raw/<procedure>/<retrieved-date>/...
@@ -469,15 +472,17 @@ Answer: ý chính, giấy tờ, phí/thời gian có đúng không?
 Latency: từng stage và end-to-end mất bao lâu?
 ```
 
-### 8.5. Gate G2
+### 8.5. Gate G2 đã đạt
 
-- 2–3 thủ tục demo đã có source và phạm vi công bố rõ.
+- 3 thủ tục hư cấu có snapshot, source, hash và cảnh báo rõ.
 - Gold set khóa version và tách khỏi prompt tuning.
-- Mỗi answer có source thật hoặc trạng thái thiếu dữ liệu.
-- Có bảng baseline retrieval, answer quality và latency.
+- Mỗi answer có source fixture hợp lệ hoặc trạng thái thiếu dữ liệu.
+- Có báo cáo retrieval, citation safety và latency kỹ thuật.
 - Nhóm biết bottleneck nằm ở data, retrieval hay generation.
 
-Ngưỡng phần trăm chỉ chốt sau baseline cùng mentor; không tự tuyên bố đạt production.
+Kết quả chi tiết nằm trong `docs/giai-doan-2/NGHIEM-THU-G2.md`. Việc đo độ đúng
+hành chính chỉ bắt đầu sau khi dữ liệu thật được kiểm kê và có người nghiệp vụ
+duyệt; không tự tuyên bố đạt production.
 
 ## 9. Giai đoạn 3 – Model local lightweight
 
@@ -614,25 +619,25 @@ Chỉ bắt đầu khi core answer + local model + domain baseline đã đạt g
 
 ## 13. Bảng Now – Next – Later – Parked
 
-### NOW – Hoàn tất dữ liệu D1 và Gate G2
+### NOW – Đóng release G2 và kiểm kê dữ liệu công ty
 
-1. Giữ checkpoint D0 trên `g2/integration` chạy xanh và không nhập dữ liệu thật
-   vào `data/demo_synthetic`.
-2. Review chéo spike đăng ký khai sinh; lấy nguồn chi tiết chính thức có thành
-   phần hồ sơ và trình tự, không suy đoán các field còn thiếu.
-3. Mở rộng thành 2–3 thủ tục và 30–50 tình huống giả có gold source, reviewer
-   độc lập và TEST split đóng băng.
-4. Chạy retrieval/evaluation trên D1 và phân tích lỗi theo từng câu.
-5. Xin công ty duyệt provider + loại dữ liệu trước khi thêm hosted baseline.
+1. Giữ release `g2-v1.0.0` và corpus `synthetic-demo-v1` chạy xanh.
+2. Không nhập dữ liệu công ty vào `data/demo_synthetic` và không commit dữ liệu
+   nội bộ lên GitHub.
+3. Lập inventory: format, dung lượng, license/quyền dùng, PII, phiên bản, phạm vi
+   thủ tục, nơi lưu và người duyệt nghiệp vụ.
+4. Chốt dữ liệu nào được phép gửi hosted API; mặc định không gửi nếu chưa duyệt.
+5. Thiết kế import adapter mới dựa trên schema G2, không làm hỏng D0 regression.
 
-### NEXT – Sau khi D1 và hosted baseline được duyệt
+### NEXT – Baseline trên dữ liệu được duyệt
 
-1. So sánh template/hosted trên cùng gold set và chốt ngưỡng Gate G2 với mentor.
-2. Nhận, kiểm kê và phân loại dataset công ty; không tự động đưa D2 ra provider ngoài.
-3. Phân tích lỗi để quyết định có cần embedding/vector search hay chưa.
-4. Chốt quyết định G3 và baseline để model local phải vượt qua.
+1. Import một phạm vi nhỏ của dataset công ty vào môi trường được phép.
+2. Nhờ người nghiệp vụ tạo/review gold set và evidence.
+3. Chạy retrieval baseline, phân tích lỗi và quyết định có cần embedding hay chưa.
+4. Benchmark hosted nếu được phép hoặc model local nếu dữ liệu phải ở nội bộ.
+5. Chốt baseline để model lightweight phải vượt qua.
 
-### LATER – Sau khi G2 đạt
+### LATER – Sau baseline dữ liệu thật
 
 1. Model local ≤2B đầu tiên.
 2. Quantization/benchmark.

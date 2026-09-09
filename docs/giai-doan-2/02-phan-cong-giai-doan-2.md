@@ -1,4 +1,4 @@
-# Phân công Giai đoạn 2 – Data, RAG và Hosted AI baseline
+# Phân công Giai đoạn 2 – Dataset giả lập, RAG và Grounded AI
 
 > Tài liệu giao việc chính thức cho Tú, Minh và Hoan.
 > Cách trình bày: **Tổng → Phân → Hợp**.
@@ -10,11 +10,11 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.4` |
-| Trạng thái | `G2_I01_D0_TECHNICAL_PASS; G2_FINAL_BLOCKED_BY_D1_AND_HOSTED_APPROVAL` |
+| Phiên bản | `v1.5` |
+| Trạng thái | `G2_COMPLETED_SYNTHETIC_SCOPE` |
 | Baseline bắt đầu | `main`, tag `g1-v1.0.0` |
-| Thay đổi lần này | Hoàn thiện thêm `data/demo_synthetic`: 3 thủ tục/24 fragment/33 câu, validator và retrieval DEV/TEST pass; chưa công nhận D1 |
-| Dữ liệu được phép | D0 fixture; D1 công khai chỉ sau publish/review gate; D2 không được gửi ra ngoài |
+| Thay đổi lần này | Nghiệm thu G2 bằng dataset v1 giả lập: 3 thủ tục/24 fragment/33 câu, full stack và regression pass |
+| Dữ liệu được phép | G2 chỉ dùng D0 fixture; D1 công khai và D2 công ty chuyển sang mốc tiếp theo |
 
 ---
 
@@ -22,29 +22,28 @@
 
 ## 1. Mục tiêu duy nhất
 
-G2 phải chứng minh được một lát cắt nhỏ nhưng thật:
+G2 phải chứng minh được một lát cắt kỹ thuật nhỏ chạy end-to-end:
 
 ```text
-Người dùng đặt câu hỏi hành chính công
-→ hệ thống tìm đúng đoạn từ nguồn chính thức đã khóa phiên bản
+Người dùng đặt câu hỏi về thủ tục hư cấu
+→ hệ thống tìm đúng đoạn từ fixture đã khóa phiên bản
 → AI chỉ dùng các đoạn đó để diễn giải
 → Backend từ chối citation giả
 → Web trả lời kèm nguồn có thể bấm kiểm tra
 → nhóm đo được lỗi nằm ở data, retrieval hay generation
 ```
 
-Hosted API chỉ là baseline để rút ngắn thời gian lắp ráp và đo chất lượng. Nó
-không thay thế mục tiêu model local lightweight ở G3.
+G2 dùng grounded template offline để khóa luồng. Hosted API và model local là
+baseline của mốc sau, không phải điều kiện nghiệm thu synthetic scope.
 
 ## 2. Phạm vi G2
 
 ### 2.1. Bắt buộc làm
 
-- Chọn **2–3 thủ tục** sau khi mentor xác nhận; spike đầu chỉ dùng **một thủ tục**.
-- Lưu snapshot từ nguồn công khai chính thức, có URL, thời điểm lấy, phạm vi áp
-  dụng, hash và trạng thái review.
+- Có **3 thủ tục hư cấu** với tên/cảnh báo không thể nhầm là hướng dẫn thật.
+- Lưu snapshot fixture, URL `.invalid`, thời điểm tạo, phạm vi, hash và provenance.
 - Chuẩn hóa dữ liệu thành procedure record và fragment có thể truy hồi.
-- Tạo **30–50 câu hỏi giả** cùng expected points, forbidden points và gold source.
+- Tạo **33 câu hỏi giả** cùng expected points, forbidden points và gold source.
 - Làm exact/alias search và keyword/BM25 tối giản.
 - Trả `EvidenceBundle` có fragment/source ID thật.
 - AI Service diễn giải chỉ từ evidence và trả output máy đọc được.
@@ -515,36 +514,32 @@ báo diff, command, Recall@k/MRR, latency, query fail, assumption và blocker.
 
 ### 8.1. Mục tiêu của Hoan
 
-Bổ sung grounded API v2 song song với Mock API v1, xây evaluation offline trước;
-sau khi được công ty cho phép mới thêm hosted baseline cho `D1_PUBLIC_DEMO`.
-Output phải bám evidence, đo được và không làm hỏng G1.
+Bổ sung grounded API v2 song song với Mock API v1, xây evaluation offline bằng
+template D0. Output phải bám evidence, đo được và không làm hỏng G1. Hosted/local
+provider được giữ sau cùng interface nhưng chuyển sang mốc sau G2.
 
 ### 8.2. Phạm vi công việc
 
 1. Chốt G2 contract với Tú/Minh và giữ version thay đổi.
 2. Tạo fixture EvidenceBundle để làm AI Service/evaluation ngay sau Checkpoint 0.
-3. Thêm một hosted-provider adapter sau interface hiện có; không để tên SDK/schema
-   provider rò sang Backend.
-4. API key chỉ qua environment/secret store; không commit và không log.
+3. Giữ provider interface độc lập; không để chi tiết runtime rò sang Backend.
+4. G2 không cần API key và không thực hiện external call.
 5. Prompt bắt buộc: chỉ trả lời từ evidence, không tự tạo nguồn, nếu thiếu thì
    `NEED_CLARIFICATION` hoặc `INSUFFICIENT_DATA`.
 6. Parse/validate GroundedAnswer; output sai schema phải fail có kiểm soát.
-7. Cấu hình timeout, retry nhỏ có exponential backoff cho 429/5xx; không retry lỗi
-   validation hoặc auth vô hạn.
-8. Viết evaluation harness chạy cùng gold set cho template baseline và hosted AI.
+7. Cấu hình timeout và ánh xạ lỗi provider có kiểm soát.
+8. Viết evaluation harness chạy gold fixture cho template baseline.
 9. Ghi provider/model/version, latency, token usage, error rate và request ID.
 10. Phối hợp Minh nối EvidenceBundle; phối hợp phần Web chỉ ở mức hiển thị nguồn
     tối thiểu, không redesign UI.
-11. Cập nhật Compose, `.env.example`, runbook và CI. CI mặc định mock hosted call;
-    live evaluation chỉ chạy thủ công/opt-in với secret được cấp.
+11. Cập nhật Compose, `.env.example`, runbook và CI; toàn bộ G2 chạy offline.
 
-### 8.3. Điều kiện dùng hosted API
+### 8.3. Điều kiện dùng hosted API ở mốc sau
 
-- Chỉ gửi câu hỏi giả và evidence tối thiểu từ `D1_PUBLIC_DEMO`.
+- Chỉ gửi câu hỏi và evidence thuộc phân loại được công ty cho phép.
 - Không gửi dataset công ty, PII, cookie, history thật hoặc raw corpus đầy đủ.
 - Công ty/mentor phải xác nhận provider được dùng và loại dữ liệu được phép gửi.
-- Nếu chưa được duyệt hoặc hết quota, hệ thống vẫn chạy bằng MockProvider/template
-  baseline; G2 không được phụ thuộc duy nhất vào dịch vụ miễn phí.
+- Nếu chưa được duyệt hoặc hết quota, hệ thống vẫn chạy bằng MockProvider/template.
 - Ghi rõ hosted baseline không phải model lightweight cuối cùng.
 
 ### 8.4. Evaluation tối thiểu
@@ -560,24 +555,24 @@ Output phải bám evidence, đo được và không làm hỏng G1.
 | Runtime | p50/p95 latency, tokens/request, timeout, 429/5xx |
 | Regression | G1 auth/history/isolation/idempotency và full-stack smoke |
 
-Không dùng cùng tập TEST để chỉnh prompt rồi báo điểm. Template baseline và hosted
-model phải chạy trên cùng corpus version, cùng split và cùng retrieval output.
+Không dùng cùng tập TEST để chỉnh prompt rồi báo điểm. Khi thêm hosted/local model
+ở mốc sau, các model phải chạy trên cùng corpus version, split và retrieval output.
 
 ### 8.5. Deliverable của Hoan
 
-- Hosted provider adapter và config an toàn.
+- Provider boundary và template D0 an toàn.
 - Grounded prompt/output parser cùng tests.
 - Evaluation CLI/report có per-question result, không chỉ điểm trung bình.
-- So sánh template baseline với hosted baseline.
+- Báo cáo template baseline và format sẵn cho candidate sau.
 - Compose/runbook/CI và smoke end-to-end answer + sources.
 - Bảng bottleneck: data, retrieval, generation hay provider/runtime.
 
 ### 8.6. Test Hoan phải chứng minh
 
-- Mock và hosted adapter cùng tuân thủ interface nội bộ.
+- Mock/template cùng tuân thủ interface nội bộ.
 - Evidence rỗng không tạo câu trả lời khẳng định.
 - Prompt injection nằm trong question/evidence không được biến thành instruction.
-- Output malformed/timeout/429/5xx được xử lý dự đoán được.
+- Output malformed/timeout/provider failure được xử lý dự đoán được.
 - Citation ngoài allowlist evidence bị phát hiện trước khi công bố.
 - Secret không xuất hiện trong source, log hoặc evaluation artifact.
 - Evaluation có thể chạy offline bằng mock/template trong CI.
@@ -587,7 +582,7 @@ model phải chạy trên cùng corpus version, cùng split và cùng retrieval 
 
 - Một lệnh hoặc runbook chạy được evaluation có tái lập.
 - Có báo cáo so sánh và lỗi theo từng question ID.
-- Hosted baseline hoạt động với D1 khi có key; không có key vẫn test được hệ thống.
+- Toàn bộ G2 chạy offline, không cần key hoặc dịch vụ bên thứ ba.
 - G1 CI/regression và G2 smoke đều xanh.
 - Nhóm có bằng chứng để quyết định bước tiếp theo, không chọn model theo cảm giác.
 
@@ -599,18 +594,18 @@ Trước khi sửa, đọc hết docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md
 docs/giai-doan-2/02-phan-cong-giai-doan-2.md, docs/contracts-g1.md, AI Service,
 Backend client, Compose và CI hiện có.
 
-G2 dùng provider boundary hiện có để thêm MỘT hosted baseline được công ty duyệt,
-chỉ với D1_PUBLIC_DEMO. Không gửi PII, dataset công ty, raw corpus hoặc secret vào
-prompt/log/repo. Provider SDK/schema không được rò sang Backend. Grounded prompt
+G2 dùng provider boundary hiện có với template D0 hoàn toàn offline. Không gửi
+PII, dataset công ty, raw corpus hoặc secret vào prompt/log/repo. Provider
+SDK/schema không được rò sang Backend. Grounded prompt
 chỉ cho phép dùng EvidenceBundle; output gồm answer, status, cited_fragment_ids và
 missing_information. Evidence rỗng hoặc thiếu căn cứ phải abstain. Output sai
 schema phải fail có kiểm soát.
 
-Viết evaluation harness chạy template và hosted trên cùng corpus/gold split. Đo
+Viết evaluation harness chạy template trên corpus/gold split D0. Đo
 retrieval, citation validity/support, expected points, forbidden claims,
 abstention, p50/p95 latency, token usage và lỗi theo từng question. CI dùng mock;
-live API là opt-in bằng environment secret. Không làm Qwen local, fine-tune,
-quantization, Case, queue, vector DB hay redesign Web trong G2.
+không có live API trong G2. Không làm Qwen local, fine-tune, quantization, Case,
+queue, vector DB hay redesign Web trong G2.
 
 Chỉ sửa ai-service/**, evaluation/**, Compose/CI/runbook và phần integration được
 Hoan sở hữu. Trước khi kết thúc, chạy tests/smoke/eval; báo file, command, result,
@@ -625,7 +620,7 @@ chi phí/quota quan sát được, assumption, risk và blocker.
 
 | ID | Owner | Task | Phụ thuộc | Output kiểm tra được |
 |---|---|---|---|---|
-| G2-00 | Cả nhóm | Chốt 2–3 thủ tục, allowlist và năm schema | Không | Biên bản/contract được cả ba xác nhận |
+| G2-00 | Cả nhóm | Chốt 3 thủ tục hư cấu, allowlist và năm schema | Không | Biên bản/contract được cả ba xác nhận |
 | G2-D01 | Tú | Source register và one-procedure snapshot | G2-00 | Raw + manifest + hash |
 | G2-D02 | Tú | Normalize procedure/fragments | G2-D01 | Validator pass |
 | G2-D03 | Tú | Khoảng 10 câu hỏi spike | G2-D02 | Gold được review chéo |
@@ -634,36 +629,35 @@ chi phí/quota quan sát được, assumption, risk và blocker.
 | G2-A01 | Hoan | Grounded contract/prompt bằng fixture | G2-00 | Schema tests pass |
 | G2-A02 | Hoan | Evaluation harness offline | G2-A01 | Report trên fixture |
 | G2-I01 | Cả nhóm | Ghép one-procedure end-to-end | D03/R02/A02 | Web answer + source |
-| G2-D04 | Tú | Mở rộng 2–3 thủ tục, 30–50 câu | G2-I01 | Dataset/gold v1 reviewed |
+| G2-D04 | Tú | Mở rộng 3 thủ tục, 33 câu | G2-I01 | Dataset/gold v1 validated |
 | G2-R03 | Minh | Retrieval report và sửa lỗi đo được | G2-D04 | Per-query report |
-| G2-A03 | Hoan | Hosted baseline được duyệt | G2-I01 | Live D1 report, không secret |
-| G2-I02 | Hoan chủ trì | Full G2 integration/CI/demo | R03/A03 | Gate G2 evidence |
+| G2-A03 | Hoan | Hosted baseline | G2-I01 | Chuyển sang mốc sau G2 |
+| G2-I02 | Hoan chủ trì | Full G2 integration/CI/demo | D04/R03 | Gate G2 evidence |
 
 Tiến độ tại 09/09/2026:
 
-- `G2-D01/D02/D03`: **TECHNICAL_PREFLIGHT_PASS; HUMAN_REVIEW_PENDING** – một
-  thủ tục/10 câu đã sửa hash, schema và provenance; chưa đủ hồ sơ/bước và chưa
-  được phép publish.
+- `G2-D01/D02/D03/D04`: **DONE_D0** – 3 nguồn, 3 thủ tục, 24 fragment và 33
+  câu DEV/TEST; hash/schema/provenance/publish gate đều pass.
 - `G2-R01/R02`: **IMPLEMENTED_AND_TESTED_D0** – ingest idempotent, retrieval,
   ambiguity guard và EvidenceBundle đã chạy trong Core Backend.
 - `G2-A01/A02`: **IMPLEMENTED_AND_TESTED_D0** – route/schema/prompt v2, template
   D0, evaluation 8 case và strict safety pass.
 - `G2-I01`: **D0_TECHNICAL_PASS** – Docker Compose, API smoke, Web source rendering
   và Chromium reload-history E2E pass bằng fixture giả.
-- `G2-D04/R03`: **BLOCKED_BY_SCOPE_AND_HUMAN_REVIEW** – cần nguồn chi tiết,
-  2–3 thủ tục và 30–50 câu được review.
-- `G2-A03`: **NOT_STARTED_BY_POLICY** – không dùng key/provider thật trước khi
-  công ty duyệt provider và dữ liệu D1.
-- `G2-I02`: **NOT_DONE** – chỉ nghiệm thu khi D04/R03/A03 và báo cáo D1 đạt gate.
+- `G2-R03`: **DONE_D0** – DEV 23/23 và TEST 10/10; Recall@5 = 1.0, không câu fail.
+- `G2-A03`: **MOVED_TO_NEXT_MILESTONE** – không dùng key/provider thật trước khi
+  công ty duyệt provider và loại dữ liệu.
+- `G2-I02`: **DONE_SYNTHETIC_SCOPE** – full stack, smoke, citation, persistence,
+  G1 regression và Chromium G2 E2E pass. Xem `NGHIEM-THU-G2.md`.
 
 ## 10. Cách làm song song, không ai phải chờ
 
-Ba nhánh đã được ghép tại checkpoint D0. Việc song song tiếp theo là:
+Ba nhánh đã được ghép và nghiệm thu. Việc song song tiếp theo là:
 
 ```text
-Tú:   lấy nguồn chi tiết, hoàn tất review và mở rộng D1
-Minh: chạy retrieval report trên gold D1, phân tích từng lỗi
-Hoan: giữ D0 regression xanh, chuẩn bị hosted adapter sau approval
+Tú:   kiểm kê cấu trúc/quyền dùng dataset công ty, không commit dữ liệu nội bộ
+Minh: thiết kế import adapter và chạy retrieval trên sample đã được duyệt
+Hoan: giữ G2 regression xanh, chuẩn bị hosted/local adapter theo chính sách
 ```
 
 Không ép `publish` pass bằng cách tự điền dữ kiện nguồn không có hoặc tự duyệt
@@ -687,24 +681,24 @@ gold. Không để hosted key trở thành điều kiện duy trì D0.
 Luồng D0 đã chạy end-to-end. Chỉ mở rộng corpus D1 sau khi spike nguồn thật qua
 review chéo; không coi D0 là phê duyệt dữ liệu nghiệp vụ.
 
-### Checkpoint 2 – Dataset/gold v1
+### Checkpoint 2 – Dataset/gold v1 – DONE
 
 - 2–3 thủ tục, 30–50 câu và review chéo.
 - Frozen corpus version và TEST split.
 - Data quality gate pass.
 
-### Checkpoint 3 – Baseline và error analysis
+### Checkpoint 3 – Baseline và error analysis – DONE TRÊN D0
 
-- Chạy retrieval + template + hosted trên cùng test setup.
+- Chạy retrieval + template trên cùng test setup; hosted chuyển sang mốc sau.
 - Liệt kê từng lỗi và chủ sở hữu sửa.
 - Cùng mentor chốt ngưỡng phần trăm sau baseline, không chọn số đẹp trước.
 
-### Checkpoint 4 – Nghiệm thu G2
+### Checkpoint 4 – Nghiệm thu G2 – DONE
 
 - Full stack chạy qua Docker Compose.
 - Trả nguồn đúng hoặc thiếu dữ liệu; không citation giả.
 - G1 regression xanh.
-- Có báo cáo latency/quality và quyết định G3.
+- Có báo cáo retrieval/latency kỹ thuật và quyết định đầu vào G3.
 
 ## 12. Branch và ownership file đề xuất
 
@@ -736,16 +730,16 @@ Contract G2 là file chung. Người muốn đổi schema phải nêu migration/
 Các điều kiện không thương lượng:
 
 - Source/reference/schema/hash validation pass.
-- Không PII và không dữ liệu công ty trong D1/hosted request.
+- Không PII và không dữ liệu công ty trong fixture/hosted request.
 - Mọi citation ID trong answer thuộc evidence của đúng request: **100%**.
 - Test split không bị dùng để chỉnh prompt.
 - Không evidence thì không trả câu khẳng định như có căn cứ.
 - G1 auth/history/isolation/idempotency regression pass.
 - Có raw result theo từng câu, không chỉ báo một điểm trung bình.
 
-Các ngưỡng như Recall@5, expected-point coverage, forbidden-claim rate và p95
-latency sẽ được chốt với mentor **sau one-procedure baseline**. Điều này tránh đặt
-mục tiêu tùy ý khi nhóm chưa biết độ khó thực tế.
+Kết quả D0: Recall@5 = 1.0 trên DEV/TEST, citation binding 100% trong smoke/E2E
+và không có câu retrieval fail. Các số này chỉ là gate kỹ thuật; ngưỡng nghiệp vụ
+sẽ được chốt lại trên dữ liệu thật cùng người duyệt chuyên môn.
 
 ## 15. Câu hỏi phải xác nhận với mentor trước Checkpoint 0
 

@@ -1,4 +1,4 @@
-# G2/D0 – Báo cáo kiểm thử tích hợp
+# G2 – Báo cáo kiểm thử tích hợp phạm vi synthetic
 
 ## Báo cáo cập nhật
 
@@ -6,8 +6,8 @@
 |---|---|
 | Ngày chạy | 09/09/2026 |
 | Nhánh | `g2/integration` |
-| Kết luận kỹ thuật | `G2_I01_D0_TECHNICAL_PASS` |
-| Kết luận nghiệp vụ | `G2_FINAL_NOT_PASSED` |
+| Kết luận kỹ thuật | `G2_COMPLETED_SYNTHETIC_SCOPE` |
+| Kết luận nghiệp vụ | Chưa đánh giá; nằm ngoài phạm vi G2 synthetic |
 | Dữ liệu runtime | `synthetic-demo-v1`, `D0_SYSTEM_SMOKE`, hoàn toàn giả |
 
 ## Tổng
@@ -21,7 +21,7 @@ Web → Core Backend → retrieval fixture → EvidenceBundle
 
 Kết quả này chứng minh plumbing, contract, persistence và guardrail D0. Nó không
 chứng minh độ đúng hành chính, không phải benchmark model thật và không thay thế
-review dữ liệu D1.
+review dữ liệu thật ở mốc tiếp theo.
 
 ## Phân – bằng chứng đã chạy
 
@@ -60,19 +60,20 @@ failure. Report tại
 ghi prompt `g2-grounded-v2`, status accuracy/citation validity/abstention accuracy
 đều 1.0 và unsafe-answer rate 0 trên chính fixture này.
 
-## Hợp – gate còn mở
+## Hợp – kết luận
 
-Các mục sau chưa chạy hoặc chưa đủ điều kiện, do đó toàn bộ G2 chưa được nghiệm
-thu:
+Phạm vi G2 synthetic đã đủ điều kiện nghiệm thu: dataset v1, retrieval, grounded
+template, citation verifier, persistence, source rendering, Docker và regression
+đều pass. Biên bản chính nằm tại
+[`docs/giai-doan-2/NGHIEM-THU-G2.md`](../../../docs/giai-doan-2/NGHIEM-THU-G2.md).
 
-- Data D1 `--mode publish` đang fail đúng thiết kế: source/gold còn chờ reviewer,
-  mới có 1 thủ tục/10 câu và thiếu nguồn chi tiết cho hồ sơ/các bước.
-- Chưa có retrieval và answer-quality report trên corpus D1 đã duyệt.
-- Chưa có hosted adapter/live baseline vì công ty chưa duyệt provider và loại dữ
-  liệu được gửi ra ngoài.
-- Chưa có ngưỡng Recall/answer/latency được mentor ký nhận.
-- Workflow CI đã có G1 regression + G2 smoke/E2E nhưng cần GitHub run xanh trên
-  commit tích hợp sau khi push.
+Các mục sau chuyển sang mốc dữ liệu/model tiếp theo, không phải gate còn thiếu của
+G2 synthetic:
+
+- kiểm kê và ingest dataset thật công ty trong môi trường được phép;
+- người nghiệp vụ review evidence/gold và đặt ngưỡng chất lượng;
+- hosted adapter/live baseline nếu chính sách cho phép;
+- local lightweight model và benchmark trên cùng gold set.
 
 Không dùng key đã từng xuất hiện trong chat. Khi D1 và provider được duyệt, dùng
 secret mới qua `.env` local hoặc GitHub secret, tuyệt đối không ghi vào report,
