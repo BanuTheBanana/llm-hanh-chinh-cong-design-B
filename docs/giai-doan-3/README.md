@@ -5,8 +5,8 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.0` |
-| Trạng thái | `G3_READY_TO_START_CHECKPOINT_0` |
+| Phiên bản | `v1.2` |
+| Trạng thái | `G3_A01_PASS_D0_E2E; G3_A02_WAITING_FOR_D03_R02` |
 
 ## Tổng
 
@@ -20,8 +20,9 @@ baseline chứng minh model là bottleneck.
 2. [Data contract G3 giữa Tú và Minh](02-contract-data-g3.md).
 3. [Machine-readable JSON Schema](schema/data-contract-v1.schema.json).
 4. [Chiến lược và phân công G3](03-chien-luoc-va-phan-cong-giai-doan-3.md).
-5. [Contract grounded hiện tại](../contracts-g2.md).
-6. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
+5. [Runbook Qwen3-1.7B local](04-runbook-qwen-local.md).
+6. [Contract grounded hiện tại](../contracts-g2.md).
+7. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
 
 ## Hợp
 

@@ -1,10 +1,11 @@
-# AI Service G1 + nền móng grounded G2
+# AI Service G1/G2 + local provider G3
 
 FastAPI service nội bộ do Hoan phụ trách. G1 chỉ dùng `MockProvider`; không gọi
 OpenAI, không host Qwen và không làm RAG.
 
-Nền móng G2 bổ sung API grounded v2 và evaluation offline bằng `template`. Hiện
-không có hosted adapter nào được bật và service không cần API key.
+Nền móng G2 bổ sung API grounded v2 và evaluation offline bằng `template`. G3
+thêm `LocalGroundedProvider` cho llama.cpp/Qwen3-1.7B; không có hosted adapter
+nào được bật và service không cần API key.
 
 ## API
 
@@ -42,7 +43,7 @@ docker run --rm -p 8001:8001 -e LLM_PROVIDER=mock llm-hcc-ai-service
 | `APP_ENV` | `development` | Tên môi trường |
 | `LOG_LEVEL` | `INFO` | Mức log |
 | `LLM_PROVIDER` | `mock` | G1 chỉ hỗ trợ `mock` |
-| `GROUNDED_PROVIDER` | `template` | G2 hiện chỉ hỗ trợ offline `template` |
+| `GROUNDED_PROVIDER` | `template` | `template` hoặc `local`; G1 vẫn dùng mock |
 | `MOCK_MODE` | `success` | `success`, `error` hoặc `timeout` |
 | `MOCK_LATENCY_MS` | `10` | Độ trễ trước khi xử lý mock |
 | `MOCK_TIMEOUT_SECONDS` | `5` | Thời gian giữ request ở timeout mode |
@@ -71,6 +72,12 @@ Với `GROUNDED_PROVIDER=template`:
 Hosted provider chưa được triển khai. Chỉ thêm sau khi mentor/công ty duyệt
 provider và dữ liệu `D1_PUBLIC_DEMO`; không dùng key từng xuất hiện trong chat,
 commit hoặc log.
+
+Với `GROUNDED_PROVIDER=local`, xem
+[runbook Qwen local](../docs/giai-doan-3/04-runbook-qwen-local.md). Provider chỉ
+allowlist `D0_SYSTEM_SMOKE` trong checkpoint A01, gọi endpoint HTTP local đã
+allowlist, ép constrained JSON và kiểm tra lại schema/citation/thinking content.
+HTTP client được reuse trong vòng đời ứng dụng và đóng khi shutdown.
 
 ## Evaluation offline
 

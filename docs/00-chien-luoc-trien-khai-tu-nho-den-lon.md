@@ -10,10 +10,10 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v2.1` |
-| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_COMPLETED_SYNTHETIC_SCOPE`; `G3_DATA_AUDIT_AND_LOCAL_BASELINE` |
+| Phiên bản | `v2.2` |
+| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_COMPLETED_SYNTHETIC_SCOPE`; `G3_A01_LOCAL_D0_E2E_PASS` |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
-| Thay đổi lần này | Đã nhận và audit workbook công ty; G3 ưu tiên governance → preprocessing → RAG baseline → Qwen3-1.7B local zero-shot → chỉ QLoRA khi model là bottleneck |
+| Thay đổi lần này | Khóa implementation G3-A01: local provider có JSON/citation guard, allowlist endpoint, shared client lifecycle, prompt/output cap và runtime non-thinking; live benchmark A02 vẫn chờ RAG + gold TEST |
 
 Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](parked/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; sơ đồ nằm trong [`architecture/`](architecture/README.md).
 
@@ -29,6 +29,12 @@ Hồ sơ G3: [Audit dataset công ty](giai-doan-3/01-audit-dataset-cong-ty.md) v
 Contract `g3-data-v1` là ranh giới đã khóa: Tú tạo private JSONL đúng schema,
 Minh chỉ ingest record đủ review gate. Mọi thay đổi field/enum/nullability phải
 đổi `schema_version`, cập nhật validator và được Tú–Minh cùng xác nhận.
+
+Nhánh Hoan đã hoàn tất `G3-A01` sau provider boundary v2. AI Service chỉ gọi
+llama.cpp ở endpoint local allowlist, dùng constrained JSON và từ chối thinking
+content/citation lạ. Xem [runbook Qwen local](giai-doan-3/04-runbook-qwen-local.md).
+Việc này chưa đồng nghĩa `G3-A02` đạt: không ghi số quality/latency/VRAM cho tới
+khi chạy đúng artifact model và TEST đã khóa từ Tú + retrieval output từ Minh.
 
 ### Kết luận audit đầu vào G3
 

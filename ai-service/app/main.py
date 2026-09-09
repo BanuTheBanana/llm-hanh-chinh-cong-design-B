@@ -1,4 +1,6 @@
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from time import perf_counter
 from uuid import UUID, uuid4
 
@@ -7,7 +9,12 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.config import get_settings
-from app.dependencies import get_grounded_provider, get_provider
+from app.dependencies import (
+    close_grounded_provider_cache,
+    get_grounded_provider,
+    get_provider,
+    initialize_grounded_provider_cache,
+)
 from app.grounded_service import run_grounded_generation
 from app.grounding import PROMPT_VERSION
 from app.providers.base import (
@@ -30,6 +37,15 @@ from app.schemas import (
 )
 
 logger = logging.getLogger("ai_service")
+
+
+@asynccontextmanager
+async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+    initialize_grounded_provider_cache(application)
+    try:
+        yield
+    finally:
+        await close_grounded_provider_cache(application)
 
 
 def _error_response(
@@ -77,6 +93,7 @@ def create_app() -> FastAPI:
         title="Hành chính công AI Service",
         version="2.0.0",
         description="G1 mock boundary plus the offline grounded G2 foundation.",
+        lifespan=lifespan,
     )
 
     @application.exception_handler(RequestValidationError)
