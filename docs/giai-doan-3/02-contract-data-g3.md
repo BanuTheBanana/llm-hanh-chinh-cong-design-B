@@ -77,15 +77,17 @@ Quy ước hash cụ thể của `g3-preprocess-v3`:
 cuối. Nếu sau review đổi title, phải giữ ID cũ trong `aliases` hoặc ghi migration;
 không âm thầm tạo thủ tục mới.
 
-## 2. Mapping 9 cột nghiệp vụ Excel (C–K)
+## 2. Mapping 12 cột Excel
 
-Workbook được bàn giao cho nhóm có chín cột nghiệp vụ từ C đến K. Nó không có
-email hay timestamp. Pipeline nhận diện theo tên header, không theo chữ cái cột,
-và cũng chấp nhận bản xuất biểu mẫu có thêm metadata; nếu gặp email thì phải DROP,
+Local preflight xác nhận workbook có 12 header ở cột 1–12. Excel hiển thị từ C–K
+không chứng minh file chỉ có chín cột vì A/B có thể đang ẩn hoặc ngoài vùng nhìn.
+Pipeline nhận diện theo tên header, không theo chữ cái cột. Email phải DROP;
 timestamp chỉ được dùng làm metadata audit.
 
 | Cột Excel | Đích | Quy tắc |
 |---|---|---|
+| Dấu thời gian | `SourceManifest.collected_at` | Chỉ là lúc nhập form; không dùng làm effective date |
+| Địa chỉ email | DROP | Không hash để dùng lại, không log, không đưa normalized |
 | Tên thủ tục hành chính | `ProcedureRecord.title`, aliases | Normalize; duplicate vào conflict register |
 | Lĩnh vực | `category_code`, `category_label` | Map taxonomy; hai cách viết Giáo dục về một code |
 | Hình thức nộp | `submission_methods` | `Trực tiếp→DIRECT`, `Trực tuyến→ONLINE`, `Cả hai→[DIRECT,ONLINE]` |
@@ -94,15 +96,8 @@ timestamp chỉ được dùng làm metadata audit.
 | Lệ phí | `fees` + fragment | Luôn giữ `raw_text`; `amount_vnd=null` nếu có nhiều điều kiện/không parse chắc |
 | Địa điểm tiếp nhận | `receiving_authority` + jurisdiction | Không suy luận địa bàn ngoài text có sẵn |
 | Ghi chú | fragment `OTHER` | Chỉ tạo khi có nội dung; không trộn vào field khác |
-| Cột K | Chưa ingest cho tới khi chốt header/ý nghĩa | Build dừng nếu cột chưa mapping có dữ liệu; cột rỗng toàn bộ có thể bỏ |
-
-Hai cột metadata tùy chọn chỉ dành cho biến thể đầu vào khác:
-
-| Cột tùy chọn | Đích | Quy tắc |
-|---|---|---|
-| Dấu thời gian | `SourceManifest.collected_at` | Chỉ là lúc nhập form; không dùng làm effective date |
-| Địa chỉ email | DROP | Không hash để dùng lại, không log, không đưa normalized |
 | File biểu mẫu | source/attachment pending | Chỉ dùng sau khi quyền truy cập, snapshot và hash được xác nhận |
+| Trạng thái | audit legacy only | Không đồng nghĩa `APPROVED_FOR_DEMO` |
 
 Các field `applicant_scope`, `steps`, `legal_bases`, `effective_dates`,
 `procedure_code`, `issuing_authority` không có cột nguồn tương ứng. Chúng phải là

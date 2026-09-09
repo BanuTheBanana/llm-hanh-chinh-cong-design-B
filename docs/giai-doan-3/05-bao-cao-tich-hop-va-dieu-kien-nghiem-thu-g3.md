@@ -9,7 +9,7 @@
 | Baseline | `main` tại `g2-v1.0.0` |
 | Trạng thái code | `INTEGRATED_AND_REGRESSION_TESTED` |
 | Trạng thái G3 | `NOT_ACCEPTED_YET` |
-| Lý do | D2 thật chưa qua review/governance, chưa có TEST khóa và chưa nối contract D2 runtime |
+| Lý do | D2 đã preflight nhưng chưa qua review/governance, chưa có TEST khóa và chưa nối contract D2 runtime |
 
 ## Tổng
 
@@ -36,7 +36,7 @@ Chưa được phép nối D2 thật
 | Task | Trạng thái chính xác | Còn thiếu để đóng |
 |---|---|---|
 | G3-00 | `PARTIAL` | Quyền sử dụng, người duyệt, freshness và chính sách D2 chưa có sign-off |
-| G3-D01 | `TECHNICAL_PASS` | Chạy local trên đúng workbook; xác nhận cột K nếu có dữ liệu |
+| G3-D01 | `PASS_ON_REAL_WORKBOOK` | 42 source, 38 procedure, 202 fragment, 4 conflict, 40 gold draft; mọi preflight gate kỹ thuật PASS |
 | G3-D02 | `BLOCKED_HUMAN_REVIEW` | Duyệt source/provenance và quyết định mọi conflict thực |
 | G3-D03 | `DRAFT_GENERATOR_PASS` | Reviewer thứ hai duyệt expected point/citation và khóa TEST |
 | G3-R01 | `PREFLIGHT_PASS_INGEST_BLOCKED` | Chốt D2 runtime projection rồi làm ingest idempotent/pin/rollback |
@@ -71,6 +71,12 @@ Chưa được phép nối D2 thật
 Các con số trên chỉ chứng minh regression/code fixture, không thay kết quả D2 thật.
 
 ### 4. Checklist người có quyền cần thực hiện
+
+Build và preflight workbook thật đã hoàn tất local. Không cần chạy lại trừ khi
+workbook thay đổi. Output private hiện ở
+`data/company_private/company-tthc-9c38dde8-v1/`.
+
+Các lệnh dưới đây là runbook tái lập:
 
 Từ repository, chạy ở máy nội bộ được phép:
 

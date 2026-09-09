@@ -6,7 +6,7 @@
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
 | Phiên bản | `v1.5-integration-audit` |
-| Trạng thái | `G3_CODE_INTEGRATED; D2_RELEASE_BLOCKED_BY_HUMAN_GATES` |
+| Trạng thái | `G3_C1_REAL_PREFLIGHT_PASS; D2_RELEASE_BLOCKED_BY_HUMAN_GATES` |
 
 ## Tổng
 

@@ -7,7 +7,7 @@
 | Cập nhật gần nhất | 09/09/2026 |
 | Phiên bản công cụ | `g3-preprocess-v3` |
 | Contract | `g3-data-v1` |
-| Trạng thái kỹ thuật | Parser/validator/gold draft đã có; chờ review nghiệp vụ |
+| Trạng thái kỹ thuật | Workbook thật preflight PASS; chờ review nghiệp vụ |
 | Phân loại dữ liệu | `D2_COMPANY_REAL`, chỉ xử lý local |
 
 ## Tổng
@@ -74,8 +74,8 @@ Hoan/người thứ hai kiểm từng expected point và citation.
 
 ### Parser chịu trách nhiệm
 
-- nhận diện chín cột nghiệp vụ C–K bằng header, không phụ thuộc vị trí vật lý;
-- chấp nhận metadata tùy chọn từ bản export khác nhưng luôn loại email khỏi output;
+- nhận diện 12 header của workbook thật, không phụ thuộc cột đang được Excel hiển thị;
+- luôn loại email khỏi output; timestamp chỉ là metadata audit;
 - dừng với `UNSUPPORTED_COLUMNS_WITH_DATA_AT_INDEX` nếu cột chưa có mapping chứa
   dữ liệu; chỉ bỏ qua cột có header nhưng rỗng toàn bộ;
 - bỏ dòng trống trong used range;

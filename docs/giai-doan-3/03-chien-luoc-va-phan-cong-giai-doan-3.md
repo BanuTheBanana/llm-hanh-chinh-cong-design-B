@@ -259,8 +259,8 @@ Branch: `g3/data-tu`
 ### Công việc
 
 1. Không sửa file Excel gốc; ghi hash và version.
-2. Lập mapping chín cột nghiệp vụ C–K → schema chuẩn; build phải dừng nếu cột chưa
-   mapping có dữ liệu.
+2. Mapping 12 header đã xác minh → schema chuẩn; build phải dừng nếu cột chưa mapping
+   có dữ liệu.
 3. Loại email khỏi normalized data; timestamp chỉ giữ ở audit metadata nếu cần.
 4. Normalize NFC, khoảng trắng, bullet, category, submission method, fee/time.
 5. Lập `conflicts.jsonl` cho mọi nhóm duplicate do build hiện tại phát hiện; hỏi
@@ -439,7 +439,7 @@ Không ai cần chờ hoàn toàn:
 
 | Task | Trạng thái | Bằng chứng/việc còn lại |
 |---|---|---|
-| G3-D01 – parser/validator | `TECHNICALLY_COMPLETE` | Test hư cấu chứng minh schema, reference, PII, conflict và deterministic; cần Tú chạy local trên workbook thật |
+| G3-D01 – parser/validator | `PASS_ON_REAL_WORKBOOK` | 42 source, 38 procedure, 202 fragment, 4 conflict, 40 gold draft; schema/reference/PII/deterministic PASS |
 | G3-D02 – conflict/provenance | `BLOCKED_HUMAN_REVIEW` | Mọi conflict do build hiện tại phát hiện và nguồn/hiệu lực phải do người nghiệp vụ quyết định |
 | G3-D03 – gold DEV/TEST | `DRAFT_GENERATOR_COMPLETE` | Gold đúng schema và split theo procedure; Hoan/người thứ hai phải duyệt expected point/citation rồi khóa TEST |
 

@@ -5,137 +5,115 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật | 09/09/2026 |
-| Phiên bản | `v1.1-input-shape-correction` |
-| Trạng thái | `INPUT_SHAPE_CORRECTED; LOCAL_PREFLIGHT_REQUIRED` |
+| Phiên bản | `v1.2-local-preflight` |
+| Trạng thái | `G3_C1_PREFLIGHT_PASS; HUMAN_REVIEW_REQUIRED` |
 | Phân loại | `D2_COMPANY_REAL` |
-| Phạm vi xác nhận | Theo workbook nhóm bàn giao: 9 cột nghiệp vụ C–K, không có email/timestamp |
-| Fingerprint và số liệu nội dung | Phải sinh lại bằng pipeline local; không dùng số liệu của audit v1.0 |
+| Cách chạy | Script local, không gọi API ngoài, chỉ báo count/hash/mã trạng thái |
+| Dataset version | `company-tthc-9c38dde8-v1` |
+| Workbook SHA-256 | `9c38dde8f496f853f72b5bf19d0c538d36503cfb52da1ec03d08bfcbfb9dec03` |
 
-Raw workbook nằm trong `dataset/` và được `.gitignore` chặn. Không đổi tên, sửa
-trực tiếp hay commit file gốc. Mọi output phát sinh từ nội dung công ty cũng phải
-nằm dưới `data/company_private/`.
-
-> Đính chính bắt buộc: audit v1.0 đã mô tả nhầm một bản xuất biểu mẫu 12 cột có
-> email/timestamp. Đó không phải shape của workbook hiện tại. Các kết luận về email,
-> timestamp, trạng thái `Xong`, số link, duplicate và SHA-256 trong bản cũ không được
-> dùng làm bằng chứng cho file hiện tại.
+Raw workbook nằm trong `dataset/`; output nằm trong `data/company_private/`. Cả hai
+đều private/ignored và không được commit hoặc gửi tới hosted API.
 
 ## Tổng
 
-Đây là bảng tri thức thủ tục hành chính, không phải dataset huấn luyện LLM. Nó là
-đầu vào cho RAG sau khi được chuẩn hóa và review; không đưa thẳng vào Qwen để
-fine-tune.
+Workbook có 12 header được parser nhận diện ở cột 1–12. Việc giao diện Excel đang
+hiển thị từ C đến K không có nghĩa file chỉ có chín cột: A/B có thể bị ẩn hoặc nằm
+ngoài vùng đang nhìn, và còn cột L. Pipeline map theo tên header, không theo vị trí.
 
 ```text
-Excel 9 cột private
-→ nhận diện header + chặn cột chưa mapping
-→ chuẩn hóa deterministic
-→ ProcedureRecord + ProcedureFragment + conflict register
-→ review nguồn/xung đột
-→ gold DEV/TEST review độc lập
-→ RAG
-→ Qwen local zero-shot
+Workbook private
+→ 42 SourceManifest
+→ 38 ProcedureRecord
+→ 202 ProcedureFragment
+→ 4 ConflictRecord OPEN
+→ 40 GoldQuestion draft
+→ schema/reference/PII/deterministic preflight PASS
 ```
+
+Đây là bảng tri thức cho RAG, không phải dataset instruction/output để fine-tune.
 
 ## Phân
 
-### 1. Shape đầu vào đã chốt
+### 1. Kết quả local preflight đã xác minh
 
-Nhóm xác nhận workbook có chín cột nghiệp vụ từ C đến K. Các cột đã nhìn rõ gồm:
+| Chỉ số | Kết quả |
+|---|---:|
+| Header nhận diện | 12/12 |
+| Source row accounting | 42 |
+| Procedure sau normalize | 38 |
+| Fragment | 202 |
+| Conflict mở | 4 |
+| Gold draft | 40 |
+| Deterministic rebuild | PASS |
+| Workbook fingerprint | PASS |
+| JSON Schema | PASS |
+| Reference integrity | PASS |
+| PII scan trên normalized output | PASS |
+| Procedure chờ review | 38 |
+| Gold chờ review lần hai | 40 |
 
-1. Tên thủ tục hành chính.
-2. Lĩnh vực.
-3. Hình thức nộp.
-4. Thành phần hồ sơ.
-5. Thời gian giải quyết.
-6. Lệ phí.
-7. Địa điểm tiếp nhận hồ sơ trực tiếp (nếu có).
-8. Ghi chú.
-9. Cột K phải được nhận diện bằng đúng header khi chạy local.
+`PII scan PASS` áp dụng cho output normalized, không có nghĩa raw workbook là dữ
+liệu công khai. Parser nhận diện metadata email nhưng không đưa email vào snapshot,
+ID, normalized JSONL, report hoặc prompt.
 
-Pipeline map theo tên header, không theo vị trí. Nếu cột K hoặc bất kỳ cột chưa có
-mapping nào chứa dữ liệu, build phải dừng bằng
-`UNSUPPORTED_COLUMNS_WITH_DATA_AT_INDEX`; một cột chỉ có header nhưng rỗng toàn bộ
-có thể được bỏ. Biến thể đầu vào khác có email/timestamp vẫn được nhận diện, nhưng
-email luôn bị DROP và timestamp không bao giờ được coi là ngày hiệu lực.
+### 2. Mapping đầu vào
 
-### 2. Những gì chỉ được kết luận sau local preflight
+Pipeline nhận diện:
 
-Không tái sử dụng các con số của audit cũ. Pipeline phải sinh báo cáo mới cho đúng
-workbook hiện tại:
+1. Dấu thời gian — chỉ là audit metadata, không phải ngày hiệu lực.
+2. Địa chỉ email — DROP hoàn toàn.
+3. Tên thủ tục hành chính.
+4. Lĩnh vực.
+5. Hình thức nộp.
+6. Thành phần hồ sơ.
+7. Thời gian giải quyết.
+8. Lệ phí.
+9. Địa điểm tiếp nhận.
+10. Ghi chú.
+11. File biểu mẫu.
+12. Trạng thái legacy — không đồng nghĩa phê duyệt nghiệp vụ.
 
-- SHA-256 nguyên file và `dataset_version`;
-- số dòng nguồn thực, số dòng trống bị bỏ;
-- số thủ tục sau normalize;
-- phân bố lĩnh vực;
-- số field thiếu theo loại;
-- số nhóm title trùng/xung đột;
-- số fragment và gold draft;
-- schema/reference/PII/deterministic result.
+Parser vẫn có test cho biến thể chỉ gồm chín business column. Nếu tương lai xuất
+hiện cột chưa mapping và cột đó có dữ liệu, build dừng bằng
+`UNSUPPORTED_COLUMNS_WITH_DATA_AT_INDEX`, không bỏ dữ kiện im lặng.
 
-Báo cáo chỉ chứa count/hash/error code, không chứa nội dung ô hoặc đường dẫn private.
+### 3. Việc bắt buộc phải do con người quyết định
 
-### 3. Rủi ro nghiệp vụ vẫn còn dù file không có email
+- Ai có quyền ký `APPROVED_FOR_DEMO` và `APPROVED_FOR_PRODUCTION`.
+- Workbook/source nội bộ có đủ thẩm quyền làm bằng chứng hay cần URL/căn cứ bổ sung.
+- Cách xử lý bốn conflict thực: merge, version hay keep separate.
+- Procedure code, jurisdiction, effective date, issuing authority và freshness.
+- Từng expected point/citation của 40 gold draft; reviewer phải khác author.
 
-| Mức | Vấn đề | Cách xử lý |
-|---|---|---|
-| Blocker | Chưa có nguồn/căn cứ chính thức đã xác nhận | Source register hoặc reviewer nghiệp vụ xác nhận nguồn nội bộ |
-| Blocker | Chưa có procedure code/version/effective date đáng tin cậy | Để `null` + `missing_fields`; không tự suy đoán |
-| High | Phạm vi địa phương có thể chỉ nằm trong text | Tách `jurisdiction` và `receiving_authority`, review trước khi dùng |
-| High | Tên trùng có thể chứa nội dung khác nhau | Tạo conflict `OPEN`, procedure `QUARANTINED`, con người quyết định |
-| High | Cột chưa mapping có thể bị mất dữ liệu | Build fail-safe, bổ sung mapping qua change control |
-| Medium | Lệ phí/thời gian có nhiều điều kiện | Giữ `raw_text`; số parse không chắc phải là `null` |
-| Medium | Thành phần hồ sơ dài hoặc có ngoại lệ | Fragment theo field/nhóm nghĩa; reviewer kiểm tra không mất điều kiện |
-| Medium | Nơi tiếp nhận hoặc field khác bị trống | Khai báo `missing_fields`; câu hỏi tương ứng phải abstain |
+AI không được tự đổi `PENDING_REVIEW` hoặc `QUARANTINED` thành `APPROVED`.
 
-Không có email trong workbook hiện tại không đồng nghĩa dữ liệu tự động an toàn:
-nội dung tự do vẫn phải qua PII/secret scan và review thủ công.
-
-### 4. Trường còn thiếu so với RAG production
-
-Nếu workbook không cung cấp thì giữ thiếu rõ ràng, không bịa:
-
-- mã thủ tục chính thức và cơ quan ban hành;
-- URL/snapshot nguồn được phép hiển thị;
-- `jurisdiction` chuẩn hóa;
-- ngày hiệu lực, hết hiệu lực và kiểm tra gần nhất;
-- căn cứ pháp lý;
-- đối tượng/điều kiện áp dụng;
-- trình tự thực hiện;
-- reviewer và trạng thái phê duyệt.
-
-### 5. Mức sẵn sàng
+### 4. Mức sẵn sàng
 
 | Mục đích | Trạng thái |
 |---|---|
-| Parser/validator trên fixture 9 cột | Sẵn sàng kỹ thuật |
-| Build workbook thật | Chờ người được phép chạy local và xử lý header chưa mapping nếu có |
-| RAG fixture | Sẵn sàng kỹ thuật |
-| RAG company demo | Chờ approved subset và source review |
-| Gold TEST | Chờ reviewer thứ hai và đóng băng theo procedure |
-| Fine-tune | Chưa có bằng chứng cần thiết; tiếp tục zero-shot baseline |
+| Preprocess workbook thật | PASS |
+| Schema/reference/PII preflight | PASS |
+| Conflict/provenance review | Chưa hoàn thành |
+| Approved corpus cho RAG | Chưa có |
+| Gold TEST đã khóa | Chưa có |
+| RAG benchmark D2 | Chưa được phép chạy như nghiệm thu |
+| Fine-tune | Chưa có bằng chứng cần; giữ zero-shot baseline |
 | Production | Chưa sẵn sàng |
 
 ## Hợp
 
 ### Kết luận
 
-Phần Tú được tách thành hai lớp:
+G3-D01 đã hoàn thành trên workbook thật về mặt kỹ thuật. Bước kế tiếp không phải
+chỉnh parser mà là review nghiệp vụ: xác nhận nguồn, xử lý bốn conflict, duyệt
+approved subset và duyệt độc lập 40 gold question. Chỉ sau publish gate, Minh mới
+mở ingest D2 và Hoan mới benchmark Qwen trên TEST thật.
 
-- lớp kỹ thuật: parser/validator/gold draft, test 9 cột, kiểm soát PII, conflict và
-  deterministic build;
-- lớp nghiệp vụ: xác nhận cột K, nguồn, hiệu lực, conflict, approved subset và gold.
+### Câu hỏi cần mentor/công ty xác nhận
 
-AI coding agent có thể hoàn tất lớp kỹ thuật nhưng không được tự ký lớp nghiệp vụ.
-Sau khi người có quyền chạy pipeline và review output private, Minh mới mở ingest,
-Hoan mới chạy benchmark Qwen trên D2.
-
-### Câu hỏi cần công ty/mentor xác nhận
-
-1. Header đầy đủ và ý nghĩa nghiệp vụ của cột K là gì?
-2. Workbook này có phải nguồn nội bộ đã được duyệt không?
-3. Ai được ký `APPROVED_FOR_DEMO` và `APPROVED_FOR_PRODUCTION`?
-4. Có được lưu normalized D2 trong Git private hay chỉ máy/server nội bộ?
-5. Có được gửi bất kỳ phần D2 nào ra hosted API không? Mặc định dự án là không.
-6. Nguồn gốc, phạm vi và ngày kiểm tra gần nhất của từng thủ tục là gì?
-7. Chính sách cập nhật/freshness và thu hồi corpus cũ là gì?
+1. Ai hoặc vai trò nào được ký duyệt dữ liệu demo?
+2. Workbook có được xem là nguồn nội bộ đã duyệt hay cần đối chiếu nguồn chính thức?
+3. Bốn conflict sẽ do ai review?
+4. Có được hiển thị nội dung nguồn nội bộ cho người dùng demo không?
+5. Có được lưu normalized D2 trên server nội bộ, và retention/freshness là bao lâu?

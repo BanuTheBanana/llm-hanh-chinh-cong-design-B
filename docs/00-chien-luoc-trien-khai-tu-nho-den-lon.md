@@ -39,11 +39,11 @@ khi chạy đúng artifact model và TEST đã khóa từ Tú + retrieval output
 
 ### Kết luận audit đầu vào G3
 
-Audit shape đã được đính chính thành chín cột nghiệp vụ C–K không có
-email/timestamp. Số dòng thực, số thủ tục sau chuẩn hóa, phân bố lĩnh vực, số nhóm
-trùng/xung đột và mọi fingerprint phải được pipeline hiện tại đo lại trên đúng
-workbook; không tái sử dụng số liệu từ audit nhầm trước đó. Dữ liệu chưa chứng minh
-có procedure code, URL/căn cứ nguồn, phạm vi hiệu lực hay ngày xác minh. Vì vậy:
+Local preflight đã xác nhận workbook có 12 header (A/B có thể bị ẩn khi người dùng
+chỉ nhìn thấy C–K), 42 source, 38 procedure, 202 fragment, 4 conflict và 40 gold
+draft. Email metadata bị loại khỏi output; schema/reference/PII/deterministic đều
+PASS. Dữ liệu vẫn chưa chứng minh có procedure code, URL/căn cứ nguồn, phạm vi
+hiệu lực hay ngày xác minh. Vì vậy:
 
 ```text
 KHÔNG đưa Excel thẳng vào model
