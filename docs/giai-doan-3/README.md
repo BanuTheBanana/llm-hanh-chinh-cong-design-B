@@ -24,9 +24,10 @@ baseline chứng minh model là bottleneck.
 6. [Runbook Qwen3-1.7B local](04-runbook-qwen-local.md).
 7. [Runbook validator và retrieval G3 của Minh](../../backend/docs/g3/README.md).
 8. [Báo cáo test G3 Backend](../../backend/docs/g3/TEST_REPORT.md).
-9. [Báo cáo tích hợp và checklist đóng G3](05-bao-cao-tich-hop-va-dieu-kien-nghiem-thu-g3.md).
-10. [Contract grounded hiện tại](../contracts-g2.md).
-11. [Contract D2 runtime G3](../contracts-g3.md).
+9. [Tổng kết quá trình phát triển G1 đến G3](../bao-cao-tong-ket-giai-doan-1-den-3.md).
+10. [Báo cáo tích hợp và checklist đóng G3](05-bao-cao-tich-hop-va-dieu-kien-nghiem-thu-g3.md).
+11. [Contract grounded hiện tại](../contracts-g2.md).
+12. [Contract D2 runtime G3](../contracts-g3.md).
 12. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
 
 ## Hợp
