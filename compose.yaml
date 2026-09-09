@@ -71,10 +71,15 @@ services:
       DB_NAME: ${POSTGRES_DB:-hanh_chinh_mvp}
       DB_USER: ${POSTGRES_USER:-app_user}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-change-me-local-only}
-      # Base origin only; Backend appends /internal/v1/generate.
+      # Base origin only; Backend selects the versioned internal route.
       AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai-service:8001}
       AI_REQUEST_TIMEOUT_SECONDS: ${AI_REQUEST_TIMEOUT_SECONDS:-3}
       LLM_MAX_OUTPUT_TOKENS: ${LLM_MAX_OUTPUT_TOKENS:-300}
+      GROUNDED_MAX_OUTPUT_TOKENS: ${GROUNDED_MAX_OUTPUT_TOKENS:-500}
+      RAG_ENABLED: ${RAG_ENABLED:-false}
+      RAG_CORPUS_VERSION: ${RAG_CORPUS_VERSION:-}
+      RAG_TOP_K: ${RAG_TOP_K:-5}
+      RAG_ALLOW_FIXTURES: ${RAG_ALLOW_FIXTURES:-false}
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     depends_on:

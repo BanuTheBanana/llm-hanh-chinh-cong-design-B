@@ -62,21 +62,83 @@ async def setup(client, database, corpus, monkeypatch):
     return P + "/conversations/" + conv.json()["id"] + "/messages"
 
 
-async def test_rag_success_history_retry_and_isolation(client, database, corpus, monkeypatch):
+async def test_rag_readiness_checks_corpus_and_grounded_ai(client, database, corpus, monkeypatch):
+    monkeypatch.setattr(get_settings(), "rag_enabled", True)
+    monkeypatch.setattr(get_settings(), "rag_allow_fixtures", True)
+    monkeypatch.setattr(get_settings(), "rag_corpus_version", corpus.version)
+    async with database() as db:
+        await ingest(db, corpus)
+        await db.commit()
+
+    def handler(request):
+        assert request.method == "GET"
+        assert request.url.path == "/internal/v2/health"
+        return httpx.Response(
+            200,
+            json={
+                "status": "ok",
+                "service": "ai-service",
+                "endpoint": "grounded-v2",
+                "provider": "template",
+                "prompt_version": "g2-grounded-v2",
+                "external_calls_enabled": False,
+            },
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http:
+        app.dependency_overrides[get_ai] = lambda: AIClient(http)
+        result = await client.get("/health/rag")
+    assert result.status_code == 200
+    assert result.json() == {
+        "status": "ok",
+        "corpus_version": corpus.version,
+        "data_classification": "D0_SYSTEM_SMOKE",
+        "sources": 1,
+        "procedures": 1,
+        "fragments": 3,
+        "grounded_provider": "template",
+        "prompt_version": "g2-grounded-v2",
+        "external_calls_enabled": False,
+    }
+
+
+async def test_rag_rejects_query_over_grounded_contract_limit(
+    client, database, corpus, monkeypatch
+):
+    path = await setup(client, database, corpus, monkeypatch)
+    app.dependency_overrides[get_ai] = lambda: object()
+    response = await client.post(
+        path,
+        json={"client_message_id": str(uuid4()), "content": "x" * 4_001},
+    )
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+    assert (await client.get(path)).json() == []
+
+
+async def test_rag_success_contract_retry_and_isolation(client, database, corpus, monkeypatch):
     path = await setup(client, database, corpus, monkeypatch)
     calls = []
 
     def handler(request):
         payload = json.loads(request.content)
         calls.append(payload)
-        bundle = payload["evidence_bundle"]
+        assert request.url.path == "/internal/v2/generate"
+        assert "history" not in payload
+        assert "url" not in payload["evidence"][0]
+        assert "score" not in payload["evidence"][0]
+        assert "metadata" not in payload["evidence"][0]
         return httpx.Response(
             200,
             json={
-                "request_id": bundle["request_id"],
+                "request_id": payload["request_id"],
+                "evidence_bundle_id": payload["evidence_bundle_id"],
+                "corpus_version": payload["corpus_version"],
+                "data_classification": payload["data_classification"],
+                "prompt_version": "g2-grounded-v2",
                 "answer": "Fixture only",
                 "status": "ANSWER",
-                "cited_fragment_ids": [bundle["evidence"][0]["fragment_id"]],
+                "cited_fragment_ids": [payload["evidence"][0]["fragment_id"]],
                 "missing_information": [],
                 "provider": "mock",
                 "model": "mock-g2",
@@ -114,11 +176,15 @@ async def test_abstain_and_failure(client, database, corpus, monkeypatch, mode, 
         calls.append(1)
         if mode == "timeout":
             raise httpx.ReadTimeout("fixture")
-        bundle = json.loads(request.content)["evidence_bundle"]
+        payload = json.loads(request.content)
         return httpx.Response(
             200,
             json={
-                "request_id": bundle["request_id"],
+                "request_id": payload["request_id"],
+                "evidence_bundle_id": payload["evidence_bundle_id"],
+                "corpus_version": payload["corpus_version"],
+                "data_classification": payload["data_classification"],
+                "prompt_version": "g2-grounded-v2",
                 "answer": "Bad source",
                 "status": "ANSWER",
                 "cited_fragment_ids": ["fabricated"],
@@ -155,7 +221,7 @@ async def test_upgrade_from_g1_retains_history(database):
         conn = await db.connection()
 
         def downgrade(sync_conn):
-            cfg = Config("alembic.ini")
+            cfg = Config(str(Path(__file__).parents[1] / "alembic.ini"))
             cfg.attributes["connection"] = sync_conn
             command.downgrade(cfg, "0001_g1")
 
@@ -186,7 +252,7 @@ async def test_upgrade_from_g1_retains_history(database):
         conn = await db.connection()
 
         def upgrade(sync_conn):
-            cfg = Config("alembic.ini")
+            cfg = Config(str(Path(__file__).parents[1] / "alembic.ini"))
             cfg.attributes["connection"] = sync_conn
             command.upgrade(cfg, "head")
             command.check(cfg)
@@ -218,11 +284,15 @@ async def test_failed_citation_retry_reuses_user(client, database, corpus, monke
     repair = False
 
     def handler(request):
-        bundle = json.loads(request.content)["evidence_bundle"]
+        payload = json.loads(request.content)
         return httpx.Response(
             200,
             json={
-                "request_id": bundle["request_id"],
+                "request_id": payload["request_id"],
+                "evidence_bundle_id": payload["evidence_bundle_id"],
+                "corpus_version": payload["corpus_version"],
+                "data_classification": payload["data_classification"],
+                "prompt_version": "g2-grounded-v2",
                 "answer": "Fixture answer",
                 "status": "ANSWER",
                 "cited_fragment_ids": ["frag_fees" if repair else "bad_id"],

@@ -1,62 +1,73 @@
-# G2 Backend — kết quả kiểm tra
+# G2/D0 – Báo cáo kiểm thử tích hợp
 
-## Đã chạy trên bản bàn giao
+## Báo cáo cập nhật
 
-| Lệnh / kiểm tra | Kết quả |
+| Trường | Nội dung |
 |---|---|
-| uv sync --frozen | Cài đúng lockfile của repo; không thêm dependency |
-| uv run --frozen pytest tests/test_unit.py tests/test_config.py tests/test_rag_unit.py -q | 68 passed |
-| uv run --frozen ruff check . | Pass |
-| uv run --frozen ruff format --check . | Pass |
-| python compileall app/migrations/tests | Pass |
-| alembic upgrade head --sql | Sinh SQL từ DB trống đến G2 thành công |
-| alembic upgrade 0001_g1:head --sql | Sinh SQL nâng cấp G1→G2 thành công |
-| pytest collection | 95 cases: 68 offline + 27 cần PostgreSQL |
-| scripts/check-repo-hygiene.py | Pass trên checkout local tạm, không phát hiện common secret patterns |
+| Ngày chạy | 09/09/2026 |
+| Nhánh | `g2/integration` |
+| Kết luận kỹ thuật | `G2_I01_D0_TECHNICAL_PASS` |
+| Kết luận nghiệp vụ | `G2_FINAL_NOT_PASSED` |
+| Dữ liệu runtime | `fixture-v1`, `D0_SYSTEM_SMOKE`, hoàn toàn giả |
 
-Có thêm pythonpath=["."] trong pytest config để cả `uv run pytest` lẫn
-`uv run python -m pytest` import app đúng khi chạy từ backend/.
+## Tổng
 
-68 offline cases gồm 39 baseline unit/config và 29 G2 cases. Đã kiểm tra hashes,
-reference/provenance, path traversal, fixture opt-in, domain allowlist, exact/
-alias/không dấu, BM25, scope/time filters, ambiguity, no-hit không gọi AI,
-request ID/citation allowlist, HTTP errors/timeout/schema và evaluation fixture.
+Lát cắt sau đã chạy thật từ trình duyệt tới PostgreSQL và quay lại Web:
 
-## Kết quả fixture retrieval (không phải chất lượng nghiệp vụ)
+```text
+Web → Core Backend → retrieval fixture → EvidenceBundle
+    → AI Service grounded v2 → Backend verifier → PostgreSQL → Web + source
+```
 
-Corpus synthetic fixture-v1: 1 thủ tục giả, 3 fragment, 10 câu DEV, 7 câu có gold
-fragment để tính recall/MRR. Các case còn lại kiểm tra no-hit/filter.
+Kết quả này chứng minh plumbing, contract, persistence và guardrail D0. Nó không
+chứng minh độ đúng hành chính, không phải benchmark model thật và không thay thế
+review dữ liệu D1.
 
-- Recall@5: 1.0.
-- MRR: 1.0.
-- Query fail trong run này: 0/10.
-- p50: khoảng 0.0703 ms; p95: khoảng 0.4242 ms.
-- Đo retrieval in-memory trong một run, không gồm ingest/DB load/generation/network.
+## Phân – bằng chứng đã chạy
 
-Raw result từng question ID và corpus SHA-256 trong retrieval-fixture-report.json.
-Các câu hỏi được tạo để kiểm tra kỹ thuật; không được dùng điểm này để tuyên bố
-độ chính xác hành chính hoặc làm threshold G2. Chưa có corpus/gold D1 của Tú.
+| Phạm vi | Kết quả |
+|---|---|
+| Backend full suite với PostgreSQL 16 | `108 passed` |
+| Backend Ruff check/format | Pass |
+| AI Service test | `42 passed` |
+| AI Service Ruff check/format | Pass |
+| Web unit/component | `10 passed` |
+| Web ESLint + production build | Pass |
+| Offline grounded evaluation D0 | 8/8 case, strict safety pass |
+| Data D1 technical preflight | Pass: 4 source, 1 procedure, 10 fragment, 10 question |
+| Docker Compose G2 readiness | PostgreSQL/AI/Backend/Web healthy; corpus `fixture-v1` |
+| API end-to-end smoke | Pass, gồm answer/binding/citation/history |
+| Chromium G2 E2E | Pass: login, answer + source, reload vẫn còn grounding |
+| OpenAPI/schema catalog regeneration | Khớp runtime Pydantic/FastAPI hiện tại |
+| Repository hygiene/secret-pattern check | Pass |
 
-## Chưa chạy — không tính là pass
+Retrieval fixture hiện có 10 câu DEV; report chi tiết nằm tại
+[`retrieval-fixture-report.json`](retrieval-fixture-report.json). Recall@5 và MRR
+đều 1.0 trên fixture nhỏ được tạo để kiểm tra kỹ thuật. Latency thay đổi theo mỗi
+run và được lưu trong artifact; không dùng số đó làm SLA hay kết luận chất lượng
+D1.
 
-27 PostgreSQL tests gồm 19 baseline và 8 G2 integration cases. G2 cases kiểm tra
-idempotent/concurrent ingest, version conflict, corpus pinning, source persistence,
-retry/filter conflict, isolation, no-evidence, AI failure, citation retry và
-migration G1 history→G2 giữ nguyên. Cần chạy cùng PostgreSQL16 trước merge.
+Grounded evaluation có 8 case giả bao phủ answer, empty evidence, ranking,
+clarification, evidence không liên quan, hiệu lực, prompt injection và retrieval
+failure. Report tại
+[`evaluation/reports/offline-template-v1.md`](../../../evaluation/reports/offline-template-v1.md)
+ghi prompt `g2-grounded-v2`, status accuracy/citation validity/abstention accuracy
+đều 1.0 và unsafe-answer rate 0 trên chính fixture này.
 
-Môi trường bàn giao không có PostgreSQL server hoặc Docker khả dụng. Không dùng
-SQLite để thay thế các gate cần PostgreSQL. Offline SQL generation không chứng
-minh migration online hoặc transaction/advisory lock đã pass.
+## Hợp – gate còn mở
 
-Chưa chạy hosted AI, Compose full-stack hoặc Web source rendering G2. Repo hiện
-chỉ có AI endpoint G1; Hoan cần bổ sung generate-grounded. Nguồn D1/gold reviewed,
-provider approval và end-to-end G2 là các phụ thuộc còn lại.
+Các mục sau chưa chạy hoặc chưa đủ điều kiện, do đó toàn bộ G2 chưa được nghiệm
+thu:
 
-Ingest latency/orchestration latency đã có instrumentation, nhưng chưa có số đo
-thành công với PostgreSQL/AI thật trong lượt này. Không điền số giả vào report.
+- Data D1 `--mode publish` đang fail đúng thiết kế: source/gold còn chờ reviewer,
+  mới có 1 thủ tục/10 câu và thiếu nguồn chi tiết cho hồ sơ/các bước.
+- Chưa có retrieval và answer-quality report trên corpus D1 đã duyệt.
+- Chưa có hosted adapter/live baseline vì công ty chưa duyệt provider và loại dữ
+  liệu được gửi ra ngoài.
+- Chưa có ngưỡng Recall/answer/latency được mentor ký nhận.
+- Workflow CI đã có G1 regression + G2 smoke/E2E nhưng cần GitHub run xanh trên
+  commit tích hợp sau khi push.
 
-## Bằng chứng G1 cũ
-
-Repo đầu vào ghi G1 đã đạt 58 backend tests trên PostgreSQL và full-stack CI tại
-run34197723998. Đây là baseline của nhóm trước thay đổi G2, không phải kết quả
-regression G2 mới. Cần chạy lại suite đầy đủ dù baseline cũ đã xanh.
+Không dùng key đã từng xuất hiện trong chat. Khi D1 và provider được duyệt, dùng
+secret mới qua `.env` local hoặc GitHub secret, tuyệt đối không ghi vào report,
+command, source code hay log.

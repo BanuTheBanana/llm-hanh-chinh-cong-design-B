@@ -3,7 +3,7 @@ import re
 import unicodedata
 from collections import Counter
 from dataclasses import dataclass
-from uuid import UUID
+from uuid import UUID, uuid5
 
 from app.rag.corpus import Corpus
 from app.rag.schemas import Evidence, EvidenceBundle, RetrievalInput
@@ -30,13 +30,16 @@ def retrieve(corpus: Corpus, query: RetrievalInput, request_id: UUID) -> Retriev
             continue
         if f.jurisdiction and f.jurisdiction != source.jurisdiction:
             continue
-        if f.as_of and (
-            source.status != "CONFIRMED_FROM_SOURCE"
-            or not source.effective_from
-            or not source.effective_to
-            or not source.effective_from <= f.as_of <= source.effective_to
-        ):
-            continue
+        if f.as_of:
+            date_outside_known_interval = (
+                source.effective_from is not None and f.as_of < source.effective_from
+            ) or (source.effective_to is not None and f.as_of > source.effective_to)
+            if (
+                source.status != "CONFIRMED_FROM_SOURCE"
+                or (source.effective_from is None and source.effective_to is None)
+                or date_outside_known_interval
+            ):
+                continue
         candidates.append(fragment)
     exact = set()
     for fragment in candidates:
@@ -47,7 +50,13 @@ def retrieve(corpus: Corpus, query: RetrievalInput, request_id: UUID) -> Retriev
         if any(name and normalize(name) == q for name in names):
             exact.add(proc.procedure_id)
     empty = EvidenceBundle(
-        request_id=request_id, corpus_version=corpus.version, query=query.query, evidence=[]
+        request_id=request_id,
+        evidence_bundle_id=uuid5(request_id, "grounded-evidence-bundle"),
+        corpus_version=corpus.version,
+        data_classification="D0_SYSTEM_SMOKE" if corpus.fixture else "D1_PUBLIC_DEMO",
+        query=query.query,
+        evidence=[],
+        as_of=query.filters.as_of,
     )
     if len(exact) > 1:
         return RetrievalResult(empty, True)
@@ -72,9 +81,10 @@ def retrieve(corpus: Corpus, query: RetrievalInput, request_id: UUID) -> Retriev
         if score > 0 or exact:
             scored.append((score + (1 if exact else 0), fragment))
     scored.sort(key=lambda item: (-item[0], item[1].fragment_id))
-    # Abstain instead of mixing jurisdictions when lexical results are ambiguous.
-    scopes = {corpus.sources[f.source_id].jurisdiction for _, f in scored[: query.top_k]}
-    if len(scopes) > 1 and not query.filters.jurisdiction and not query.filters.procedure_id:
+    # Never mix procedures into one answer. Detect ambiguity before top_k truncation,
+    # otherwise top_k=1 could silently hide the second matching procedure.
+    matched_procedures = {fragment.procedure_id for _, fragment in scored}
+    if len(matched_procedures) > 1 and not query.filters.procedure_id:
         return RetrievalResult(empty, True)
     evidence = []
     for score, fragment in scored[: query.top_k]:
@@ -83,16 +93,18 @@ def retrieve(corpus: Corpus, query: RetrievalInput, request_id: UUID) -> Retriev
             Evidence(
                 fragment_id=fragment.fragment_id,
                 source_id=source.source_id,
+                procedure_id=proc.procedure_id,
+                section_type=fragment.section_type,
                 title=source.title,
                 url=source.source_url,
                 text=fragment.text,
                 score=round(score, 10),
+                jurisdiction=source.jurisdiction,
+                effective_from=source.effective_from,
+                effective_to=source.effective_to,
+                validity_status="CURRENT" if query.filters.as_of else "UNKNOWN",
                 metadata={
-                    "procedure_id": proc.procedure_id,
-                    "jurisdiction": source.jurisdiction,
                     "status": source.status,
-                    "effective_from": source.effective_from,
-                    "effective_to": source.effective_to,
                     "retrieved_at": source.retrieved_at,
                     "procedure_version": proc.version,
                     "content_sha256": fragment.content_sha256,

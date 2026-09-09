@@ -28,11 +28,15 @@ API message round-trip trong run này là **56,33 ms** với Mock AI; đây ch�
 baseline kỹ thuật CI, không phải SLA hay benchmark model thật.
 
 G1 chưa có RAG, Qwen, fine-tune, Case, memory dài hạn, queue hay Socket.IO.
-Giai đoạn 2 đã có nền móng offline của Hoan: grounded API v2, citation guard và
-evaluation fixture. Contract đang chờ Tú/Minh review; dữ liệu thủ tục, RAG và
-hosted provider chưa được tích hợp.
 
-## Chạy nhanh G1
+**Checkpoint G2-I01 đã hoàn tất kỹ thuật trên `g2/integration` bằng dữ liệu giả
+D0:** Backend ingest/retrieve corpus version hóa, gọi grounded AI v2, kiểm tra
+binding/citation, lưu nguồn và Web hiển thị nguồn qua một Docker Compose overlay.
+Đây chưa phải nghiệm thu toàn bộ G2: dữ liệu công khai D1 mới có một spike đang
+chờ review chéo, chưa đủ 2–3 thủ tục/30–50 câu và hosted provider chưa được công
+ty phê duyệt.
+
+## Chạy nhanh
 
 Yêu cầu Docker Engine/Desktop và Docker Compose v2:
 
@@ -52,6 +56,17 @@ Chỉ dùng dữ liệu giả `D0_SYSTEM_SMOKE`; không nhập PII hay dữ li�
 vào bản G1. Xem runbook riêng trong [`web/`](web/README.md),
 [`backend/`](backend/README.md) và [`ai-service/`](ai-service/README.md).
 
+Chạy lát cắt G2/D0 có RAG và citation:
+
+```powershell
+docker compose -f compose.yaml -f compose.g2.yaml --profile full up --build --detach --wait
+python scripts/smoke-g2.py
+```
+
+Mở `http://localhost:3000` và hỏi về “thủ tục demo sao xanh”. Đây là fixture
+giả có cảnh báo rõ, không phải hướng dẫn hành chính thực tế. Readiness G2 ở
+`http://localhost:8000/health/rag`.
+
 ## Tài liệu trung tâm
 
 1. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
@@ -69,7 +84,9 @@ vào bản G1. Xem runbook riêng trong [`web/`](web/README.md),
 ├── web/                 # React/TypeScript, Vitest, Playwright, Nginx
 ├── backend/             # FastAPI, PostgreSQL, SQLAlchemy, Alembic
 ├── ai-service/          # FastAPI, provider interface, MockProvider
+├── data/demo_public/    # Spike D1 công khai; chưa publish khi review còn PENDING
 ├── evaluation/          # Fixture và report evaluation G2 offline
+├── tools/data/          # Downloader bảo thủ và data quality validator
 ├── infra/docker/        # Ghi chú hạ tầng bổ trợ
 ├── scripts/             # Smoke và repository hygiene checks
 ├── docs/
@@ -77,8 +94,9 @@ vào bản G1. Xem runbook riêng trong [`web/`](web/README.md),
 │   ├── giai-doan-2/     # Kế hoạch thực thi G2 hiện tại
 │   ├── archive/         # Tài liệu cũ
 │   └── parked/          # Target architecture chưa triển khai
-├── .github/workflows/   # Năm gate CI G1
+├── .github/workflows/   # Regression G1 + technical gates G2
 ├── compose.yaml         # Full G1 stack và health dependencies
+├── compose.g2.yaml      # Overlay D0: ingest fixture + bật grounded RAG
 └── .env.example         # Cấu hình demo, không có secret thật
 ```
 
@@ -87,6 +105,10 @@ vào bản G1. Xem runbook riêng trong [`web/`](web/README.md),
 | Vai trò | Branch |
 |---|---|
 | Bản chính đã hoàn tất G1 | `main`, tag `g1-v1.0.0` |
+| Tích hợp checkpoint G2 đang review | `g2/integration` |
+| AI/evaluation G2 của Hoan | `g2/ai-eval-hoan` |
+| Nhánh dữ liệu Tú đã nhập | `data/frontend-tu` |
+| Nhánh RAG Minh đã nhập | `Minh-RAG_test` |
 | Nhánh tích hợp lịch sử | `g1/integration` |
 | Lịch sử Frontend của Tú | `g1/frontend-tu` |
 | Lịch sử Backend của Minh | `g1/backend-minh` |

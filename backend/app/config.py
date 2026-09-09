@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL, make_url
 
@@ -16,6 +16,7 @@ class Settings(BaseSettings):
         hide_input_in_errors=True,
     )
     # Optional legacy/full DSN takes priority. Never print this raw value.
+    app_env: str = "development"
     database_url: SecretStr | None = None
     db_host: str = "127.0.0.1"
     db_port: int = Field(default=15432, ge=1, le=65535)
@@ -24,16 +25,25 @@ class Settings(BaseSettings):
     db_password: SecretStr = SecretStr("postgres")
     rag_enabled: bool = False
     rag_corpus_version: str = ""
-    rag_top_k: int = Field(default=5, ge=1, le=20)
+    rag_top_k: int = Field(default=5, ge=1, le=8)
     rag_allow_fixtures: bool = False
     # Root Compose provides the origin; AIClient owns the internal route path.
     ai_service_url: str = "http://localhost:8001"
     ai_request_timeout_seconds: float = Field(default=10, gt=0, le=120)
     llm_max_output_tokens: int = Field(default=300, ge=1, le=4096)
+    grounded_max_output_tokens: int = Field(default=500, ge=32, le=2048)
     session_cookie_name: str = "g1_session"
     session_cookie_secure: bool = False
     session_ttl_seconds: int = Field(default=86400, gt=0)
     web_origin: str = "http://localhost:3000"
+
+    @model_validator(mode="after")
+    def validate_rag_safety(self):
+        if self.rag_enabled and not self.rag_corpus_version.strip():
+            raise ValueError("RAG_CORPUS_VERSION is required when RAG_ENABLED=true.")
+        if self.rag_allow_fixtures and self.app_env.lower() in {"production", "prod"}:
+            raise ValueError("RAG fixtures are forbidden in production.")
+        return self
 
     @property
     def connection_url(self) -> URL:

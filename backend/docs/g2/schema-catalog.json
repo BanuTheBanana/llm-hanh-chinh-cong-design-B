@@ -3,7 +3,9 @@
     "additionalProperties": false,
     "properties": {
       "source_id": {
-        "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
         "title": "Source Id",
         "type": "string"
       },
@@ -154,7 +156,9 @@
     "additionalProperties": false,
     "properties": {
       "procedure_id": {
-        "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
         "title": "Procedure Id",
         "type": "string"
       },
@@ -258,7 +262,9 @@
       },
       "source_ids": {
         "items": {
-          "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
           "type": "string"
         },
         "minItems": 1,
@@ -275,7 +281,9 @@
         "additionalProperties": {
           "items": {
             "items": {
-              "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
               "type": "string"
             },
             "type": "array"
@@ -306,16 +314,170 @@
     "title": "ProcedureRecord",
     "type": "object"
   },
+  "SourceLocator": {
+    "additionalProperties": false,
+    "properties": {
+      "archive_member": {
+        "anyOf": [
+          {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Archive Member"
+      },
+      "page_start": {
+        "anyOf": [
+          {
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Page Start"
+      },
+      "page_end": {
+        "anyOf": [
+          {
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Page End"
+      },
+      "inner_content_sha256": {
+        "anyOf": [
+          {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Inner Content Sha256"
+      },
+      "extraction_tool": {
+        "anyOf": [
+          {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Extraction Tool"
+      }
+    },
+    "title": "SourceLocator",
+    "type": "object"
+  },
   "ProcedureFragment": {
+    "$defs": {
+      "SourceLocator": {
+        "additionalProperties": false,
+        "properties": {
+          "archive_member": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Archive Member"
+          },
+          "page_start": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Page Start"
+          },
+          "page_end": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Page End"
+          },
+          "inner_content_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Inner Content Sha256"
+          },
+          "extraction_tool": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Extraction Tool"
+          }
+        },
+        "title": "SourceLocator",
+        "type": "object"
+      }
+    },
     "additionalProperties": false,
     "properties": {
       "fragment_id": {
-        "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
         "title": "Fragment Id",
         "type": "string"
       },
       "procedure_id": {
-        "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
         "title": "Procedure Id",
         "type": "string"
       },
@@ -330,20 +492,24 @@
           "FEES",
           "PROCESSING_TIME",
           "LEGAL_BASES",
+          "PROCEDURE_SCOPE",
+          "EFFECTIVE_DATE",
           "OTHER"
         ],
         "title": "Section Type",
         "type": "string"
       },
       "text": {
-        "maxLength": 16000,
+        "maxLength": 8000,
         "minLength": 1,
         "pattern": "\\S",
         "title": "Text",
         "type": "string"
       },
       "source_id": {
-        "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
         "title": "Source Id",
         "type": "string"
       },
@@ -356,6 +522,17 @@
         "pattern": "^[0-9a-f]{64}$",
         "title": "Content Sha256",
         "type": "string"
+      },
+      "source_locator": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/SourceLocator"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
       }
     },
     "required": [
@@ -370,7 +547,57 @@
     "title": "ProcedureFragment",
     "type": "object"
   },
-  "GoldQuestion": {
+  "Filters": {
+    "additionalProperties": false,
+    "properties": {
+      "procedure_id": {
+        "anyOf": [
+          {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Procedure Id"
+      },
+      "jurisdiction": {
+        "anyOf": [
+          {
+            "maxLength": 500,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Jurisdiction"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "As Of"
+      }
+    },
+    "title": "Filters",
+    "type": "object"
+  },
+  "RetrievalInput": {
     "$defs": {
       "Filters": {
         "additionalProperties": false,
@@ -378,7 +605,9 @@
           "procedure_id": {
             "anyOf": [
               {
-                "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
                 "type": "string"
               },
               {
@@ -391,6 +620,773 @@
           "jurisdiction": {
             "anyOf": [
               {
+                "maxLength": 500,
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Jurisdiction"
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "As Of"
+          }
+        },
+        "title": "Filters",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "query": {
+        "maxLength": 4000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Query",
+        "type": "string"
+      },
+      "top_k": {
+        "default": 5,
+        "maximum": 8,
+        "minimum": 1,
+        "title": "Top K",
+        "type": "integer"
+      },
+      "filters": {
+        "$ref": "#/$defs/Filters"
+      }
+    },
+    "required": [
+      "query"
+    ],
+    "title": "RetrievalInput",
+    "type": "object"
+  },
+  "Evidence": {
+    "additionalProperties": false,
+    "properties": {
+      "fragment_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Fragment Id",
+        "type": "string"
+      },
+      "source_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Source Id",
+        "type": "string"
+      },
+      "procedure_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Procedure Id",
+        "type": "string"
+      },
+      "section_type": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Section Type",
+        "type": "string"
+      },
+      "title": {
+        "maxLength": 500,
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Title",
+        "type": "string"
+      },
+      "url": {
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Url",
+        "type": "string"
+      },
+      "text": {
+        "maxLength": 8000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Text",
+        "type": "string"
+      },
+      "score": {
+        "minimum": 0,
+        "title": "Score",
+        "type": "number"
+      },
+      "jurisdiction": {
+        "anyOf": [
+          {
+            "maxLength": 500,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Jurisdiction"
+      },
+      "effective_from": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Effective From"
+      },
+      "effective_to": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Effective To"
+      },
+      "validity_status": {
+        "default": "UNKNOWN",
+        "enum": [
+          "CURRENT",
+          "EXPIRED",
+          "FUTURE",
+          "UNKNOWN"
+        ],
+        "title": "Validity Status",
+        "type": "string"
+      },
+      "metadata": {
+        "additionalProperties": true,
+        "title": "Metadata",
+        "type": "object"
+      }
+    },
+    "required": [
+      "fragment_id",
+      "source_id",
+      "procedure_id",
+      "section_type",
+      "title",
+      "url",
+      "text",
+      "score",
+      "metadata"
+    ],
+    "title": "Evidence",
+    "type": "object"
+  },
+  "EvidenceBundle": {
+    "$defs": {
+      "Evidence": {
+        "additionalProperties": false,
+        "properties": {
+          "fragment_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Fragment Id",
+            "type": "string"
+          },
+          "source_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "procedure_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Procedure Id",
+            "type": "string"
+          },
+          "section_type": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Section Type",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Url",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Text",
+            "type": "string"
+          },
+          "score": {
+            "minimum": 0,
+            "title": "Score",
+            "type": "number"
+          },
+          "jurisdiction": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "minLength": 1,
+                "pattern": "\\S",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Jurisdiction"
+          },
+          "effective_from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Effective From"
+          },
+          "effective_to": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Effective To"
+          },
+          "validity_status": {
+            "default": "UNKNOWN",
+            "enum": [
+              "CURRENT",
+              "EXPIRED",
+              "FUTURE",
+              "UNKNOWN"
+            ],
+            "title": "Validity Status",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": [
+          "fragment_id",
+          "source_id",
+          "procedure_id",
+          "section_type",
+          "title",
+          "url",
+          "text",
+          "score",
+          "metadata"
+        ],
+        "title": "Evidence",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "request_id": {
+        "format": "uuid",
+        "title": "Request Id",
+        "type": "string"
+      },
+      "evidence_bundle_id": {
+        "format": "uuid",
+        "title": "Evidence Bundle Id",
+        "type": "string"
+      },
+      "corpus_version": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Corpus Version",
+        "type": "string"
+      },
+      "data_classification": {
+        "enum": [
+          "D0_SYSTEM_SMOKE",
+          "D1_PUBLIC_DEMO"
+        ],
+        "title": "Data Classification",
+        "type": "string"
+      },
+      "query": {
+        "maxLength": 4000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Query",
+        "type": "string"
+      },
+      "evidence": {
+        "items": {
+          "$ref": "#/$defs/Evidence"
+        },
+        "maxItems": 8,
+        "title": "Evidence",
+        "type": "array"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "As Of"
+      }
+    },
+    "required": [
+      "request_id",
+      "evidence_bundle_id",
+      "corpus_version",
+      "data_classification",
+      "query",
+      "evidence"
+    ],
+    "title": "EvidenceBundle",
+    "type": "object"
+  },
+  "Usage": {
+    "additionalProperties": false,
+    "properties": {
+      "input_tokens": {
+        "minimum": 0,
+        "title": "Input Tokens",
+        "type": "integer"
+      },
+      "output_tokens": {
+        "minimum": 0,
+        "title": "Output Tokens",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "input_tokens",
+      "output_tokens"
+    ],
+    "title": "Usage",
+    "type": "object"
+  },
+  "GroundedAnswer": {
+    "$defs": {
+      "Usage": {
+        "additionalProperties": false,
+        "properties": {
+          "input_tokens": {
+            "minimum": 0,
+            "title": "Input Tokens",
+            "type": "integer"
+          },
+          "output_tokens": {
+            "minimum": 0,
+            "title": "Output Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "input_tokens",
+          "output_tokens"
+        ],
+        "title": "Usage",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "request_id": {
+        "format": "uuid",
+        "title": "Request Id",
+        "type": "string"
+      },
+      "evidence_bundle_id": {
+        "format": "uuid",
+        "title": "Evidence Bundle Id",
+        "type": "string"
+      },
+      "corpus_version": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Corpus Version",
+        "type": "string"
+      },
+      "data_classification": {
+        "enum": [
+          "D0_SYSTEM_SMOKE",
+          "D1_PUBLIC_DEMO"
+        ],
+        "title": "Data Classification",
+        "type": "string"
+      },
+      "prompt_version": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Prompt Version",
+        "type": "string"
+      },
+      "answer": {
+        "maxLength": 8000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Answer",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "ANSWER",
+          "NEED_CLARIFICATION",
+          "INSUFFICIENT_DATA"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "cited_fragment_ids": {
+        "items": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+          "type": "string"
+        },
+        "maxItems": 8,
+        "title": "Cited Fragment Ids",
+        "type": "array"
+      },
+      "missing_information": {
+        "items": {
+          "maxLength": 500,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "maxItems": 10,
+        "title": "Missing Information",
+        "type": "array"
+      },
+      "provider": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Provider",
+        "type": "string"
+      },
+      "model": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Model",
+        "type": "string"
+      },
+      "usage": {
+        "$ref": "#/$defs/Usage"
+      },
+      "latency_ms": {
+        "minimum": 0,
+        "title": "Latency Ms",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "request_id",
+      "evidence_bundle_id",
+      "corpus_version",
+      "data_classification",
+      "prompt_version",
+      "answer",
+      "status",
+      "cited_fragment_ids",
+      "missing_information",
+      "provider",
+      "model",
+      "usage",
+      "latency_ms"
+    ],
+    "title": "GroundedAnswer",
+    "type": "object"
+  },
+  "Citation": {
+    "additionalProperties": false,
+    "properties": {
+      "fragment_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Fragment Id",
+        "type": "string"
+      },
+      "source_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Source Id",
+        "type": "string"
+      },
+      "title": {
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Title",
+        "type": "string"
+      },
+      "url": {
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Url",
+        "type": "string"
+      },
+      "metadata": {
+        "additionalProperties": true,
+        "title": "Metadata",
+        "type": "object"
+      }
+    },
+    "required": [
+      "fragment_id",
+      "source_id",
+      "title",
+      "url",
+      "metadata"
+    ],
+    "title": "Citation",
+    "type": "object"
+  },
+  "Grounding": {
+    "$defs": {
+      "Citation": {
+        "additionalProperties": false,
+        "properties": {
+          "fragment_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Fragment Id",
+            "type": "string"
+          },
+          "source_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "title": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Url",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          }
+        },
+        "required": [
+          "fragment_id",
+          "source_id",
+          "title",
+          "url",
+          "metadata"
+        ],
+        "title": "Citation",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "request_id": {
+        "format": "uuid",
+        "title": "Request Id",
+        "type": "string"
+      },
+      "evidence_bundle_id": {
+        "format": "uuid",
+        "title": "Evidence Bundle Id",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "ANSWER",
+          "NEED_CLARIFICATION",
+          "INSUFFICIENT_DATA"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "corpus_version": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Corpus Version",
+        "type": "string"
+      },
+      "data_classification": {
+        "enum": [
+          "D0_SYSTEM_SMOKE",
+          "D1_PUBLIC_DEMO"
+        ],
+        "title": "Data Classification",
+        "type": "string"
+      },
+      "prompt_version": {
+        "anyOf": [
+          {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Prompt Version"
+      },
+      "provider": {
+        "anyOf": [
+          {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Provider"
+      },
+      "model": {
+        "anyOf": [
+          {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Model"
+      },
+      "sources": {
+        "items": {
+          "$ref": "#/$defs/Citation"
+        },
+        "title": "Sources",
+        "type": "array"
+      },
+      "missing_information": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Missing Information",
+        "type": "array"
+      }
+    },
+    "required": [
+      "request_id",
+      "evidence_bundle_id",
+      "status",
+      "corpus_version",
+      "data_classification",
+      "sources",
+      "missing_information"
+    ],
+    "title": "Grounding",
+    "type": "object"
+  },
+  "GoldQuestion": {
+    "$defs": {
+      "Filters": {
+        "additionalProperties": false,
+        "properties": {
+          "procedure_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Procedure Id"
+          },
+          "jurisdiction": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "minLength": 1,
+                "pattern": "\\S",
                 "type": "string"
               },
               {
@@ -421,7 +1417,9 @@
     "additionalProperties": false,
     "properties": {
       "question_id": {
-        "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
         "title": "Question Id",
         "type": "string"
       },
@@ -434,7 +1432,9 @@
       "procedure_id": {
         "anyOf": [
           {
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
             "type": "string"
           },
           {
@@ -477,7 +1477,9 @@
       },
       "gold_source_ids": {
         "items": {
-          "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
           "type": "string"
         },
         "title": "Gold Source Ids",
@@ -485,7 +1487,9 @@
       },
       "gold_fragment_ids": {
         "items": {
-          "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
           "type": "string"
         },
         "title": "Gold Fragment Ids",
@@ -539,27 +1543,168 @@
     "title": "GoldQuestion",
     "type": "object"
   },
-  "RetrievalInput": {
+  "GroundingEvidence": {
+    "additionalProperties": false,
+    "properties": {
+      "fragment_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Fragment Id",
+        "type": "string"
+      },
+      "source_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Source Id",
+        "type": "string"
+      },
+      "procedure_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Procedure Id",
+        "type": "string"
+      },
+      "section_type": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+        "title": "Section Type",
+        "type": "string"
+      },
+      "title": {
+        "maxLength": 500,
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Title",
+        "type": "string"
+      },
+      "text": {
+        "maxLength": 8000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "title": "Text",
+        "type": "string"
+      },
+      "jurisdiction": {
+        "anyOf": [
+          {
+            "maxLength": 500,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Jurisdiction"
+      },
+      "effective_from": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Effective From"
+      },
+      "effective_to": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Effective To"
+      },
+      "validity_status": {
+        "default": "UNKNOWN",
+        "enum": [
+          "CURRENT",
+          "EXPIRED",
+          "FUTURE",
+          "UNKNOWN"
+        ],
+        "title": "Validity Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "fragment_id",
+      "source_id",
+      "procedure_id",
+      "section_type",
+      "title",
+      "text"
+    ],
+    "title": "GroundingEvidence",
+    "type": "object"
+  },
+  "GenerateGroundedRequest": {
     "$defs": {
-      "Filters": {
+      "GroundingEvidence": {
         "additionalProperties": false,
         "properties": {
+          "fragment_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Fragment Id",
+            "type": "string"
+          },
+          "source_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Source Id",
+            "type": "string"
+          },
           "procedure_id": {
-            "anyOf": [
-              {
-                "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Procedure Id"
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Procedure Id",
+            "type": "string"
+          },
+          "section_type": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Section Type",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Title",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Text",
+            "type": "string"
           },
           "jurisdiction": {
             "anyOf": [
               {
+                "maxLength": 500,
+                "minLength": 1,
+                "pattern": "\\S",
                 "type": "string"
               },
               {
@@ -569,7 +1714,7 @@
             "default": null,
             "title": "Jurisdiction"
           },
-          "as_of": {
+          "effective_from": {
             "anyOf": [
               {
                 "format": "date",
@@ -580,93 +1725,42 @@
               }
             ],
             "default": null,
-            "title": "As Of"
-          }
-        },
-        "title": "Filters",
-        "type": "object"
-      }
-    },
-    "additionalProperties": false,
-    "properties": {
-      "query": {
-        "maxLength": 10000,
-        "minLength": 1,
-        "pattern": "\\S",
-        "title": "Query",
-        "type": "string"
-      },
-      "top_k": {
-        "default": 5,
-        "maximum": 20,
-        "minimum": 1,
-        "title": "Top K",
-        "type": "integer"
-      },
-      "filters": {
-        "$ref": "#/$defs/Filters"
-      }
-    },
-    "required": [
-      "query"
-    ],
-    "title": "RetrievalInput",
-    "type": "object"
-  },
-  "EvidenceBundle": {
-    "$defs": {
-      "Evidence": {
-        "additionalProperties": false,
-        "properties": {
-          "fragment_id": {
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-            "title": "Fragment Id",
+            "title": "Effective From"
+          },
+          "effective_to": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Effective To"
+          },
+          "validity_status": {
+            "default": "UNKNOWN",
+            "enum": [
+              "CURRENT",
+              "EXPIRED",
+              "FUTURE",
+              "UNKNOWN"
+            ],
+            "title": "Validity Status",
             "type": "string"
-          },
-          "source_id": {
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-            "title": "Source Id",
-            "type": "string"
-          },
-          "title": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Title",
-            "type": "string"
-          },
-          "url": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Url",
-            "type": "string"
-          },
-          "text": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Text",
-            "type": "string"
-          },
-          "score": {
-            "minimum": 0,
-            "title": "Score",
-            "type": "number"
-          },
-          "metadata": {
-            "additionalProperties": true,
-            "title": "Metadata",
-            "type": "object"
           }
         },
         "required": [
           "fragment_id",
           "source_id",
+          "procedure_id",
+          "section_type",
           "title",
-          "url",
-          "text",
-          "score",
-          "metadata"
+          "text"
         ],
-        "title": "Evidence",
+        "title": "GroundingEvidence",
         "type": "object"
       }
     },
@@ -677,12 +1771,28 @@
         "title": "Request Id",
         "type": "string"
       },
+      "evidence_bundle_id": {
+        "format": "uuid",
+        "title": "Evidence Bundle Id",
+        "type": "string"
+      },
       "corpus_version": {
-        "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
         "title": "Corpus Version",
         "type": "string"
       },
+      "data_classification": {
+        "enum": [
+          "D0_SYSTEM_SMOKE",
+          "D1_PUBLIC_DEMO"
+        ],
+        "title": "Data Classification",
+        "type": "string"
+      },
       "query": {
+        "maxLength": 4000,
         "minLength": 1,
         "pattern": "\\S",
         "title": "Query",
@@ -690,350 +1800,42 @@
       },
       "evidence": {
         "items": {
-          "$ref": "#/$defs/Evidence"
+          "$ref": "#/$defs/GroundingEvidence"
         },
-        "maxItems": 20,
+        "maxItems": 8,
         "title": "Evidence",
         "type": "array"
-      }
-    },
-    "required": [
-      "request_id",
-      "corpus_version",
-      "query",
-      "evidence"
-    ],
-    "title": "EvidenceBundle",
-    "type": "object"
-  },
-  "GenerateGroundedRequest": {
-    "$defs": {
-      "Evidence": {
-        "additionalProperties": false,
-        "properties": {
-          "fragment_id": {
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-            "title": "Fragment Id",
-            "type": "string"
-          },
-          "source_id": {
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-            "title": "Source Id",
-            "type": "string"
-          },
-          "title": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Title",
-            "type": "string"
-          },
-          "url": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Url",
-            "type": "string"
-          },
-          "text": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Text",
-            "type": "string"
-          },
-          "score": {
-            "minimum": 0,
-            "title": "Score",
-            "type": "number"
-          },
-          "metadata": {
-            "additionalProperties": true,
-            "title": "Metadata",
-            "type": "object"
-          }
-        },
-        "required": [
-          "fragment_id",
-          "source_id",
-          "title",
-          "url",
-          "text",
-          "score",
-          "metadata"
-        ],
-        "title": "Evidence",
-        "type": "object"
       },
-      "EvidenceBundle": {
-        "additionalProperties": false,
-        "properties": {
-          "request_id": {
-            "format": "uuid",
-            "title": "Request Id",
+      "as_of": {
+        "anyOf": [
+          {
+            "format": "date",
             "type": "string"
           },
-          "corpus_version": {
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-            "title": "Corpus Version",
-            "type": "string"
-          },
-          "query": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Query",
-            "type": "string"
-          },
-          "evidence": {
-            "items": {
-              "$ref": "#/$defs/Evidence"
-            },
-            "maxItems": 20,
-            "title": "Evidence",
-            "type": "array"
+          {
+            "type": "null"
           }
-        },
-        "required": [
-          "request_id",
-          "corpus_version",
-          "query",
-          "evidence"
         ],
-        "title": "EvidenceBundle",
-        "type": "object"
-      },
-      "HistoryMessage": {
-        "additionalProperties": false,
-        "properties": {
-          "role": {
-            "enum": [
-              "user",
-              "assistant"
-            ],
-            "title": "Role",
-            "type": "string"
-          },
-          "content": {
-            "maxLength": 16000,
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Content",
-            "type": "string"
-          }
-        },
-        "required": [
-          "role",
-          "content"
-        ],
-        "title": "HistoryMessage",
-        "type": "object"
-      }
-    },
-    "additionalProperties": false,
-    "properties": {
-      "evidence_bundle": {
-        "$ref": "#/$defs/EvidenceBundle"
-      },
-      "history": {
-        "items": {
-          "$ref": "#/$defs/HistoryMessage"
-        },
-        "maxItems": 10,
-        "title": "History",
-        "type": "array"
+        "default": null,
+        "title": "As Of"
       },
       "max_output_tokens": {
-        "maximum": 4096,
-        "minimum": 1,
+        "maximum": 2048,
+        "minimum": 32,
         "title": "Max Output Tokens",
         "type": "integer"
       }
     },
     "required": [
-      "evidence_bundle",
+      "request_id",
+      "evidence_bundle_id",
+      "corpus_version",
+      "data_classification",
+      "query",
+      "evidence",
       "max_output_tokens"
     ],
     "title": "GenerateGroundedRequest",
-    "type": "object"
-  },
-  "GroundedAnswer": {
-    "$defs": {
-      "Usage": {
-        "additionalProperties": false,
-        "properties": {
-          "input_tokens": {
-            "minimum": 0,
-            "title": "Input Tokens",
-            "type": "integer"
-          },
-          "output_tokens": {
-            "minimum": 0,
-            "title": "Output Tokens",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "input_tokens",
-          "output_tokens"
-        ],
-        "title": "Usage",
-        "type": "object"
-      }
-    },
-    "additionalProperties": false,
-    "properties": {
-      "request_id": {
-        "format": "uuid",
-        "title": "Request Id",
-        "type": "string"
-      },
-      "answer": {
-        "maxLength": 16000,
-        "minLength": 1,
-        "pattern": "\\S",
-        "title": "Answer",
-        "type": "string"
-      },
-      "status": {
-        "enum": [
-          "ANSWER",
-          "NEED_CLARIFICATION",
-          "INSUFFICIENT_DATA"
-        ],
-        "title": "Status",
-        "type": "string"
-      },
-      "cited_fragment_ids": {
-        "items": {
-          "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-          "type": "string"
-        },
-        "title": "Cited Fragment Ids",
-        "type": "array"
-      },
-      "missing_information": {
-        "items": {
-          "minLength": 1,
-          "pattern": "\\S",
-          "type": "string"
-        },
-        "title": "Missing Information",
-        "type": "array"
-      },
-      "provider": {
-        "minLength": 1,
-        "pattern": "\\S",
-        "title": "Provider",
-        "type": "string"
-      },
-      "model": {
-        "minLength": 1,
-        "pattern": "\\S",
-        "title": "Model",
-        "type": "string"
-      },
-      "usage": {
-        "$ref": "#/$defs/Usage"
-      },
-      "latency_ms": {
-        "minimum": 0,
-        "title": "Latency Ms",
-        "type": "number"
-      }
-    },
-    "required": [
-      "request_id",
-      "answer",
-      "status",
-      "cited_fragment_ids",
-      "missing_information",
-      "provider",
-      "model",
-      "usage",
-      "latency_ms"
-    ],
-    "title": "GroundedAnswer",
-    "type": "object"
-  },
-  "Grounding": {
-    "$defs": {
-      "Citation": {
-        "additionalProperties": false,
-        "properties": {
-          "fragment_id": {
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-            "title": "Fragment Id",
-            "type": "string"
-          },
-          "source_id": {
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-            "title": "Source Id",
-            "type": "string"
-          },
-          "title": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Title",
-            "type": "string"
-          },
-          "url": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Url",
-            "type": "string"
-          },
-          "metadata": {
-            "additionalProperties": true,
-            "title": "Metadata",
-            "type": "object"
-          }
-        },
-        "required": [
-          "fragment_id",
-          "source_id",
-          "title",
-          "url",
-          "metadata"
-        ],
-        "title": "Citation",
-        "type": "object"
-      }
-    },
-    "additionalProperties": false,
-    "properties": {
-      "status": {
-        "enum": [
-          "ANSWER",
-          "NEED_CLARIFICATION",
-          "INSUFFICIENT_DATA"
-        ],
-        "title": "Status",
-        "type": "string"
-      },
-      "corpus_version": {
-        "pattern": "^[A-Za-z0-9_.-]{1,160}$",
-        "title": "Corpus Version",
-        "type": "string"
-      },
-      "sources": {
-        "items": {
-          "$ref": "#/$defs/Citation"
-        },
-        "title": "Sources",
-        "type": "array"
-      },
-      "missing_information": {
-        "items": {
-          "type": "string"
-        },
-        "title": "Missing Information",
-        "type": "array"
-      }
-    },
-    "required": [
-      "status",
-      "corpus_version",
-      "sources",
-      "missing_information"
-    ],
-    "title": "Grounding",
     "type": "object"
   }
 }

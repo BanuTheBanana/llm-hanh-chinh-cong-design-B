@@ -2,7 +2,7 @@
 
 > Contract version: `g2-grounded-v0.2`
 > Prompt version: `g2-grounded-v2`
-> Trạng thái: **implemented offline, chờ Tú và Minh review trước khi tích hợp**.
+> Trạng thái: **đã tích hợp D0 trên `g2/integration`; chờ team sign-off và D1**.
 > G1 `/internal/v1/generate` được giữ nguyên.
 
 ## Báo cáo cập nhật
@@ -11,7 +11,7 @@
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
 | Owner ghi contract | Hoan |
-| Consumer tương lai | Core Backend/RAG của Minh |
+| Consumer hiện tại | Core Backend/RAG, đã chạy end-to-end với fixture D0 |
 | Provider hiện được bật | `template`, offline, không gọi mạng |
 | Hosted provider | Chưa chọn/chưa bật; chờ phê duyệt |
 | Dữ liệu API nhận | `D0_SYSTEM_SMOKE` hoặc `D1_PUBLIC_DEMO`; từ chối D2 |
@@ -31,8 +31,9 @@ POST /internal/v1/generate  # giữ nguyên cho G1
 POST /internal/v2/generate  # grounded generation của G2
 ```
 
-Backend G1 chưa gọi v2. Minh chỉ chuyển luồng sang v2 sau khi contract này được cả
-ba review và retrieval đã tạo được evidence.
+Khi `RAG_ENABLED=false`, Backend tiếp tục gọi v1 để giữ regression G1. Khi bật
+RAG, Backend tạo evidence rồi gọi v2; hai luồng đã được kiểm thử song song. Team
+vẫn phải sign-off contract trước khi đóng băng thành `v1.0` và trước khi dùng D1.
 
 ## 2. Hai kiểu bundle không được nhầm
 
@@ -88,21 +89,21 @@ Content-Type: application/json
 {
   "request_id": "00000000-0000-4000-8000-000000000001",
   "evidence_bundle_id": "10000000-0000-4000-8000-000000000001",
-  "corpus_version": "public-demo-20260908-v1",
-  "data_classification": "D1_PUBLIC_DEMO",
-  "query": "Tôi cần chuẩn bị giấy tờ gì?",
+  "corpus_version": "fixture-v1",
+  "data_classification": "D0_SYSTEM_SMOKE",
+  "query": "Thủ tục demo sao xanh có lệ phí bao nhiêu?",
   "evidence": [
     {
-      "fragment_id": "frag_demo_001",
-      "source_id": "src_demo_001",
-      "procedure_id": "procedure_demo",
-      "section_type": "REQUIRED_DOCUMENTS",
-      "title": "Tên nguồn đã được Backend xác thực",
-      "text": "Nội dung fragment đã được review...",
-      "jurisdiction": "Phạm vi áp dụng đã xác thực",
-      "effective_from": null,
-      "effective_to": null,
-      "validity_status": "UNKNOWN"
+      "fragment_id": "frag_fees",
+      "source_id": "src_synthetic",
+      "procedure_id": "proc_demo",
+      "section_type": "FEES",
+      "title": "Thủ tục demo sao xanh — hoàn toàn giả",
+      "text": "Thủ tục demo sao xanh: lệ phí là 7 đơn vị giả lập.",
+      "jurisdiction": "DEMO_SCOPE",
+      "effective_from": "2026-01-01",
+      "effective_to": "2026-12-31",
+      "validity_status": "CURRENT"
     }
   ],
   "as_of": "2026-09-08",
@@ -137,12 +138,12 @@ interactive tiếp tục bị tắt cho tới khi có policy và gate riêng.
 {
   "request_id": "00000000-0000-4000-8000-000000000001",
   "evidence_bundle_id": "10000000-0000-4000-8000-000000000001",
-  "corpus_version": "public-demo-20260908-v1",
-  "data_classification": "D1_PUBLIC_DEMO",
+  "corpus_version": "fixture-v1",
+  "data_classification": "D0_SYSTEM_SMOKE",
   "prompt_version": "g2-grounded-v2",
   "answer": "...",
   "status": "ANSWER",
-  "cited_fragment_ids": ["frag_demo_001"],
+  "cited_fragment_ids": ["frag_fees"],
   "missing_information": [],
   "provider": "template",
   "model": "template-grounded-v2",
@@ -246,14 +247,15 @@ Browser không được tự gửi evidence hoặc source URL tới AI Service.
 | Hạng mục | Trạng thái |
 |---|---|
 | API v1 G1 | Giữ nguyên, regression test pass |
-| Schema/route v2 | Đã implement trên branch Hoan |
+| Schema/route v2 | Đã implement và ghép trên `g2/integration` |
 | No-evidence/citation guard | Đã implement |
 | Template offline | Đã implement |
 | Evaluation fixture/harness | Đã implement |
-| Minh review contract | Chưa thực hiện |
-| Backend/RAG integration | Chưa thực hiện |
+| Backend/RAG integration | Đã chạy D0 qua Compose/API/Web |
+| Team sign-off contract | Chưa ghi nhận; cần Tú và Minh xác nhận |
+| D1 public corpus | Spike kỹ thuật có 1 thủ tục; review/publish gate chưa đạt |
 | Hosted adapter/live API | Chưa thực hiện; chờ approval và D1 |
 
-Contract này trở thành `v1.0 FROZEN` chỉ sau khi Tú xác nhận data projection và
-Minh xác nhận Backend/RAG consumer. Trước đó, mọi thay đổi phải cập nhật version và
-test fixture cùng lúc.
+Contract này trở thành `v1.0 FROZEN` chỉ sau khi Tú và Minh formal sign-off trên
+projection/consumer đã tích hợp, đồng thời fixture contract test vẫn pass. Trước
+đó, mọi thay đổi phải cập nhật version và test fixture cùng lúc.

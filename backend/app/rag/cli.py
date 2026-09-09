@@ -51,7 +51,7 @@ def main():
             args.repo_root, dataset, args.version, set(args.allow_domain), args.allow_fixture
         )
         validation_ms = (time.perf_counter() - started) * 1000
-        if not 1 <= args.top_k <= 20:
+        if not 1 <= args.top_k <= 8:
             raise CorpusError("TOP_K_OUT_OF_RANGE")
         result = {
             "corpus_version": corpus.version,

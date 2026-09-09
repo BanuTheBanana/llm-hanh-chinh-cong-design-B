@@ -1,19 +1,29 @@
 {
   "request_id": "00000000-0000-4000-8000-000000000001",
+  "evidence_bundle_id": "10000000-0000-4000-8000-000000000001",
+  "corpus_version": "public-demo-20260908-draft1",
+  "data_classification": "D1_PUBLIC_DEMO",
   "query": "Đăng ký khai sinh thường giải quyết trong bao lâu?",
   "evidence": [
     {
       "fragment_id": "frag_birth_processing_time_001",
       "source_id": "src_hcmc_165_tthc_attachment_20260908",
-      "title": "Đăng ký khai sinh",
+      "procedure_id": "birth_registration_hcmc_demo",
+      "section_type": "PROCESSING_TIME",
+      "title": "Tệp đính kèm Quyết định 165/QĐ-UBND về thủ tục hành chính lĩnh vực Hộ tịch",
       "url": "https://vpub.hochiminhcity.gov.vn/portal/VanBan/2026-03/0CthlC7XU9ZifSN1165.rar",
       "text": "Thời hạn giải quyết: Trong ngày tiếp nhận yêu cầu; trường hợp nhận hồ sơ sau 15 giờ mà không giải quyết được ngay thì trả kết quả trong ngày làm việc tiếp theo.",
       "score": 1.0,
+      "jurisdiction": "HO_CHI_MINH_CITY",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
+      "validity_status": "CURRENT",
       "metadata": {
-        "procedure_id": "birth_registration_hcmc_demo",
-        "jurisdiction": "HO_CHI_MINH_CITY",
+        "procedure_version": "2026-01-01",
+        "content_sha256": "7f08f8ee257d42b812a9f4f431282151ffe7a5429dba38f2ddb7b619ab324b6e",
         "source_review_status": "PENDING"
       }
     }
-  ]
+  ],
+  "as_of": "2026-09-09"
 }

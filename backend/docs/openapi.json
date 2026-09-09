@@ -21,6 +21,22 @@
         }
       }
     },
+    "/health/rag": {
+      "get": {
+        "summary": "Rag Health",
+        "operationId": "rag_health_health_rag_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/login": {
       "post": {
         "summary": "Login",
@@ -835,12 +851,16 @@
         "properties": {
           "fragment_id": {
             "type": "string",
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
             "title": "Fragment Id"
           },
           "source_id": {
             "type": "string",
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
             "title": "Source Id"
           },
           "title": {
@@ -959,7 +979,9 @@
             "anyOf": [
               {
                 "type": "string",
-                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
               },
               {
                 "type": "null"
@@ -970,7 +992,10 @@
           "jurisdiction": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500,
+                "minLength": 1,
+                "pattern": "\\S"
               },
               {
                 "type": "null"
@@ -997,6 +1022,16 @@
       },
       "Grounding": {
         "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "evidence_bundle_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Evidence Bundle Id"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -1008,8 +1043,60 @@
           },
           "corpus_version": {
             "type": "string",
-            "pattern": "^[A-Za-z0-9_.-]{1,160}$",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
             "title": "Corpus Version"
+          },
+          "data_classification": {
+            "type": "string",
+            "enum": [
+              "D0_SYSTEM_SMOKE",
+              "D1_PUBLIC_DEMO"
+            ],
+            "title": "Data Classification"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
           },
           "sources": {
             "items": {
@@ -1029,8 +1116,11 @@
         "additionalProperties": false,
         "type": "object",
         "required": [
+          "request_id",
+          "evidence_bundle_id",
           "status",
           "corpus_version",
+          "data_classification",
           "sources",
           "missing_information"
         ],

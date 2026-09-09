@@ -11,7 +11,7 @@ import {
   login,
   logout,
 } from './services/api'
-import type { Conversation, Message, User } from './types/api'
+import type { Conversation, Grounding, Message, User } from './types/api'
 
 type BusyAction = 'login' | 'create-conversation' | 'send-message' | 'logout' | null
 type ErrorKind = 'unauthorized' | 'api' | 'ai-timeout' | ''
@@ -472,7 +472,11 @@ function App() {
             messages.map((message) => (
               <article className={`message ${message.role} ${message.status}`} key={message.id}>
                 <div className="message-meta">
-                  {message.role === 'user' ? user.display_name : 'Mock AI'}
+                  {message.role === 'user'
+                    ? user.display_name
+                    : message.grounding
+                      ? 'Trợ lý có nguồn'
+                      : 'Mock AI'}
                   {message.status !== 'completed' && (
                     <span className="message-status">
                       {message.status === 'pending' ? 'Đang xử lý' : 'Gửi chưa hoàn tất'}
@@ -480,6 +484,9 @@ function App() {
                   )}
                 </div>
                 <p>{message.content}</p>
+                {message.role === 'assistant' && message.grounding && (
+                  <GroundingPanel grounding={message.grounding} />
+                )}
               </article>
             ))
           )}
@@ -495,7 +502,7 @@ function App() {
                 : 'Tạo hoặc chọn một cuộc trò chuyện trước'
             }
             disabled={!activeConversation || busyAction !== null}
-            maxLength={10_000}
+            maxLength={4_000}
             rows={2}
           />
           <button
@@ -518,6 +525,65 @@ function EmptyState({ mark, title, description }: { mark: string; title: string;
       <p>{description}</p>
     </div>
   )
+}
+
+function GroundingPanel({ grounding }: { grounding: Grounding }) {
+  const label =
+    grounding.status === 'ANSWER'
+      ? 'Đã đối chiếu nguồn'
+      : grounding.status === 'NEED_CLARIFICATION'
+        ? 'Cần làm rõ'
+        : 'Chưa đủ dữ liệu'
+
+  return (
+    <section className={`grounding grounding-${grounding.status.toLowerCase()}`}>
+      <div className="grounding-heading">
+        <strong>{label}</strong>
+        <span>{grounding.sources.length} nguồn</span>
+      </div>
+      {grounding.data_classification === 'D0_SYSTEM_SMOKE' && (
+        <small className="grounding-demo">Dữ liệu mô phỏng D0 — không phải hướng dẫn thực tế.</small>
+      )}
+      {grounding.sources.length > 0 && (
+        <ol className="source-list" aria-label="Nguồn tham chiếu">
+          {grounding.sources.map((source) => {
+            const href = safeSourceUrl(source.url)
+            return (
+              <li key={`${source.source_id}:${source.fragment_id}`}>
+                {href ? (
+                  <a href={href} target="_blank" rel="noreferrer noopener">
+                    {source.title}
+                  </a>
+                ) : (
+                  <span>{source.title}</span>
+                )}
+                <code>{source.fragment_id}</code>
+              </li>
+            )
+          })}
+        </ol>
+      )}
+      {grounding.missing_information.length > 0 && (
+        <div className="missing-information">
+          <span>Cần bổ sung:</span>
+          <ul>
+            {grounding.missing_information.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  )
+}
+
+function safeSourceUrl(value: string) {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:' ? url.toString() : null
+  } catch {
+    return null
+  }
 }
 
 function getErrorMessage(requestError: unknown) {

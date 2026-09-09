@@ -1,0 +1,54 @@
+# Offline G2 overlay. It ingests only the synthetic D0 fixture and never calls
+# an external provider. Run together with compose.yaml; do not use for D1/D2.
+services:
+  rag-init:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ""
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-hanh_chinh_mvp}
+      DB_USER: ${POSTGRES_USER:-app_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-change-me-local-only}
+    volumes:
+      - .:/workspace:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - |
+        .venv/bin/alembic upgrade head &&
+        .venv/bin/python -m app.rag.cli ingest \
+          --repo-root /workspace \
+          --dataset backend/tests/fixtures/rag \
+          --version fixture-v1 \
+          --allow-domain fixture.invalid \
+          --allow-fixture
+    restart: "no"
+    networks:
+      - app-network
+
+  backend:
+    environment:
+      RAG_ENABLED: "true"
+      RAG_CORPUS_VERSION: fixture-v1
+      RAG_TOP_K: 5
+      RAG_ALLOW_FIXTURES: "true"
+      GROUNDED_MAX_OUTPUT_TOKENS: 500
+    depends_on:
+      rag-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8000/health/rag', timeout=2)
+      interval: 5s
+      timeout: 3s
+      retries: 15
+      start_period: 10s

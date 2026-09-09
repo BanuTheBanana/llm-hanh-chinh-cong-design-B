@@ -1,4 +1,4 @@
-> **G2 Retrieval/RAG của Minh đã được thêm.** Bắt đầu ở
+> **G2 Retrieval/RAG đã được tích hợp và sửa contract trên `g2/integration`.** Bắt đầu ở
 > [docs/g2/README.md](docs/g2/README.md) để migrate lên `0002_g2_rag`, ingest,
 > chạy evaluation và ghép grounded AI. G1 mặc định vẫn bật; RAG là opt-in.
 > Các số liệu/trạng thái G1 bên dưới là baseline cũ, xem báo cáo G2 riêng.
@@ -95,7 +95,12 @@ uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-lo
 | `DB_NAME` | `g1` | Database name |
 | `DB_USER` | `postgres` | Database user |
 | `DB_PASSWORD` | `postgres` | Password local demo; không dùng cho production |
-| `AI_SERVICE_URL` | `http://localhost:8001` | Origin; Backend tự nối `/internal/v1/generate` |
+| `AI_SERVICE_URL` | `http://localhost:8001` | Origin; Backend dùng v1 cho G1 hoặc `/internal/v2/generate` khi RAG bật |
+| `RAG_ENABLED` | `false` | Bật retrieval + grounded flow G2 |
+| `RAG_CORPUS_VERSION` | rỗng | Version corpus immutable đã ingest; bắt buộc khi bật RAG |
+| `RAG_TOP_K` | `5` | Số fragment, giới hạn 1–8 |
+| `RAG_ALLOW_FIXTURES` | `false` | Chỉ opt-in D0; cấu hình production bị từ chối |
+| `GROUNDED_MAX_OUTPUT_TOKENS` | `500` | Ngân sách output AI v2, giới hạn 32–2048 |
 | `AI_REQUEST_TIMEOUT_SECONDS` | `10` | Deadline tổng khi gọi AI |
 | `SESSION_COOKIE_NAME` | `g1_session` | Tên opaque cookie |
 | `SESSION_COOKIE_SECURE` | `false` | Phải `true` khi chạy HTTPS |
@@ -117,7 +122,8 @@ và AI host thành `ai-service`; không dùng `localhost` để gọi container 
    user message `failed`, không tạo assistant giả.
 6. `client_message_id` là idempotency key trong một conversation. Retry cùng
    key/nội dung không tạo thêm user message.
-7. Context gửi AI giữ tối đa 100 message gần nhất theo đúng thứ tự.
+7. Luồng G1 gửi tối đa 100 message gần nhất; luồng grounded G2 chỉ gửi query và
+   evidence projection tối thiểu, không gửi chat history sang AI Service.
 8. Log chỉ ghi `request_id`, route template, method, status, latency và loại lỗi;
    không ghi body, cookie, token, DSN hay exception text.
 

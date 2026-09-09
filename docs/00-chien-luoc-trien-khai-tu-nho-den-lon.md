@@ -10,16 +10,16 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.7` |
-| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_HOAN_OFFLINE_READY`; Data/RAG branches đang audit |
+| Phiên bản | `v1.8` |
+| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_I01_D0_TECHNICAL_PASS`; G2/D1 chưa nghiệm thu |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
-| Thay đổi lần này | Khóa grounded contract/prompt v2, provider policy và evaluation D0 8 case; mở review hai branch Data/RAG trước khi ghép; chưa gọi hosted API thật |
+| Thay đổi lần này | Ghép Data/RAG/AI, sửa contract và dữ liệu, hoàn tất lát cắt D0 qua Compose/API/Web; giữ D1 và hosted provider sau review/approval |
 
 Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](parked/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; sơ đồ nằm trong [`architecture/`](architecture/README.md).
 
 Hồ sơ thực thi và nghiệm thu G1: [Phân công Giai đoạn 1 – Tú, Minh, Hoan](01-phan-cong-giai-doan-1.md).
 Kế hoạch thực thi hiện tại: [Phân công Giai đoạn 2 – Data, RAG và Hosted AI baseline](giai-doan-2/02-phan-cong-giai-doan-2.md).
-Trọng tâm đang làm là G2 trong mục **NOW** của tài liệu này.
+Trọng tâm đang làm là hoàn tất D1/Gate G2 trong mục **NOW**; lát cắt D0 đã chạy.
 
 ### Bằng chứng hoàn thành G1
 
@@ -614,23 +614,23 @@ Chỉ bắt đầu khi core answer + local model + domain baseline đã đạt g
 
 ## 13. Bảng Now – Next – Later – Parked
 
-### NOW – Lập kế hoạch và bắt đầu G2
+### NOW – Hoàn tất dữ liệu D1 và Gate G2
 
-1. Giữ `main` và tag `g1-v1.0.0` làm baseline đã kiểm tra.
-2. Chọn 2–3 thủ tục công khai từ nguồn chính thức; lưu snapshot có version,
-   ngày lấy và phạm vi áp dụng.
-3. Tạo 30–50 tình huống giả với expected points và gold source; tách tập kiểm
-   thử khỏi dữ liệu dùng để chỉnh prompt.
-4. Làm exact/keyword retrieval tối thiểu và trả source thật hoặc
-   `INSUFFICIENT_DATA`.
-5. Chạy baseline, đo riêng retrieval, answer, citation và latency.
+1. Giữ checkpoint D0 trên `g2/integration` chạy xanh và không nhập dữ liệu thật
+   vào fixture “sao xanh”.
+2. Review chéo spike đăng ký khai sinh; lấy nguồn chi tiết chính thức có thành
+   phần hồ sơ và trình tự, không suy đoán các field còn thiếu.
+3. Mở rộng thành 2–3 thủ tục và 30–50 tình huống giả có gold source, reviewer
+   độc lập và TEST split đóng băng.
+4. Chạy retrieval/evaluation trên D1 và phân tích lỗi theo từng câu.
+5. Xin công ty duyệt provider + loại dữ liệu trước khi thêm hosted baseline.
 
-### NEXT – Sau baseline đầu của G2
+### NEXT – Sau khi D1 và hosted baseline được duyệt
 
-1. Chạy hosted baseline nếu công ty phê duyệt rõ dữ liệu được phép gửi.
+1. So sánh template/hosted trên cùng gold set và chốt ngưỡng Gate G2 với mentor.
 2. Nhận, kiểm kê và phân loại dataset công ty; không tự động đưa D2 ra provider ngoài.
 3. Phân tích lỗi để quyết định có cần embedding/vector search hay chưa.
-4. Chốt ngưỡng Gate G2 cùng mentor từ kết quả baseline, không tự chọn phần trăm đẹp.
+4. Chốt quyết định G3 và baseline để model local phải vượt qua.
 
 ### LATER – Sau khi G2 đạt
 
@@ -765,10 +765,12 @@ Giới hạn công việc:
 1. Giữ tag `g1-v1.0.0` và bằng chứng CI làm mốc so sánh.
 2. Quay demo ngắn cho mentor nếu cần; dùng số 56,33 ms đúng với chú thích
    “Mock CI baseline”, không gọi đó là SLA/model benchmark.
-3. Tạo `data/demo_public/` cho 2–3 thủ tục công khai có nguồn chính thức.
-4. Khóa schema snapshot và gold set 30–50 câu trước khi tối ưu retrieval.
-5. Tích hợp exact/keyword retrieval và source output sau cùng API hiện có.
-6. Chạy baseline G2 rồi mới quyết định embedding, reranker hay model local.
+3. Nhờ reviewer thứ hai kiểm tra source, fragment và 10 gold question hiện có.
+4. Lấy nguồn chi tiết chính thức rồi mở rộng `data/demo_public/` lên 2–3 thủ tục,
+   30–50 câu; chỉ khi đó mới cho `--mode publish` pass.
+5. Chạy retrieval + grounded evaluation D1 và chốt ngưỡng với mentor.
+6. Xin phê duyệt hosted provider; dùng secret mới qua `.env`/secret store, tuyệt
+   đối không tái sử dụng key đã xuất hiện trong chat.
 
 ## 21. Câu trình bày với mentor
 

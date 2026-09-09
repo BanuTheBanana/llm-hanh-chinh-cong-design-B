@@ -1,55 +1,52 @@
-# Thay đổi G2 của Minh
+# Changelog tích hợp G2
 
-Baseline: ZIP llm-hanh-chinh-cong-main.zip người dùng gửi. Không sửa các thư mục
-web/, ai-service/, data/, scripts/, Compose hoặc CI chung. Không sửa migration G1.
-Không cập nhật package dependencies; tiếp tục dùng uv.lock có sẵn.
+## 09/09/2026 – D0 technical vertical slice
 
-## Đã sửa
+Baseline: `main` / tag `g1-v1.0.0`.
 
-- `backend/pyproject.toml`: pytest pythonpath, không đổi dependency.
-- `backend/docs/TEST_REPORT.md`: liên kết tới báo cáo G2.
-- `backend/README.md`
-- `backend/app/chat.py`
-- `backend/app/config.py`
-- `backend/app/main.py`
-- `backend/app/models.py`
-- `backend/app/schemas.py`
-- `backend/docs/openapi.json`
-- `backend/migrations/env.py`
-- `backend/tests/test_unit.py`
+Nguồn ghép:
 
-## Đã thêm
+- Hoan: `g2/ai-eval-hoan`;
+- Tú: `data/frontend-tu`;
+- Minh: `Minh-RAG_test`;
+- tích hợp và sửa lỗi: `g2/integration`.
 
-- `backend/docs/g2/CHANGELOG.md`
-- `backend/docs/g2/TEST_REPORT.md`
-- `backend/.env.example`
-- `backend/app/rag/__init__.py`
-- `backend/app/rag/cli.py`
-- `backend/app/rag/corpus.py`
-- `backend/app/rag/evaluation.py`
-- `backend/app/rag/grounding.py`
-- `backend/app/rag/models.py`
-- `backend/app/rag/retrieval.py`
-- `backend/app/rag/schemas.py`
-- `backend/app/rag/store.py`
-- `backend/docs/g2/README.md`
-- `backend/docs/g2/contracts-g2.md`
-- `backend/docs/g2/retrieval-fixture-report.json`
-- `backend/docs/g2/schema-catalog.json`
-- `backend/migrations/versions/0002_g2_rag.py`
-- `backend/tests/fixtures/rag/README.md`
-- `backend/tests/fixtures/rag/gold/questions.jsonl`
-- `backend/tests/fixtures/rag/normalized/fragments.jsonl`
-- `backend/tests/fixtures/rag/normalized/procedures.jsonl`
-- `backend/tests/fixtures/rag/raw/snapshot.txt`
-- `backend/tests/fixtures/rag/source_manifest.jsonl`
-- `backend/tests/test_rag_integration.py`
-- `backend/tests/test_rag_unit.py`
+### Contract và Backend/RAG
 
-## Điểm ghép cần Hoan/Tú review
+- Đồng bộ Core Backend với `POST /internal/v2/generate`; bỏ request wrapper và
+  history khỏi grounded projection.
+- Bind/kiểm tra `request_id`, `evidence_bundle_id`, corpus version, data
+  classification, prompt version và citation allowlist trước khi lưu.
+- Giới hạn query/evidence/output theo contract, kiểm tra invariant của
+  `ANSWER`, `NEED_CLARIFICATION` và `INSUFFICIENT_DATA`.
+- Không trộn nhiều procedure trong một bundle; phát hiện ambiguity trước khi
+  cắt `top_k`.
+- Thêm readiness `/health/rag`, config guard cấm fixture ở production và lỗi
+  upstream an toàn.
+- Sửa Alembic path để chạy độc lập current working directory.
 
-- Endpoint mới /internal/v1/generate-grounded, request/response trong schema-catalog.json.
-- Public retrieval_filters và nullable grounding; G1 không cần gửi fields mới.
-- Forward biến RAG_* trong Compose khi muốn bật G2 trong container.
-- Bổ sung Web source display và corpora/gold D1 reviewed.
-- Full PostgreSQL regression cần pass trước merge; mặc định RAG_ENABLED=false.
+### Data
+
+- Chuyển cây dữ liệu về canonical path `data/demo_public`.
+- Sửa raw hash theo byte snapshot, nguồn/fragment reference và provenance tới
+  file PDF nằm trong archive.
+- Sửa submission method, fee, exemption và legal bases theo snapshot; không tự
+  điền documents/steps khi nguồn không có.
+- Thêm data validator hai mode: technical `preflight` và human/business
+  `publish`.
+- Giữ source/gold ở trạng thái pending; không tự gắn APPROVED.
+
+### AI, Web, Compose và CI
+
+- Giữ template provider offline chỉ nhận D0; D1/hosted vẫn khóa bằng policy.
+- Thêm Compose overlay ingest fixture và bật grounded flow mà không phá G1.
+- Web hiển thị status, cảnh báo D0, missing information và nguồn HTTPS đã hydrate
+  từ Backend.
+- Thêm API smoke và Chromium E2E cho answer + source + reload history.
+- CI chạy data preflight, G1 regression rồi G2 Compose/API/browser smoke.
+
+### Trạng thái
+
+`G2-I01` bằng D0 đã pass kỹ thuật. `G2-D04`, `G2-R03`, `G2-A03` và `G2-I02`
+chưa hoàn tất vì D1 thiếu review/phạm vi và hosted provider chưa được phê duyệt.
+Chi tiết lệnh/kết quả ở [TEST_REPORT.md](TEST_REPORT.md).

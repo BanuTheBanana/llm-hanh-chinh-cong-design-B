@@ -2,12 +2,36 @@ from datetime import date
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    field_validator,
+    model_validator,
+)
 
-ID = Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9_.-]{1,160}$")]
+ID = Annotated[
+    str,
+    StringConstraints(
+        min_length=1,
+        max_length=128,
+        pattern=r"^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+    ),
+]
 Hash = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
 Text = Annotated[str, StringConstraints(min_length=1, pattern=r"\S")]
+QueryText = Annotated[str, StringConstraints(min_length=1, max_length=4_000, pattern=r"\S")]
+GroundedText = Annotated[str, StringConstraints(min_length=1, max_length=8_000, pattern=r"\S")]
+Title = Annotated[str, StringConstraints(min_length=1, max_length=500, pattern=r"\S")]
+Scope = Annotated[
+    str,
+    StringConstraints(min_length=1, max_length=500, strip_whitespace=True, pattern=r"\S"),
+]
 Status = Literal["ANSWER", "NEED_CLARIFICATION", "INSUFFICIENT_DATA"]
+DataClassification = Literal["D0_SYSTEM_SMOKE", "D1_PUBLIC_DEMO"]
+ValidityStatus = Literal["CURRENT", "EXPIRED", "FUTURE", "UNKNOWN"]
 BUSINESS_FIELDS = (
     "applicant_scope",
     "receiving_authority",
@@ -67,6 +91,20 @@ class ProcedureRecord(Strict):
     field_evidence: dict[str, list[list[ID]]]
 
 
+class SourceLocator(Strict):
+    archive_member: Text | None = None
+    page_start: int | None = Field(default=None, ge=1, strict=True)
+    page_end: int | None = Field(default=None, ge=1, strict=True)
+    inner_content_sha256: Hash | None = None
+    extraction_tool: Text | None = None
+
+    @model_validator(mode="after")
+    def valid_page_range(self):
+        if self.page_start and self.page_end and self.page_end < self.page_start:
+            raise ValueError("Invalid source page interval")
+        return self
+
+
 class ProcedureFragment(Strict):
     fragment_id: ID
     procedure_id: ID
@@ -80,41 +118,68 @@ class ProcedureFragment(Strict):
         "FEES",
         "PROCESSING_TIME",
         "LEGAL_BASES",
+        "PROCEDURE_SCOPE",
+        "EFFECTIVE_DATE",
         "OTHER",
     ]
-    text: Text = Field(max_length=16000)
+    text: GroundedText
     source_id: ID
     ordinal: int = Field(ge=0, strict=True)
     content_sha256: Hash
+    source_locator: SourceLocator | None = None
 
 
 class Filters(Strict):
     procedure_id: ID | None = None
-    jurisdiction: str | None = None
+    jurisdiction: Scope | None = None
     as_of: date | None = None
 
 
 class RetrievalInput(Strict):
-    query: Text = Field(max_length=10000)
-    top_k: int = Field(default=5, ge=1, le=20, strict=True)
+    query: QueryText
+    top_k: int = Field(default=5, ge=1, le=8, strict=True)
     filters: Filters = Field(default_factory=Filters)
 
 
 class Evidence(Strict):
     fragment_id: ID
     source_id: ID
-    title: Text
+    procedure_id: ID
+    section_type: ID
+    title: Title
     url: Text
-    text: Text
+    text: GroundedText
     score: float = Field(ge=0, allow_inf_nan=False)
+    jurisdiction: Scope | None = None
+    effective_from: date | None = None
+    effective_to: date | None = None
+    validity_status: ValidityStatus = "UNKNOWN"
     metadata: dict
+
+    @model_validator(mode="after")
+    def valid_interval(self):
+        if self.effective_from and self.effective_to and self.effective_to < self.effective_from:
+            raise ValueError("Invalid effective interval")
+        return self
 
 
 class EvidenceBundle(Strict):
     request_id: UUID
+    evidence_bundle_id: UUID
     corpus_version: ID
-    query: Text
-    evidence: list[Evidence] = Field(max_length=20)
+    data_classification: DataClassification
+    query: QueryText
+    evidence: list[Evidence] = Field(max_length=8)
+    as_of: date | None = None
+
+    @model_validator(mode="after")
+    def valid_evidence_budget(self):
+        fragment_ids = [item.fragment_id for item in self.evidence]
+        if len(fragment_ids) != len(set(fragment_ids)):
+            raise ValueError("Duplicate evidence fragment IDs")
+        if sum(len(item.text) for item in self.evidence) > 32_000:
+            raise ValueError("Evidence text budget exceeded")
+        return self
 
 
 class Usage(Strict):
@@ -124,14 +189,35 @@ class Usage(Strict):
 
 class GroundedAnswer(Strict):
     request_id: UUID
-    answer: Text = Field(max_length=16000)
+    evidence_bundle_id: UUID
+    corpus_version: ID
+    data_classification: DataClassification
+    prompt_version: ID
+    answer: GroundedText
     status: Status
-    cited_fragment_ids: list[ID]
-    missing_information: list[Text]
-    provider: Text
-    model: Text
+    cited_fragment_ids: list[ID] = Field(max_length=8)
+    missing_information: list[Scope] = Field(max_length=10)
+    provider: ID
+    model: ID
     usage: Usage
-    latency_ms: float = Field(ge=0, allow_inf_nan=False)
+    latency_ms: int = Field(ge=0, strict=True)
+
+    @field_validator("cited_fragment_ids", "missing_information")
+    @classmethod
+    def unique_lists(cls, value):
+        if len(value) != len(set(value)):
+            raise ValueError("Duplicate list value")
+        return value
+
+    @model_validator(mode="after")
+    def valid_status(self):
+        if self.status == "ANSWER" and (not self.cited_fragment_ids or self.missing_information):
+            raise ValueError("Invalid ANSWER invariant")
+        if self.status == "NEED_CLARIFICATION" and not self.missing_information:
+            raise ValueError("Invalid NEED_CLARIFICATION invariant")
+        if self.status == "INSUFFICIENT_DATA" and self.cited_fragment_ids:
+            raise ValueError("Invalid INSUFFICIENT_DATA invariant")
+        return self
 
 
 class Citation(Strict):
@@ -143,8 +229,14 @@ class Citation(Strict):
 
 
 class Grounding(Strict):
+    request_id: UUID
+    evidence_bundle_id: UUID
     status: Status
     corpus_version: ID
+    data_classification: DataClassification
+    prompt_version: ID | None = None
+    provider: ID | None = None
+    model: ID | None = None
     sources: list[Citation]
     missing_information: list[str]
 
@@ -166,12 +258,34 @@ class GoldQuestion(Strict):
     filters: Filters = Field(default_factory=Filters)
 
 
-class HistoryMessage(Strict):
-    role: Literal["user", "assistant"]
-    content: Text = Field(max_length=16000)
+class GroundingEvidence(Strict):
+    fragment_id: ID
+    source_id: ID
+    procedure_id: ID
+    section_type: ID
+    title: Title
+    text: GroundedText
+    jurisdiction: Scope | None = None
+    effective_from: date | None = None
+    effective_to: date | None = None
+    validity_status: ValidityStatus = "UNKNOWN"
 
 
 class GenerateGroundedRequest(Strict):
-    evidence_bundle: EvidenceBundle
-    history: list[HistoryMessage] = Field(default_factory=list, max_length=10)
-    max_output_tokens: int = Field(ge=1, le=4096, strict=True)
+    request_id: UUID
+    evidence_bundle_id: UUID
+    corpus_version: ID
+    data_classification: DataClassification
+    query: QueryText
+    evidence: list[GroundingEvidence] = Field(max_length=8)
+    as_of: date | None = None
+    max_output_tokens: int = Field(ge=32, le=2048, strict=True)
+
+    @model_validator(mode="after")
+    def valid_evidence_budget(self):
+        fragment_ids = [item.fragment_id for item in self.evidence]
+        if len(fragment_ids) != len(set(fragment_ids)):
+            raise ValueError("Duplicate evidence fragment IDs")
+        if sum(len(item.text) for item in self.evidence) > 32_000:
+            raise ValueError("Evidence text budget exceeded")
+        return self

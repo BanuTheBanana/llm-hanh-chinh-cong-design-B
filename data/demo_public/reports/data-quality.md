@@ -1,6 +1,9 @@
 # Data quality report
 
-Status: `SPIKE_NORMALIZED_PENDING_CROSS_REVIEW`
+Status: `SPIKE_TECHNICALLY_REPAIRED_PENDING_CROSS_REVIEW`
+
+Updated 09/09/2026 during integration audit. This report deliberately does not
+claim `APPROVED` or G2 completion.
 
 One official source-level-2 snapshot has been captured. It is a legal-document
 listing, not a procedure page, so no `ProcedureRecord`, fragment, or gold
@@ -15,7 +18,7 @@ Source review notes:
 - Access: one direct HTML GET, 30-second timeout, no login/CAPTCHA bypass,
 	`User-Agent: CaoData-G2-demo/1.0`.
 - Snapshot: `data/demo_public/raw/legal_portal/2026-09-08/he-thong-van-ban.html`
-- SHA-256: `515e72e4560235d56e39b18eb5f29e95f6eba73895a4c23b4412b7ed6f3326ec`
+- SHA-256 of the immutable Git snapshot: `f6f2264974458058bdb4b8b30a1e7d2d3e9a985c6e3b8685f6c4382f7254b970`
 - Review: `PENDING`; a second reviewer must confirm the source before it is
 	used in the corpus.
 
@@ -44,13 +47,19 @@ procedure/version fields.
 Spike normalization output:
 
 - 1 `ProcedureRecord`: `birth_registration_hcmc_demo`.
-- 7 `ProcedureFragment` records covering scope, processing time, submission
-	method/location, receiving authority, legal bases, effective date and fees.
+- 10 `ProcedureFragment` records covering scope, processing time, direct and
+  online submission, receiving authority, three legal-basis groups, effective
+  date and fees.
 - 10 `GoldQuestion` records across `DEV` and `TEST`.
 - `required_documents` and `steps` remain empty because the reviewed catalogue
 	snapshot does not provide those sections. No replacement facts were inferred.
-- All gold questions use `contains_pii=false`; questions with unsupported scope
-	are marked `NEED_CLARIFICATION` or `INSUFFICIENT_DATA`.
+- The integration audit corrected online submission, the zero-online-fee rule,
+  exemptions, the 8,000 VND copy fee and the previously truncated legal bases
+  from pages 1–5 of `DM_TTHC_HO_TICH_signed.pdf`.
+- Each normalized fragment now records archive member, page range, inner PDF
+  SHA-256 and extraction tool. Gold question 7 is explicitly out-of-corpus.
+- All gold questions use `contains_pii=false`; reviewer is explicitly
+  `PENDING_SECOND_REVIEW`, not a placeholder that could be mistaken for approval.
 
 ## Remaining Tu work
 
@@ -80,12 +89,14 @@ that explicitly contains `Thành phần hồ sơ` and `Trình tự thực hiện
 `Đăng ký khai sinh`. Until then, leaving `required_documents` and `steps` empty
 is intentional and contract-compliant.
 
-Validation run on 2026-09-08:
+Technical preflight command:
 
 ```text
-python tools/data/validate_dataset.py --root .
-{"errors": 0, "records": {"fragments": 7, "procedures": 1, "questions": 10, "sources": 4}}
+python tools/data/validate_dataset.py --root . --mode preflight
 ```
 
-Once a procedure source is approved, add its immutable raw snapshot and replace
-this report with the full validator output plus the normalized data review.
+The strict `--mode publish` gate must continue to fail while sources are
+`PENDING`, reviewers are pending, detailed documents/steps are absent, and the
+dataset remains below 2 procedures and 30 questions. Once those items are
+resolved by the team/mentor, replace this draft report with captured validator,
+ingestion, retrieval and evaluation outputs.

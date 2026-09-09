@@ -18,6 +18,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python scripts/check-repo-hygiene.py
+      - name: Validate public-data draft consistency
+        run: python tools/data/validate_dataset.py --root . --mode preflight
 
   ai-service:
     runs-on: ubuntu-latest
@@ -124,9 +126,20 @@ jobs:
       - name: Run live browser smoke flow
         working-directory: web
         run: npm run test:e2e
+      - name: Restart as offline G2 grounded stack
+        run: |
+          docker compose --profile full down --volumes --remove-orphans
+          docker compose -f compose.yaml -f compose.g2.yaml --profile full up --build --detach --wait
+      - name: Run G2 grounded API smoke flow
+        run: python scripts/smoke-g2.py
+      - name: Run G2 grounded browser smoke flow
+        working-directory: web
+        env:
+          G2_E2E: "1"
+        run: npx playwright test e2e/g2.spec.ts
       - name: Show service logs on failure
         if: failure()
-        run: docker compose --profile full logs --no-color
+        run: docker compose -f compose.yaml -f compose.g2.yaml --profile full logs --no-color
       - name: Stop the complete G1 stack
         if: always()
-        run: docker compose --profile full down --volumes --remove-orphans
+        run: docker compose -f compose.yaml -f compose.g2.yaml --profile full down --volumes --remove-orphans

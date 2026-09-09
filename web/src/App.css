@@ -43,6 +43,20 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .message.failed p { background: #fff0e8; border-color: #d89a82; }
 .message-meta { color: #74877e; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .message-status { color: #a54d2f; margin-left: 9px; }
+.grounding { background: #f8faf6; border: 1px solid #d7e1d6; border-top: 0; color: #435b53; padding: 12px 15px; }
+.grounding-heading { align-items: center; display: flex; font-size: 12px; justify-content: space-between; }
+.grounding-heading strong { color: #315c4d; }
+.grounding-heading span { color: #74877e; }
+.grounding-insufficient_data { border-color: #dfd7c5; }
+.grounding-need_clarification { border-color: #e4cfaa; }
+.grounding-demo { color: #8a6840; display: block; margin-top: 7px; }
+.source-list { display: grid; gap: 7px; margin: 10px 0 0; padding-left: 20px; }
+.source-list li { padding-left: 3px; }
+.source-list a { color: #245f52; overflow-wrap: anywhere; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.source-list code { color: #71837c; display: block; font-size: 10px; margin-top: 2px; overflow-wrap: anywhere; }
+.missing-information { font-size: 12px; margin-top: 9px; }
+.missing-information span { font-weight: 600; }
+.missing-information ul { margin: 5px 0 0; padding-left: 20px; }
 .composer { background: #fff; border-top: 1px solid #dce0d8; display: flex; gap: 12px; padding: 20px 7%; }
 .composer textarea { border: 1px solid #cfd8ce; color: #263a35; flex: 1; font: 14px/1.5 ui-sans-serif, system-ui, sans-serif; min-height: 44px; padding: 12px 14px; resize: vertical; }
 .composer button, .login-form button { padding: 0 21px; }

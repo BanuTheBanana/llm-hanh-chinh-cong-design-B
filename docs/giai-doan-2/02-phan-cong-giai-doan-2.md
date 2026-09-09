@@ -10,11 +10,11 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.2` |
-| Trạng thái | `HOAN_OFFLINE_READY; DATA_RAG_BRANCHES_UNDER_REVIEW` |
+| Phiên bản | `v1.3` |
+| Trạng thái | `G2_I01_D0_TECHNICAL_PASS; G2_FINAL_BLOCKED_BY_D1_AND_HOSTED_APPROVAL` |
 | Baseline bắt đầu | `main`, tag `g1-v1.0.0` |
-| Thay đổi lần này | Hoan khóa grounded v0.2 + prompt v2, provider policy và evaluation D0 8 case; đang review branch Data/RAG trước khi ghép |
-| Dữ liệu được phép | Chỉ `D1_PUBLIC_DEMO`: nguồn công khai chính thức và tình huống giả, không PII |
+| Thay đổi lần này | Đã ghép ba branch, sửa contract/data/RAG, chạy D0 end-to-end qua Compose/API/Web; chưa công nhận D1 |
+| Dữ liệu được phép | D0 fixture; D1 công khai chỉ sau publish/review gate; D2 không được gửi ra ngoài |
 
 ---
 
@@ -76,7 +76,7 @@ validate/ingest → exact/keyword/BM25 → EvidenceBundle
                     │
                     ▼
 Hoan
-AI Service → grounded prompt → hosted provider được duyệt
+AI Service → grounded prompt → template D0 / hosted provider được duyệt sau
            → GroundedAnswer + cited_fragment_ids
                     │
                     ▼
@@ -641,25 +641,33 @@ chi phí/quota quan sát được, assumption, risk và blocker.
 
 Tiến độ tại 09/09/2026:
 
-- `G2-A01`: **IMPLEMENTED_OFFLINE_PENDING_TEAM_REVIEW** – route/schema/prompt v2,
-  provider classification policy, template D0 và guardrail đã có.
-- `G2-A02`: **IMPLEMENTED_OFFLINE** – fixture D0 8 case, CLI, report hash,
-  retrieval/citation/abstention/runtime metrics và strict safety đã chạy;
-  chưa có gold D1/RAG thật.
-- `G2-A03`: **NOT_STARTED** – không dùng key/provider thật trước approval và D1.
+- `G2-D01/D02/D03`: **TECHNICAL_PREFLIGHT_PASS; HUMAN_REVIEW_PENDING** – một
+  thủ tục/10 câu đã sửa hash, schema và provenance; chưa đủ hồ sơ/bước và chưa
+  được phép publish.
+- `G2-R01/R02`: **IMPLEMENTED_AND_TESTED_D0** – ingest idempotent, retrieval,
+  ambiguity guard và EvidenceBundle đã chạy trong Core Backend.
+- `G2-A01/A02`: **IMPLEMENTED_AND_TESTED_D0** – route/schema/prompt v2, template
+  D0, evaluation 8 case và strict safety pass.
+- `G2-I01`: **D0_TECHNICAL_PASS** – Docker Compose, API smoke, Web source rendering
+  và Chromium reload-history E2E pass bằng fixture giả.
+- `G2-D04/R03`: **BLOCKED_BY_SCOPE_AND_HUMAN_REVIEW** – cần nguồn chi tiết,
+  2–3 thủ tục và 30–50 câu được review.
+- `G2-A03`: **NOT_STARTED_BY_POLICY** – không dùng key/provider thật trước khi
+  công ty duyệt provider và dữ liệu D1.
+- `G2-I02`: **NOT_DONE** – chỉ nghiệm thu khi D04/R03/A03 và báo cáo D1 đạt gate.
 
 ## 10. Cách làm song song, không ai phải chờ
 
-Chỉ cần cả ba họp ngắn và khóa G2-00 trước. Sau đó:
+Ba nhánh đã được ghép tại checkpoint D0. Việc song song tiếp theo là:
 
 ```text
-Tú:   làm raw/manifest/normalized cho một thủ tục thật
-Minh: làm ingest/retrieval bằng fixture đúng schema
-Hoan: làm grounded AI/evaluation bằng fixture EvidenceBundle
+Tú:   lấy nguồn chi tiết, hoàn tất review và mở rộng D1
+Minh: chạy retrieval report trên gold D1, phân tích từng lỗi
+Hoan: giữ D0 regression xanh, chuẩn bị hosted adapter sau approval
 ```
 
-Không chờ Tú hoàn thành 30–50 câu mới code. Không để Minh tự đoán data schema.
-Không để Hoan đợi hosted key mới làm evaluation. Ghép sớm ở 10 câu đầu.
+Không ép `publish` pass bằng cách tự điền dữ kiện nguồn không có hoặc tự duyệt
+gold. Không để hosted key trở thành điều kiện duy trì D0.
 
 ## 11. Checkpoint
 
@@ -676,7 +684,8 @@ Không để Hoan đợi hosted key mới làm evaluation. Ghép sớm ở 10 c�
 - Hoan: grounded output + offline evaluation.
 - Demo được answer/source hoặc abstain đúng.
 
-Nếu spike chưa chạy end-to-end, không mở rộng corpus.
+Luồng D0 đã chạy end-to-end. Chỉ mở rộng corpus D1 sau khi spike nguồn thật qua
+review chéo; không coi D0 là phê duyệt dữ liệu nghiệp vụ.
 
 ### Checkpoint 2 – Dataset/gold v1
 
@@ -703,10 +712,10 @@ Tạo branch sau khi commit kế hoạch/contract G2 làm baseline chung:
 
 | Người | Branch | Phạm vi chính |
 |---|---|---|
-| Tú | `g2/data-tu` | `data/demo_public/**`, `tools/data/**`, docs data |
-| Minh | `g2/rag-backend-minh` | `backend/**`, migration và docs retrieval |
+| Tú | `data/frontend-tu` (đã nhập) | `data/demo_public/**`, `tools/data/**`, docs data |
+| Minh | `Minh-RAG_test` (đã nhập) | `backend/**`, migration và docs retrieval |
 | Hoan | `g2/ai-eval-hoan` | `ai-service/**`, `evaluation/**`, Compose/CI |
-| Tích hợp | `g2/integration` | Chỉ nhận PR nhỏ đã test từ ba branch |
+| Tích hợp | `g2/integration` | Đang chứa checkpoint D0 đã kiểm thử |
 
 Contract G2 là file chung. Người muốn đổi schema phải nêu migration/consumer bị
 ảnh hưởng và được hai người còn lại đồng ý trước khi merge.

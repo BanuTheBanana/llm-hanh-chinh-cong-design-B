@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import * as api from './services/api'
-import type { Conversation, CreateMessageResponse, Message, User } from './types/api'
+import type { Conversation, CreateMessageResponse, Grounding, Message, User } from './types/api'
 
 vi.mock('./services/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./services/api')>()
@@ -190,5 +190,52 @@ describe('G1 web flow', () => {
     expect(await screen.findByRole('heading', { name: 'Trợ lý hành chính' })).toBeInTheDocument()
     expect(screen.queryByText('Hồ sơ A')).not.toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('Đã xóa dữ liệu khỏi giao diện')
+  })
+
+  it('renders verified grounding sources and refuses unsafe source schemes', async () => {
+    getConversationsMock.mockResolvedValue([conversationA])
+    const grounding: Grounding = {
+      request_id: '00000000-0000-4000-8000-000000000001',
+      evidence_bundle_id: '10000000-0000-4000-8000-000000000001',
+      status: 'ANSWER',
+      corpus_version: 'fixture-v1',
+      data_classification: 'D0_SYSTEM_SMOKE',
+      prompt_version: 'g2-grounded-v2',
+      provider: 'template',
+      model: 'template-grounded-v2',
+      missing_information: [],
+      sources: [
+        {
+          fragment_id: 'frag_fees',
+          source_id: 'src_synthetic',
+          title: 'Nguồn fixture chính thức',
+          url: 'https://fixture.invalid/synthetic',
+          metadata: {},
+        },
+        {
+          fragment_id: 'frag_bad',
+          source_id: 'src_bad',
+          title: 'Nguồn không an toàn',
+          url: 'javascript:alert(1)',
+          metadata: {},
+        },
+      ],
+    }
+    getMessagesMock.mockResolvedValue([
+      message('u-1', conversationA.id, 'user', 'Lệ phí?'),
+      { ...message('a-1', conversationA.id, 'assistant', 'Câu trả lời có nguồn'), grounding },
+    ])
+    const user = userEvent.setup()
+
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: /Hồ sơ A/ }))
+
+    expect(await screen.findByText('Đã đối chiếu nguồn')).toBeInTheDocument()
+    expect(screen.getByText(/Dữ liệu mô phỏng D0/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Nguồn fixture chính thức' })).toHaveAttribute(
+      'href',
+      'https://fixture.invalid/synthetic',
+    )
+    expect(screen.getByText('Nguồn không an toàn').closest('a')).toBeNull()
   })
 })

@@ -22,6 +22,8 @@ from app.config import get_settings
 from app.db import engine, get_db
 from app.errors import APIError
 from app.models import Conversation, Message, SessionRecord, User, utcnow
+from app.rag.corpus import CorpusError
+from app.rag.store import load_corpus
 from app.schemas import (
     ConversationInput,
     ConversationOutput,
@@ -80,12 +82,23 @@ async def trace_request(request: Request, call_next):
     except Exception as exc:
         # Exception messages can contain SQL, URLs or credentials. Log only safe metadata.
         route = request.scope.get("route")
+        trace = exc.__traceback__
+        while trace and trace.tb_next:
+            trace = trace.tb_next
+        location = (
+            f"{trace.tb_frame.f_code.co_filename.rsplit('/', 1)[-1].rsplit(chr(92), 1)[-1]}:"
+            f"{trace.tb_frame.f_code.co_name}:{trace.tb_lineno}"
+            if trace is not None
+            else "unknown"
+        )
         logger.error(
-            "unhandled_request_error request_id=%s route=%s method=%s error_type=%s",
+            "unhandled_request_error request_id=%s route=%s method=%s "
+            "error_type=%s error_location=%s",
             request.state.request_id,
             getattr(route, "path", "unmatched"),
             request.method,
             type(exc).__name__,
+            location,
         )
         response = error_response(request, 500, "INTERNAL_ERROR", "Lỗi hệ thống.")
     response.headers["X-Request-ID"] = str(request.state.request_id)
@@ -263,6 +276,47 @@ async def health(db: AsyncSession = Depends(get_db)):
     except Exception as exc:
         raise APIError(503, "DATABASE_UNAVAILABLE", "Database chưa sẵn sàng.") from exc
     return {"status": "ok"}
+
+
+@app.get("/health/rag")
+async def rag_health(
+    db: AsyncSession = Depends(get_db),
+    ai: AIClient = Depends(get_ai),
+):
+    current = get_settings()
+    if not current.rag_enabled:
+        return {"status": "disabled"}
+    try:
+        corpus = await load_corpus(
+            db,
+            current.rag_corpus_version,
+            current.rag_allow_fixtures,
+        )
+        response = await ai.client.get(
+            current.ai_service_url.rstrip("/") + "/internal/v2/health",
+            timeout=current.ai_request_timeout_seconds,
+        )
+        response.raise_for_status()
+        grounded = response.json()
+        if (
+            not isinstance(grounded, dict)
+            or grounded.get("status") != "ok"
+            or grounded.get("endpoint") != "grounded-v2"
+        ):
+            raise ValueError("invalid grounded readiness")
+    except (CorpusError, httpx.HTTPError, ValueError) as exc:
+        raise APIError(503, "RAG_UNAVAILABLE", "RAG hoặc grounded AI chưa sẵn sàng.") from exc
+    return {
+        "status": "ok",
+        "corpus_version": corpus.version,
+        "data_classification": "D0_SYSTEM_SMOKE" if corpus.fixture else "D1_PUBLIC_DEMO",
+        "sources": len(corpus.sources),
+        "procedures": len(corpus.procedures),
+        "fragments": len(corpus.fragments),
+        "grounded_provider": grounded.get("provider"),
+        "prompt_version": grounded.get("prompt_version"),
+        "external_calls_enabled": grounded.get("external_calls_enabled"),
+    }
 
 
 app.include_router(router)

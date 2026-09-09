@@ -1,3 +1,12 @@
 # Evaluation manifests hash fixture bytes, so JSONL line endings must be stable
 # across Windows and Linux checkouts.
 evaluation/fixtures/**/*.jsonl text eol=lf
+
+# Corpus manifests hash raw snapshots byte-for-byte. Treat every raw artifact as
+# opaque so core.autocrlf cannot silently invalidate hashes on Windows.
+backend/tests/fixtures/rag/raw/** -text
+data/demo_public/raw/** -text
+
+# Normalized/gold JSONL is intentionally UTF-8 + LF on every platform.
+backend/tests/fixtures/rag/**/*.jsonl text eol=lf
+data/demo_public/**/*.jsonl text eol=lf

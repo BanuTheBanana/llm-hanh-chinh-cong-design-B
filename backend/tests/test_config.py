@@ -61,6 +61,23 @@ def test_llm_max_output_tokens_is_bounded(value):
         Settings(_env_file=None, llm_max_output_tokens=value)
 
 
+@pytest.mark.parametrize("value", [31, 2049])
+def test_grounded_max_output_tokens_is_bounded(value):
+    with pytest.raises(ValueError):
+        Settings(_env_file=None, grounded_max_output_tokens=value)
+
+
+def test_rag_requires_version_and_fixture_is_forbidden_in_production():
+    with pytest.raises(ValueError, match="RAG_CORPUS_VERSION"):
+        Settings(_env_file=None, rag_enabled=True)
+    with pytest.raises(ValueError, match="forbidden in production"):
+        Settings(
+            _env_file=None,
+            app_env="production",
+            rag_allow_fixtures=True,
+        )
+
+
 @pytest.mark.parametrize(
     "raw",
     [

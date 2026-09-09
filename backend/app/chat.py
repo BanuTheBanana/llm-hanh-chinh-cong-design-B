@@ -61,6 +61,8 @@ async def conversation_lock(conversation_id: UUID):
 async def send_message(
     conversation_id: UUID, user_id: UUID, body: MessageInput, request_id: UUID, ai: AIClient
 ) -> MessagePair:
+    if get_settings().rag_enabled and len(body.content) > 4_000:
+        raise APIError(422, "VALIDATION_ERROR", "Tin nhắn RAG không được vượt quá 4.000 ký tự.")
     filters = body.retrieval_filters.model_dump(mode="json")
     async with conversation_lock(conversation_id) as db:
         conversation = await owned_conversation(db, conversation_id, user_id)
@@ -141,7 +143,6 @@ async def send_message(
                     ),
                     request_id,
                     ai,
-                    [{"role": m.role, "content": m.content} for m in history[:-1]][-10:],
                 )
             else:
                 answer = await ai.generate(

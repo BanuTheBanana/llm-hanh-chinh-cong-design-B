@@ -187,6 +187,7 @@ def test_openapi_contract():
     schema = app.openapi()
     expected = {
         "/health": {"get"},
+        "/health/rag": {"get"},
         "/api/v1/auth/login": {"post"},
         "/api/v1/auth/logout": {"post"},
         "/api/v1/auth/me": {"get"},
