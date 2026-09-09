@@ -47,7 +47,7 @@ llama_cpp_version_or_commit: 0.4.0-dev, build 10853, commit 9dcf84e5a
 chat_template_sha256: F94F2AD6AC676D3B5D80453A6CC0D6C58760C6F613CF44550ADCBC62818EDE9D
 context_tokens: 4096
 max_output_tokens: 500
-temperature: 0.7
+temperature: 0.2
 top_p: 0.8
 top_k: 20
 min_p: 0.0
@@ -96,7 +96,7 @@ llama-server `
   -ngl 99 `
   -fa `
   -sm row `
-  --temp 0.7 `
+  --temp 0.2 `
   --top-p 0.8 `
   --top-k 20 `
   --min-p 0.0 `
@@ -183,7 +183,7 @@ dữ liệu thật, không quyết định QLoRA trước error analysis.
 
 | Gate | Kết quả |
 |---|---|
-| AI Service test | `65 passed` |
+| AI Service test | `66 passed` |
 | Ruff lint/format | `PASS` |
 | Compose G3 config | `PASS` |
 | llama.cpp + Vulkan trên RTX 5060 Ti 16 GB | `PASS` |

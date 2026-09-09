@@ -52,13 +52,13 @@ không đi qua Gemini, Groq, OpenAI hay provider hosted nào.
 | Metric aggregate | DEV | TEST khóa cuối |
 |---|---:|---:|
 | Số câu | 31 | 9 |
-| Routing accuracy | 86,67% | 100% |
-| Retrieval Recall@5 | 70% | 75% |
-| Status accuracy | 83,87% | 88,89% |
+| Routing accuracy | 100% | 100% |
+| Retrieval Recall@5 | 80% | 75% |
+| Status accuracy | 96,77% | 88,89% |
 | Valid generation | 100% | 100% |
 | Citation binding | 100% | 100% |
-| Generation latency p50 | 613,792 ms | 611,455 ms |
-| Generation latency p95 | 1.075,007 ms | 1.177,404 ms |
+| Generation latency p50 | 605,523 ms | 611,455 ms |
+| Generation latency p95 | 1.128,392 ms | 1.177,404 ms |
 | External AI call | 0 | 0 |
 
 Các metric chỉ đo routing/retrieval, contract, status và citation. Chúng chưa đo
@@ -85,6 +85,20 @@ Các số TEST trong bảng trên là kết quả khóa trước lần hardening
 chạy lại để chỉnh router**. Muốn công bố metric TEST sau thay đổi phải tạo
 `TEST_V2` mới theo change control; việc này không làm mất giá trị của gate chức
 năng G3 nhưng ngăn tuyên bố quá mức về chất lượng tổng quát.
+
+#### Chịu lỗi generation
+
+Kiểm thử Web tiếp tục phát hiện Qwen có thể trả output sai contract hai lần làm
+Backend trả `502` và message ở trạng thái chưa hoàn tất. Local generation đã được
+hạ temperature từ `0.7` xuống `0.2`. Nếu cả hai output vẫn chỉ sai contract, AI
+Service chuyển sang trích xuất nguyên văn evidence đã duyệt, bind citation và hiển
+thị rõ `chế độ trích xuất an toàn`; không dùng kiến thức model để bù dữ liệu.
+Timeout, mất kết nối, envelope hỏng và thinking leakage vẫn fail-closed.
+
+Sau sửa, câu hỏi thời gian từng lỗi đạt 5/5 lượt `ANSWER` có citation và không cần
+fallback. Toàn bộ DEV đạt 31/31 generation, không còn HTTP error; 5 lượt khác dùng
+fallback trích xuất và đều qua citation verifier. Đây là resilience gate, không
+phải tuyên bố rằng Qwen tự diễn giải đúng 100%.
 
 ### 3. E2E thật
 
@@ -116,7 +130,7 @@ local → verifier → PostgreSQL history:
 | Module | Kết quả |
 |---|---:|
 | Backend + PostgreSQL migration thật | 149 passed, 1 Windows symlink skip |
-| AI Service | 65 passed |
+| AI Service | 66 passed |
 | Data G3 pipeline/release | 7 passed |
 | Web | 11 passed; lint + production build PASS |
 | Docker Compose + D2 readiness | PASS |

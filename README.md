@@ -47,6 +47,7 @@ pipeline tạo một release 10 thủ tục/49 fragment, khóa 31 DEV + 9 TEST, 
 exact/BM25 và Qwen3-1.7B Q8_0 local qua Backend/Web với citation và PostgreSQL
 history. D2 được mount read-only, pin version/hash và không được gửi tới hosted API.
 Routing tự nhiên đã qua gate 10/10 tên thủ tục trực tiếp và 10/10 mẫu hội thoại;
+generation sai contract có retry và fallback trích xuất evidence kèm citation.
 QLoRA chưa có căn cứ nên chưa thực hiện. Đây chưa phải chứng nhận đúng nghiệp vụ
 hoặc production release; raw/derived company data không được commit lên GitHub.
 

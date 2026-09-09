@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     local_llm_context: int = Field(default=4096, ge=512, le=32768)
     local_llm_max_prompt_characters: int = Field(default=8000, ge=1000, le=64000)
     local_llm_max_output_tokens: int = Field(default=500, ge=32, le=2048)
-    local_llm_temperature: float = Field(default=0.7, gt=0, le=2)
+    local_llm_temperature: float = Field(default=0.2, gt=0, le=2)
     local_llm_top_p: float = Field(default=0.8, gt=0, le=1)
     local_llm_top_k: int = Field(default=20, ge=1, le=100)
     local_llm_min_p: float = Field(default=0.0, ge=0, le=1)

@@ -102,7 +102,7 @@ async def test_valid_response_sends_locked_llama_cpp_payload(provider_factory):
         assert payload["model"] == "test-model"
         assert payload["stream"] is False
         assert payload["max_tokens"] == 200
-        assert payload["temperature"] == 0.7
+        assert payload["temperature"] == 0.2
         assert payload["top_p"] == 0.8
         assert payload["top_k"] == 20
         assert payload["min_p"] == 0.0
@@ -175,15 +175,24 @@ async def test_invalid_http_json_raises_provider_response_error(provider_factory
         await generate(provider_factory(handler))
 
 
-async def test_malformed_model_json_raises_provider_response_error(provider_factory):
+async def test_malformed_model_json_uses_extractive_fallback(provider_factory):
+    calls = 0
+
     def handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
         return httpx.Response(
             200,
             json={"choices": [{"message": {"content": "not valid json"}}]},
         )
 
-    with pytest.raises(ProviderResponseError):
-        await generate(provider_factory(handler))
+    result = await generate(provider_factory(handler))
+
+    assert calls == 2
+    assert result.status == "ANSWER"
+    assert result.cited_fragment_ids == ("frag_001",)
+    assert "chế độ trích xuất an toàn" in result.answer
+    assert "Hồ sơ cần nộp Phiếu A." in result.answer
 
 
 @pytest.mark.parametrize(
@@ -212,15 +221,34 @@ async def test_malformed_openai_envelope_raises_provider_response_error(
         await generate(provider_factory(handler))
 
 
-async def test_forged_citation_raises_provider_response_error(provider_factory):
+async def test_forged_citation_uses_extractive_fallback(provider_factory):
     def handler(_request: httpx.Request) -> httpx.Response:
         return httpx.Response(
             200,
             json=make_openai_response(cited_ids=["frag_not_in_evidence"]),
         )
 
-    with pytest.raises(ProviderResponseError):
-        await generate(provider_factory(handler))
+    result = await generate(provider_factory(handler))
+
+    assert result.status == "ANSWER"
+    assert result.cited_fragment_ids == ("frag_001",)
+
+
+async def test_extractive_fallback_stays_within_answer_budget(provider_factory):
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": "not valid json"}}]},
+        )
+
+    result = await generate(
+        provider_factory(handler, max_prompt_characters=20_000),
+        evidence=[evidence_fragment(text="A" * 8_000)],
+    )
+
+    assert result.status == "ANSWER"
+    assert len(result.answer) <= 8_000
+    assert result.answer.endswith("…")
 
 
 @pytest.mark.parametrize(

@@ -1,4 +1,5 @@
 import json
+import logging
 from collections.abc import Sequence
 from datetime import date
 from urllib.parse import urlsplit
@@ -13,6 +14,8 @@ from app.schemas import GroundedDataClassification, GroundingEvidenceFragment
 DEFAULT_LOCAL_ALLOWED_HOSTS = frozenset(
     {"127.0.0.1", "::1", "host.docker.internal", "local-model", "localhost"}
 )
+MAX_GROUNDED_ANSWER_CHARACTERS = 8_000
+logger = logging.getLogger("ai.grounded")
 
 # llama.cpp converts this top-level json_schema to a constrained-output grammar.
 # Pydantic validation below remains mandatory because the runtime is untrusted.
@@ -63,7 +66,7 @@ class LocalGroundedProvider(GroundedProvider):
         context_tokens: int,
         max_prompt_characters: int,
         max_output_tokens: int,
-        temperature: float = 0.7,
+        temperature: float = 0.2,
         top_p: float = 0.8,
         top_k: int = 20,
         min_p: float = 0.0,
@@ -194,6 +197,61 @@ class LocalGroundedProvider(GroundedProvider):
             raise ProviderResponseError("local model returned invalid completion token usage")
         return raw_content, input_tokens, output_tokens
 
+    def _extractive_fallback(
+        self,
+        evidence: Sequence[GroundingEvidenceFragment],
+        *,
+        input_tokens: int,
+        output_tokens: int,
+    ) -> GroundedGenerationResult:
+        """Return reviewed evidence verbatim when model output violates the contract twice."""
+        if not evidence:
+            return GroundedGenerationResult(
+                answer="Chưa có đủ nguồn đã duyệt để trả lời câu hỏi này.",
+                status="INSUFFICIENT_DATA",
+                cited_fragment_ids=(),
+                missing_information=(),
+                provider=self.name,
+                model=self.model_name,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+            )
+
+        prefix = "Theo nguồn đã duyệt (chế độ trích xuất an toàn):"
+        lines: list[str] = []
+        cited_fragment_ids: list[str] = []
+        used_characters = len(prefix)
+        for fragment in evidence:
+            marker = "\n- "
+            available = MAX_GROUNDED_ANSWER_CHARACTERS - used_characters - len(marker)
+            if available <= 0:
+                break
+            text = " ".join(fragment.text.split())
+            truncated = len(text) > available
+            if truncated:
+                text = text[: max(1, available - 1)].rstrip() + "…"
+            lines.append(marker + text)
+            cited_fragment_ids.append(fragment.fragment_id)
+            used_characters += len(marker) + len(text)
+            if truncated:
+                break
+
+        logger.warning(
+            "local_grounded_extractive_fallback evidence_count=%d cited_count=%d",
+            len(evidence),
+            len(cited_fragment_ids),
+        )
+        return GroundedGenerationResult(
+            answer=prefix + "".join(lines),
+            status="ANSWER",
+            cited_fragment_ids=tuple(cited_fragment_ids),
+            missing_information=(),
+            provider=self.name,
+            model=self.model_name,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+
     async def generate_grounded(
         self,
         *,
@@ -241,7 +299,11 @@ class LocalGroundedProvider(GroundedProvider):
                 break
             except ProviderResponseError:
                 if attempt == 1:
-                    raise
+                    return self._extractive_fallback(
+                        evidence,
+                        input_tokens=input_tokens,
+                        output_tokens=output_tokens,
+                    )
                 retry_messages = [
                     *messages,
                     {

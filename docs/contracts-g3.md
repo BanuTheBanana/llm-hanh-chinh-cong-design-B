@@ -82,9 +82,12 @@ retrieval index hoặc runtime memory của Backend.
 
 AI chỉ trả answer/status/cited fragment IDs/missing information. AI Service kiểm
 JSON schema, status invariant, citation allowlist và thinking leakage. Nếu output
-sai contract, local provider retry đúng một lần; lần hai vẫn sai thì trả lỗi, không
-lưu assistant answer giả. Backend bind lại request/bundle/version/classification
-và hydrate citation từ evidence do chính Backend giữ.
+sai contract, local provider retry đúng một lần. Lần hai vẫn sai contract thì trả
+bản trích xuất nguyên văn từ evidence đã duyệt, có citation và nhãn `chế độ trích
+xuất an toàn`; không tự tạo dữ kiện. Timeout, lỗi kết nối, response envelope hỏng
+hoặc thinking leakage vẫn trả lỗi. Backend bind lại
+request/bundle/version/classification và hydrate citation từ evidence do chính
+Backend giữ.
 
 ## Hợp
 
