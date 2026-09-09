@@ -27,7 +27,7 @@ review dữ liệu D1.
 
 | Phạm vi | Kết quả |
 |---|---|
-| Backend full suite với PostgreSQL 16 | `108 passed` |
+| Backend full suite với PostgreSQL 16 | `109 passed` |
 | Backend Ruff check/format | Pass |
 | AI Service test | `42 passed` |
 | AI Service Ruff check/format | Pass |
@@ -38,7 +38,7 @@ review dữ liệu D1.
 | Retrieval D0 synthetic | DEV 23/23 và TEST 10/10 pass; Recall@5 = 1.0 |
 | Data D1 technical preflight | Pass: 4 source, 1 procedure, 10 fragment, 10 question |
 | Docker Compose G2 readiness | PostgreSQL/AI/Backend/Web healthy; corpus `synthetic-demo-v1` |
-| API end-to-end smoke | Pass, gồm answer/binding/citation/history |
+| API end-to-end smoke | Pass cho cả 3 thủ tục, gồm answer/binding/citation/history |
 | Chromium G2 E2E | Pass: login, answer + source, reload vẫn còn grounding |
 | OpenAPI/schema catalog regeneration | Khớp runtime Pydantic/FastAPI hiện tại |
 | Repository hygiene/secret-pattern check | Pass |

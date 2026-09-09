@@ -39,17 +39,17 @@ def main() -> int:
         path = f"/api/v1/conversations/{conversation['id']}/messages"
         checks = (
             (
-                "khai sinh sao mai",
+                "Lệ phí của Đăng ký khai sinh Sao Mai là bao nhiêu?",
                 "src_synthetic_birth_star",
                 "https://fixture.invalid/d0/birth_star",
             ),
             (
-                "căn cước ánh trăng",
+                "Cần giấy tờ gì để làm căn cước Ánh Trăng?",
                 "src_synthetic_identity_moon",
                 "https://fixture.invalid/d0/identity_moon",
             ),
             (
-                "khai tử mây trắng",
+                "Khai tử Mây Trắng được xử lý trong bao lâu?",
                 "src_synthetic_death_cloud",
                 "https://fixture.invalid/d0/death_cloud",
             ),

@@ -64,9 +64,9 @@ docker compose -f compose.yaml -f compose.g2.yaml --profile full up --build --de
 python scripts/smoke-g2.py
 ```
 
-Mở `http://localhost:3000` và hỏi “khai sinh sao mai”, “căn cước ánh trăng”
-hoặc “khai tử mây trắng”. Đây là dataset D0 giả có cảnh báo rõ, không phải hướng
-dẫn hành chính thực tế. Readiness G2 ở
+Mở `http://localhost:3000` và hỏi về “khai sinh Sao Mai”, “căn cước Ánh Trăng”
+hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong một câu hỏi dài tự nhiên.
+Đây là dataset D0 giả có cảnh báo rõ, không phải hướng dẫn hành chính thực tế. Readiness G2 ở
 `http://localhost:8000/health/rag`.
 
 ## Tài liệu trung tâm

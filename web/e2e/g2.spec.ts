@@ -4,7 +4,7 @@ test.skip(process.env.G2_E2E !== '1', 'Runs only against the offline G2 Compose 
 
 test('grounded answer renders a safe source and survives reload', async ({ page }) => {
   const user = `g2-e2e-${Date.now()}-${Math.random().toString(16).slice(2)}`
-  const question = 'khai sinh sao mai'
+  const question = 'Lệ phí của Đăng ký khai sinh Sao Mai là bao nhiêu?'
 
   await page.goto('/')
   await page.getByLabel('Tên hiển thị').fill(user)

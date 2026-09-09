@@ -10,8 +10,8 @@
   "recall_at_k": 1.0,
   "mrr": 0.75,
   "latency_ms": {
-    "p50": 0.3169999981764704,
-    "p95": 0.6924999979673885
+    "p50": 0.4380000027595088,
+    "p95": 1.0270000057062134
   },
   "failed_question_ids": [],
   "results": [
@@ -32,7 +32,7 @@
       "retrieval_status": "ANSWER",
       "expected_status": "ANSWER",
       "pass": true,
-      "latency_ms": 0.6371
+      "latency_ms": 1.027
     },
     {
       "question_id": "q_d0_009",
@@ -51,7 +51,7 @@
       "retrieval_status": "ANSWER",
       "expected_status": "ANSWER",
       "pass": true,
-      "latency_ms": 0.3325
+      "latency_ms": 0.5524
     },
     {
       "question_id": "q_d0_010",
@@ -70,7 +70,7 @@
       "retrieval_status": "ANSWER",
       "expected_status": "ANSWER",
       "pass": true,
-      "latency_ms": 0.3191
+      "latency_ms": 0.5831
     },
     {
       "question_id": "q_d0_018",
@@ -89,7 +89,7 @@
       "retrieval_status": "ANSWER",
       "expected_status": "ANSWER",
       "pass": true,
-      "latency_ms": 0.3184
+      "latency_ms": 0.438
     },
     {
       "question_id": "q_d0_019",
@@ -108,7 +108,7 @@
       "retrieval_status": "ANSWER",
       "expected_status": "ANSWER",
       "pass": true,
-      "latency_ms": 0.2954
+      "latency_ms": 0.3309
     },
     {
       "question_id": "q_d0_020",
@@ -127,7 +127,7 @@
       "retrieval_status": "ANSWER",
       "expected_status": "ANSWER",
       "pass": true,
-      "latency_ms": 0.2902
+      "latency_ms": 0.3196
     },
     {
       "question_id": "q_d0_028",
@@ -146,7 +146,7 @@
       "retrieval_status": "ANSWER",
       "expected_status": "ANSWER",
       "pass": true,
-      "latency_ms": 0.317
+      "latency_ms": 0.4437
     },
     {
       "question_id": "q_d0_029",
@@ -165,7 +165,7 @@
       "retrieval_status": "ANSWER",
       "expected_status": "ANSWER",
       "pass": true,
-      "latency_ms": 0.3096
+      "latency_ms": 0.3406
     },
     {
       "question_id": "q_d0_030",
@@ -184,7 +184,7 @@
       "retrieval_status": "ANSWER",
       "expected_status": "ANSWER",
       "pass": true,
-      "latency_ms": 0.2978
+      "latency_ms": 0.3612
     },
     {
       "question_id": "q_d0_033",
@@ -195,7 +195,7 @@
       "retrieval_status": "INSUFFICIENT_DATA",
       "expected_status": "INSUFFICIENT_DATA",
       "pass": true,
-      "latency_ms": 0.6925
+      "latency_ms": 1.0224
     }
   ]
 }

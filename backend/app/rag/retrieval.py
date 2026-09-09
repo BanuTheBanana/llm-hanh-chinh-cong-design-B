@@ -47,7 +47,10 @@ def retrieve(corpus: Corpus, query: RetrievalInput, request_id: UUID) -> Retriev
         names = [proc.title, *proc.aliases] + [
             corpus.sources[s].procedure_code for s in proc.source_ids
         ]
-        if any(name and normalize(name) == q for name in names):
+        # A user normally embeds the procedure name/code in a longer question
+        # (for example "lệ phí của <procedure> là bao nhiêu?"). Treat a full
+        # normalized name phrase as an explicit scope, not only an exact query.
+        if any(name and f" {normalize(name)} " in f" {q} " for name in names):
             exact.add(proc.procedure_id)
     empty = EvidenceBundle(
         request_id=request_id,

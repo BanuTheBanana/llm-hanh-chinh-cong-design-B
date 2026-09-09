@@ -95,7 +95,13 @@ def test_invalid_corpus(dataset_copy, path, change, error):
 
 @pytest.mark.parametrize(
     "query,expected",
-    [("DEMO001", 3), ("làm phiếu sao xanh", 3), ("lam phieu sao xanh", 3), ("quantumxyz", 0)],
+    [
+        ("DEMO001", 3),
+        ("làm phiếu sao xanh", 3),
+        ("lam phieu sao xanh", 3),
+        ("Lệ phí của làm phiếu sao xanh là bao nhiêu?", 3),
+        ("quantumxyz", 0),
+    ],
 )
 def test_exact_alias_and_nohit(corpus, query, expected):
     found = retrieve(corpus, RetrievalInput(query=query), UUID(int=1))
@@ -161,6 +167,13 @@ def test_ambiguity_is_detected_before_top_k_and_across_procedures(corpus, jurisd
     )
     result = retrieve(corpus, RetrievalInput(query="hồ sơ", top_k=1), uuid4())
     assert result.needs_clarification and not result.bundle.evidence
+    scoped = retrieve(
+        corpus,
+        RetrievalInput(query="Lệ phí của thủ tục khác là bao nhiêu?", top_k=1),
+        uuid4(),
+    )
+    assert not scoped.needs_clarification
+    assert scoped.bundle.evidence[0].procedure_id == "proc_other"
 
 
 def response(bundle, **changes):
