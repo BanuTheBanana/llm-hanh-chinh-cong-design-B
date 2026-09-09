@@ -66,6 +66,26 @@ Các metric chỉ đo routing/retrieval, contract, status và citation. Chúng c
 dùng để sửa prompt, RAG hay model. Mọi cải tiến tiếp theo phải thực hiện trên DEV,
 sau đó tạo một release/TEST lock mới theo change control.
 
+#### Routing hardening sau kiểm thử thủ công
+
+Kiểm thử người dùng phát hiện cách hỏi bỏ tiền tố `Thủ tục` bị đánh dấu mơ hồ dù
+đã nêu đúng tên. Router đã được sửa trên DEV: sinh biến thể tên không có tiền tố
+chung, loại từ chỉ intent khỏi query định tuyến, chọn top-1 chỉ khi vượt ngưỡng
+điểm/khoảng cách và ưu tiên tên đầy đủ nhất khi hai tên lồng nhau.
+
+| Gate sau sửa | Kết quả |
+|---|---:|
+| Gọi tên tự nhiên trực tiếp trên 10 thủ tục | 10/10 route đúng |
+| Mẫu hội thoại `Tôi muốn làm ...` trên 10 thủ tục | 10/10 route đúng |
+| Hai câu đăng ký khai sinh từng thất bại | 2/2 `ANSWER`, có citation |
+| Câu thiếu tên thủ tục | `NEED_CLARIFICATION`, 0 nguồn |
+| Câu ngoài corpus | `INSUFFICIENT_DATA`, 0 nguồn |
+
+Các số TEST trong bảng trên là kết quả khóa trước lần hardening và **không được
+chạy lại để chỉnh router**. Muốn công bố metric TEST sau thay đổi phải tạo
+`TEST_V2` mới theo change control; việc này không làm mất giá trị của gate chức
+năng G3 nhưng ngăn tuyên bố quá mức về chất lượng tổng quát.
+
 ### 3. E2E thật
 
 Một câu `ANSWER` thuộc DEV đã chạy qua Web contract → Backend → RAG D2 → Qwen
@@ -95,7 +115,7 @@ local → verifier → PostgreSQL history:
 
 | Module | Kết quả |
 |---|---:|
-| Backend + PostgreSQL migration thật | 143 passed, 1 Windows symlink skip |
+| Backend + PostgreSQL migration thật | 149 passed, 1 Windows symlink skip |
 | AI Service | 65 passed |
 | Data G3 pipeline/release | 7 passed |
 | Web | 11 passed; lint + production build PASS |

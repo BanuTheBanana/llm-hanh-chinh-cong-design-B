@@ -176,7 +176,15 @@ def test_runtime_rejects_a_changed_corpus_under_the_same_version(dataset):
 
 
 @pytest.mark.parametrize(
-    "query", ["Lệ phí của Mẫu Alpha?", "Phí CODE-Alpha là gì?", "Lệ phí Thủ tục hư cấu Alpha?"]
+    "query",
+    [
+        "Lệ phí của Mẫu Alpha?",
+        "Phí CODE-Alpha là gì?",
+        "Lệ phí Thủ tục hư cấu Alpha?",
+        "Hư cấu Alpha có lệ phí gì?",
+        "Tôi muốn làm hư cấu Alpha, lệ phí bao nhiêu?",
+        "Alpha có lệ phí gì?",
+    ],
 )
 def test_route_binding(dataset, query):
     result = retrieve(load(dataset, VERSION, 2), query)
@@ -186,6 +194,17 @@ def test_route_binding(dataset, query):
     assert "source_locator" not in evidence and "source_uri" not in evidence
 
 
+def test_longest_explicit_procedure_name_wins_over_contained_shorter_name(tmp_path):
+    groups = fixture_groups()
+    groups[1][1]["title"] = "Thủ tục hư cấu Alpha mở rộng"
+    data = load(write_dataset(tmp_path, groups), VERSION, 2)
+
+    result = retrieve(data, "Hư cấu Alpha mở rộng có lệ phí gì?")
+
+    assert result["status"] == "ANSWER"
+    assert result["procedure_id"] == "fictional-beta"
+
+
 @pytest.mark.parametrize(
     "query,status",
     [
@@ -193,6 +212,8 @@ def test_route_binding(dataset, query):
         ("Mẫu Alpha lệ phí và nộp ở đâu?", "INSUFFICIENT_DATA"),
         ("Lệ phí Mẫu Alpha và Mẫu Beta?", "NEED_CLARIFICATION"),
         ("Lệ phí thủ tục?", "NEED_CLARIFICATION"),
+        ("Hư cấu có lệ phí gì?", "NEED_CLARIFICATION"),
+        ("Tôi cần chuẩn bị giấy tờ gì?", "NEED_CLARIFICATION"),
         ("zzyyxx", "INSUFFICIENT_DATA"),
     ],
 )

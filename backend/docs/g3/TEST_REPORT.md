@@ -1,4 +1,4 @@
-# Test report — 09/09/2026 (G3 technical foundation)
+# Test report — 10/09/2026 (G3 technical foundation)
 
 ## Báo cáo cập nhật
 
@@ -10,13 +10,15 @@
 
 ## Đã chạy
 
-- Toàn bộ Backend với PostgreSQL test riêng: **143 passed, 1 skipped**.
+- Toàn bộ Backend với PostgreSQL test riêng: **149 passed, 1 skipped**.
 - Skip là test symlink khi Windows không cấp quyền tạo symlink; path guard vẫn có
   test trên môi trường cho phép.
 - Ruff check/format: PASS; migration Alembic thật chạy trong schema test riêng.
 - G3 test bao phủ schema/reference/PII, review/conflict, retrieval/abstention,
   read-only runtime projection, immutable corpus hash và loại gold/TEST khỏi
   serving memory.
+- Routing bỏ được tiền tố chung `Thủ tục`, ưu tiên tên đầy đủ nhất khi tên này
+  chứa tên thủ tục ngắn hơn, dùng ngưỡng top-1/top-2 và vẫn abstain với câu mơ hồ.
 - Repo hygiene: PASS; 223 file được kiểm, không có workbook/private data/model/secret.
 
 Benchmark D2 aggregate và E2E nằm trong

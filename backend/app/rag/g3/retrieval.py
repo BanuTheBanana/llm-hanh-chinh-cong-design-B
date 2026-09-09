@@ -19,6 +19,73 @@ INTENTS = {
     "applicant_scope": ("doi tuong", "ai duoc"),
 }
 
+# These words describe the user's request, not the procedure identity. Keeping
+# them in procedure-name BM25 made generic words such as "hồ sơ" select several
+# unrelated procedures and turned ordinary questions into false ambiguity.
+ROUTING_STOPWORDS = frozenset(
+    {
+        "ai",
+        "bao",
+        "bi",
+        "biet",
+        "can",
+        "cach",
+        "cho",
+        "chuan",
+        "co",
+        "cua",
+        "dia",
+        "duoc",
+        "gi",
+        "han",
+        "hanh",
+        "hay",
+        "hinh",
+        "ho",
+        "lam",
+        "le",
+        "may",
+        "muon",
+        "nao",
+        "ngay",
+        "nhan",
+        "nhieu",
+        "nhung",
+        "nop",
+        "o",
+        "online",
+        "phan",
+        "pham",
+        "phi",
+        "phuong",
+        "qua",
+        "so",
+        "tai",
+        "thanh",
+        "theo",
+        "thoi",
+        "thu",
+        "tiep",
+        "tien",
+        "toi",
+        "to",
+        "tra",
+        "trinh",
+        "truc",
+        "tuc",
+        "tuyen",
+        "vi",
+        "ve",
+        "voi",
+    }
+) | frozenset(
+    token for phrases in INTENTS.values() for phrase in phrases for token in phrase.split()
+)
+GENERIC_PROCEDURE_PREFIXES = ("thu tuc hanh chinh ", "thu tuc ")
+ROUTING_MIN_SCORE = 1.0
+ROUTING_MIN_MARGIN = 0.75
+ROUTING_MIN_RATIO = 1.35
+
 
 def bm25(query, texts):
     docs = [Counter(normalize(text).split()) for text in texts]
@@ -37,6 +104,32 @@ def bm25(query, texts):
                 score += idf * tf * 2.5 / (tf + 1.5 * (0.25 + 0.75 * sum(doc.values()) / avg))
         scores.append(score)
     return scores
+
+
+def procedure_names(data, procedure):
+    """Return normalized names plus safe variants derived from generic prefixes."""
+    raw_names = [procedure["title"], *procedure["aliases"]]
+    raw_names += [
+        data.sources[source_id]["procedure_code"] for source_id in procedure["source_ids"]
+    ]
+    names = set()
+    for raw_name in raw_names:
+        if not raw_name:
+            continue
+        name = normalize(raw_name)
+        if not name:
+            continue
+        names.add(name)
+        for prefix in GENERIC_PROCEDURE_PREFIXES:
+            if name.startswith(prefix):
+                shortened = name.removeprefix(prefix).strip()
+                if len(shortened.split()) >= 2:
+                    names.add(shortened)
+    return sorted(names)
+
+
+def routing_query(query):
+    return " ".join(token for token in normalize(query).split() if token not in ROUTING_STOPWORDS)
 
 
 def retrieve(data, query, top_k=5, procedure_id=None, category=None, as_of=None):
@@ -67,20 +160,44 @@ def retrieve(data, query, top_k=5, procedure_id=None, category=None, as_of=None)
     ]
     exact = []
     for p in pool:
-        names = [p["title"], *p["aliases"]]
-        names += [data.sources[s]["procedure_code"] for s in p["source_ids"]]
-        if any(name and " " + normalize(name) + " " in q for name in names):
-            exact.append(p)
+        matched_names = [name for name in procedure_names(data, p) if " " + name + " " in q]
+        if matched_names:
+            # A long procedure name can legitimately contain another procedure's
+            # shorter name. Prefer the most specific explicit phrase; preserve
+            # clarification when two distinct names have equal specificity.
+            specificity = max(len(name.split()) for name in matched_names)
+            exact.append((specificity, p))
     # Routing includes rejected procedures so an explicit pending title cannot
     # accidentally fall through to a different approved procedure.
     if exact:
-        pool = exact
+        best_specificity = max(specificity for specificity, _ in exact)
+        pool = [p for specificity, p in exact if specificity == best_specificity]
     elif not procedure_id:
+        scoped_query = routing_query(normalized_query)
+        if not scoped_query:
+            return dict(result, status="NEED_CLARIFICATION", reason="PROCEDURE_NOT_SPECIFIED")
         scores = bm25(
-            normalized_query,
-            [" ".join([p["title"], *p["aliases"], p["category_label"]]) for p in pool],
+            scoped_query,
+            [" ".join([*procedure_names(data, p), normalize(p["category_label"])]) for p in pool],
         )
-        pool = [p for p, score in zip(pool, scores) if score > 0]
+        ranked = sorted(
+            ((score, p) for p, score in zip(pool, scores) if score > 0),
+            key=lambda item: (-item[0], item[1]["procedure_id"]),
+        )
+        if not ranked:
+            pool = []
+        elif len(ranked) == 1:
+            pool = [ranked[0][1]] if ranked[0][0] >= ROUTING_MIN_SCORE else []
+        else:
+            top_score, top = ranked[0]
+            second_score = ranked[1][0]
+            dominant = (
+                top_score - second_score >= ROUTING_MIN_MARGIN
+                and top_score / second_score >= ROUTING_MIN_RATIO
+            )
+            if not dominant:
+                return dict(result, status="NEED_CLARIFICATION", reason="AMBIGUOUS_PROCEDURE")
+            pool = [top] if top_score >= ROUTING_MIN_SCORE else []
     if len(pool) > 1:
         return dict(result, status="NEED_CLARIFICATION", reason="AMBIGUOUS_PROCEDURE")
     if not pool:
