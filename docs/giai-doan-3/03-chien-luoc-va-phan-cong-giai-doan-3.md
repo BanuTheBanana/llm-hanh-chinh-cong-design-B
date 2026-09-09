@@ -5,8 +5,8 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.1` |
-| Trạng thái | `G3_C1_TOOLING_READY_HUMAN_REVIEW_REQUIRED` |
+| Phiên bản | `v1.2-integration-audit` |
+| Trạng thái | `G3_CODE_INTEGRATED; D2_RELEASE_BLOCKED_BY_HUMAN_GATES` |
 | Baseline | `main`, tag `g2-v1.0.0` |
 | Nhánh tích hợp | `g3/integration` |
 | Model baseline đề xuất | `Qwen/Qwen3-1.7B`, local, non-thinking |
@@ -172,9 +172,9 @@ Code parser/validator được commit; dữ liệu output tiếp tục ignored. 
 Gate:
 
 - email không xuất hiện trong normalized/log/report;
-- 42 input row được accounting đủ: approved, pending hoặc quarantined;
+- toàn bộ input row thực được accounting đủ: approved, pending hoặc quarantined;
 - không record rỗng, không reference gãy;
-- 4 nhóm duplicate có quyết định con người;
+- mọi nhóm duplicate/conflict do pipeline hiện tại phát hiện có quyết định con người;
 - chạy lại cùng raw phải sinh cùng output/hash.
 
 ### G3-C2 – RAG baseline dữ liệu công ty
@@ -259,10 +259,12 @@ Branch: `g3/data-tu`
 ### Công việc
 
 1. Không sửa file Excel gốc; ghi hash và version.
-2. Lập mapping 12 cột Excel → schema chuẩn.
+2. Lập mapping chín cột nghiệp vụ C–K → schema chuẩn; build phải dừng nếu cột chưa
+   mapping có dữ liệu.
 3. Loại email khỏi normalized data; timestamp chỉ giữ ở audit metadata nếu cần.
 4. Normalize NFC, khoảng trắng, bullet, category, submission method, fee/time.
-5. Lập `conflicts.jsonl` cho 4 nhóm duplicate; hỏi người nghiệp vụ, không tự chọn.
+5. Lập `conflicts.jsonl` cho mọi nhóm duplicate do build hiện tại phát hiện; hỏi
+   người nghiệp vụ, không tự chọn và không tái sử dụng con số từ audit cũ.
 6. Bổ sung source/procedure code/jurisdiction/effective/reviewer hoặc để `null` +
    `PENDING_REVIEW`, không bịa.
 7. Chọn 8–10 thủ tục ưu tiên phủ Hộ tịch, Văn hóa–Xã hội, Kinh tế–Hạ tầng và ít
@@ -283,7 +285,7 @@ Branch: `g3/data-tu`
 
 - PII scan sạch;
 - deterministic build;
-- 42/42 row accounted;
+- toàn bộ dòng thực do local preflight đếm được đều được accounting;
 - duplicate resolution có chữ ký/vai trò reviewer;
 - mọi gold answer point trỏ được về fragment/source;
 - không đưa raw hoặc derived company content vào commit/AI chat.
@@ -295,7 +297,7 @@ Branch: `g3/data-tu`
 code parser/validator; raw và output company phải nằm ở path ignored. Không in,
 log hoặc commit email. Không dùng LLM/API ngoài để sửa dữ kiện. Chuẩn hóa phải
 deterministic và tạo quarantine cho conflict/missing provenance. Không tự chuyển
-PENDING thành APPROVED. Trước khi kết thúc, chứng minh 42/42 input row được
+PENDING thành APPROVED. Trước khi kết thúc, chứng minh toàn bộ input row thực được
 accounting, PII scan sạch, build lặp lại cùng hash và gold references hợp lệ.
 ```
 
@@ -438,7 +440,7 @@ Không ai cần chờ hoàn toàn:
 | Task | Trạng thái | Bằng chứng/việc còn lại |
 |---|---|---|
 | G3-D01 – parser/validator | `TECHNICALLY_COMPLETE` | Test hư cấu chứng minh schema, reference, PII, conflict và deterministic; cần Tú chạy local trên workbook thật |
-| G3-D02 – conflict/provenance | `BLOCKED_HUMAN_REVIEW` | Bốn nhóm conflict và nguồn/hiệu lực phải do người nghiệp vụ quyết định |
+| G3-D02 – conflict/provenance | `BLOCKED_HUMAN_REVIEW` | Mọi conflict do build hiện tại phát hiện và nguồn/hiệu lực phải do người nghiệp vụ quyết định |
 | G3-D03 – gold DEV/TEST | `DRAFT_GENERATOR_COMPLETE` | Gold đúng schema và split theo procedure; Hoan/người thứ hai phải duyệt expected point/citation rồi khóa TEST |
 
 Chi tiết lệnh chạy và ranh giới bảo mật nằm trong
@@ -471,11 +473,12 @@ G3 chỉ hoàn thành khi:
 
 ## 12. Việc bắt đầu ngay
 
-1. Tú chạy công cụ `G3-D01` trên máy local, giữ output private và bàn giao báo cáo
-   count/hash; implementation parser/validator đã hoàn tất.
-2. Minh làm `G3-R01`: importer từ normalized fixture theo schema khóa.
-3. Hoan làm `G3-A01`: local model server spike và provider adapter.
-4. Người nghiệp vụ xử lý `G3-D02`; Hoan/người thứ hai review gold `G3-D03`.
-5. Cả nhóm hỏi công ty bảy câu governance trong file audit.
-6. Chưa tải model hoặc train bằng dataset công ty trên cloud ngoài khi chưa có
-   xác nhận chính sách.
+1. Người được phép chạy `G3-D01` trên đúng workbook, giữ output private và bàn giao
+   báo cáo count/hash; implementation parser/validator đã hoàn tất.
+2. Nếu build báo cột chưa mapping có dữ liệu, khóa ý nghĩa cột đó rồi mới sửa
+   contract/parser; không bỏ cột để chạy cho xanh.
+3. Người nghiệp vụ xử lý `G3-D02`; Hoan/người thứ hai review gold `G3-D03`.
+4. Sau approved subset, Minh mở transactional ingest/pin/rollback và đo R02 trên
+   TEST thật; hiện chỉ có preflight/retrieval fixture.
+5. Sau R02/D03, Hoan chạy A02 trên Qwen local; cả nhóm mới nối I01 D2 và ký A03.
+6. Chưa train hoặc gửi dataset công ty ra cloud ngoài khi chưa có xác nhận chính sách.

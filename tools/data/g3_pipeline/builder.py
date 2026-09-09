@@ -395,10 +395,22 @@ def build_dataset(
     except StopIteration as exc:
         raise BuildError("WORKBOOK_EMPTY") from exc
     columns = map_headers(headers)
+    mapped_indexes = {column.index for column in columns.values()}
+    unmapped_indexes = [
+        index
+        for index, value in enumerate(headers, 1)
+        if nfc_text(value) and index not in mapped_indexes
+    ]
 
     source_rows: list[SourceRow] = []
     skipped_empty_rows = 0
     for row_number, row in enumerate(rows, start=2):
+        unsupported_with_data = [
+            index for index in unmapped_indexes if index <= len(row) and nfc_text(row[index - 1])
+        ]
+        if unsupported_with_data:
+            indexes = ",".join(str(index) for index in unsupported_with_data)
+            raise BuildError(f"UNSUPPORTED_COLUMNS_WITH_DATA_AT_INDEX:{indexes}")
         values: dict[str, str] = {}
         raw_values: dict[str, str] = {}
         for field, column in columns.items():

@@ -50,6 +50,18 @@ fixture hư cấu và report đã loại nội dung nhạy cảm được lên G
 - Hash dùng SHA-256 chữ thường trên bytes/text đã quy định.
 - File phải sort ổn định theo primary ID để build deterministic.
 
+Quy ước hash cụ thể của `g3-preprocess-v3`:
+
+- `workbook_sha256`: SHA-256 trên bytes nguyên bản của file workbook;
+- `raw_cell_sha256`: chuyển giá trị ô bằng `str(value)` (ô trống là chuỗi rỗng),
+  sau đó SHA-256 trên UTF-8, trước mọi chuẩn hóa văn bản;
+- fragment `content_sha256`: SHA-256 trên UTF-8 của `fragment.text` sau NFC/trim;
+- source `content_sha256`: tạo object canonical từ toàn bộ field nguồn không PII mà
+  parser hỗ trợ (`title`, `category`, hình thức, hồ sơ, thời gian, phí, nơi nhận,
+  ghi chú, attachment và legacy status); field không tồn tại là chuỗi rỗng, giá trị
+  đã NFC/trim, JSON dùng `sort_keys` và không khoảng trắng, rồi SHA-256 trên UTF-8;
+- email, nếu có ở biến thể input khác, không tham gia source snapshot/hash nội dung.
+
 ### ID deterministic
 
 | ID | Quy tắc |
@@ -65,12 +77,15 @@ fixture hư cấu và report đã loại nội dung nhạy cảm được lên G
 cuối. Nếu sau review đổi title, phải giữ ID cũ trong `aliases` hoặc ghi migration;
 không âm thầm tạo thủ tục mới.
 
-## 2. Mapping 12 cột Excel
+## 2. Mapping 9 cột nghiệp vụ Excel (C–K)
+
+Workbook được bàn giao cho nhóm có chín cột nghiệp vụ từ C đến K. Nó không có
+email hay timestamp. Pipeline nhận diện theo tên header, không theo chữ cái cột,
+và cũng chấp nhận bản xuất biểu mẫu có thêm metadata; nếu gặp email thì phải DROP,
+timestamp chỉ được dùng làm metadata audit.
 
 | Cột Excel | Đích | Quy tắc |
 |---|---|---|
-| Dấu thời gian | `SourceManifest.collected_at` | Chỉ là lúc nhập form; không dùng làm effective date |
-| Địa chỉ email | DROP | Không hash để dùng lại, không log, không đưa normalized |
 | Tên thủ tục hành chính | `ProcedureRecord.title`, aliases | Normalize; duplicate vào conflict register |
 | Lĩnh vực | `category_code`, `category_label` | Map taxonomy; hai cách viết Giáo dục về một code |
 | Hình thức nộp | `submission_methods` | `Trực tiếp→DIRECT`, `Trực tuyến→ONLINE`, `Cả hai→[DIRECT,ONLINE]` |
@@ -79,8 +94,15 @@ không âm thầm tạo thủ tục mới.
 | Lệ phí | `fees` + fragment | Luôn giữ `raw_text`; `amount_vnd=null` nếu có nhiều điều kiện/không parse chắc |
 | Địa điểm tiếp nhận | `receiving_authority` + jurisdiction | Không suy luận địa bàn ngoài text có sẵn |
 | Ghi chú | fragment `OTHER` | Chỉ tạo khi có nội dung; không trộn vào field khác |
+| Cột K | Chưa ingest cho tới khi chốt header/ý nghĩa | Build dừng nếu cột chưa mapping có dữ liệu; cột rỗng toàn bộ có thể bỏ |
+
+Hai cột metadata tùy chọn chỉ dành cho biến thể đầu vào khác:
+
+| Cột tùy chọn | Đích | Quy tắc |
+|---|---|---|
+| Dấu thời gian | `SourceManifest.collected_at` | Chỉ là lúc nhập form; không dùng làm effective date |
+| Địa chỉ email | DROP | Không hash để dùng lại, không log, không đưa normalized |
 | File biểu mẫu | source/attachment pending | Chỉ dùng sau khi quyền truy cập, snapshot và hash được xác nhận |
-| trạng thái | audit legacy only | `Xong` không đồng nghĩa `APPROVED_FOR_DEMO` |
 
 Các field `applicant_scope`, `steps`, `legal_bases`, `effective_dates`,
 `procedure_code`, `issuing_authority` không có cột nguồn tương ứng. Chúng phải là

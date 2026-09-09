@@ -5,7 +5,7 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản công cụ | `g3-preprocess-v2` |
+| Phiên bản công cụ | `g3-preprocess-v3` |
 | Contract | `g3-data-v1` |
 | Trạng thái kỹ thuật | Parser/validator/gold draft đã có; chờ review nghiệp vụ |
 | Phân loại dữ liệu | `D2_COMPANY_REAL`, chỉ xử lý local |
@@ -74,7 +74,10 @@ Hoan/người thứ hai kiểm từng expected point và citation.
 
 ### Parser chịu trách nhiệm
 
-- nhận diện 12 cột bằng header, không phụ thuộc vị trí C–K;
+- nhận diện chín cột nghiệp vụ C–K bằng header, không phụ thuộc vị trí vật lý;
+- chấp nhận metadata tùy chọn từ bản export khác nhưng luôn loại email khỏi output;
+- dừng với `UNSUPPORTED_COLUMNS_WITH_DATA_AT_INDEX` nếu cột chưa có mapping chứa
+  dữ liệu; chỉ bỏ qua cột có header nhưng rỗng toàn bộ;
 - bỏ dòng trống trong used range;
 - không xuất email;
 - NFC normalize và tạo ID/hash ổn định;

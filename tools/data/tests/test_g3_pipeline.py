@@ -3,9 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from openpyxl import Workbook
 
-from g3_pipeline.builder import build_dataset, verify_deterministic
+from g3_pipeline.builder import BuildError, build_dataset, verify_deterministic
 from g3_pipeline.validator import validate_dataset
 
 HEADERS = [
@@ -22,6 +23,8 @@ HEADERS = [
     "File biểu mẫu",
     "Trạng thái",
 ]
+
+BUSINESS_HEADERS = HEADERS[2:11]
 
 
 def create_workbook(path: Path) -> None:
@@ -97,6 +100,28 @@ def create_workbook(path: Path) -> None:
     workbook.save(path)
 
 
+def create_nine_column_workbook(path: Path) -> None:
+    """Build a supported nine-business-column fixture without form metadata."""
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Dữ liệu mẫu 9 cột"
+    sheet.append(BUSINESS_HEADERS)
+    sheet.append(
+        [
+            "Thủ tục Mặt Trăng",
+            "Hộ tịch",
+            "Cả hai",
+            "- Giấy tờ Alpha\n- Giấy tờ Beta",
+            "3 ngày làm việc",
+            "Không thu phí",
+            "Bộ phận Một cửa",
+            None,
+            None,
+        ]
+    )
+    workbook.save(path)
+
+
 def schema_path() -> Path:
     return Path(__file__).parents[3] / "docs/giai-doan-3/schema/data-contract-v1.schema.json"
 
@@ -141,6 +166,54 @@ def test_review_is_never_approved_automatically(tmp_path: Path) -> None:
     procedures = load_jsonl(result.dataset_dir / "normalized/procedures.jsonl")
     statuses = {row["review"]["status"] for row in procedures}
     assert statuses == {"PENDING_REVIEW", "QUARANTINED"}
+
+
+def test_build_accepts_nine_recognized_business_columns_without_form_metadata(
+    tmp_path: Path,
+) -> None:
+    workbook = tmp_path / "synthetic-nine-columns.xlsx"
+    create_nine_column_workbook(workbook)
+
+    result = build_dataset(workbook, tmp_path / "private")
+    report = validate_dataset(
+        result.dataset_dir,
+        schema_path(),
+        mode="preflight",
+        expected_source_count=1,
+        workbook_path=workbook,
+    )
+    sources = load_jsonl(result.dataset_dir / "source_manifest.jsonl")
+
+    assert report["status"] == "PASS", report
+    assert report["counts"]["sources"] == 1
+    assert sources[0]["collected_at"] is None
+
+
+def test_unknown_nonempty_column_is_rejected_instead_of_silently_dropped(
+    tmp_path: Path,
+) -> None:
+    workbook_path = tmp_path / "synthetic-unknown-column.xlsx"
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.append([*BUSINESS_HEADERS, "Cột nghiệp vụ chưa có mapping"])
+    sheet.append(
+        [
+            "Thủ tục Mặt Trăng",
+            "Hộ tịch",
+            "Trực tiếp",
+            "Giấy tờ Alpha",
+            "3 ngày làm việc",
+            "Không thu phí",
+            "Bộ phận Một cửa",
+            None,
+            None,
+            "Dữ kiện không được phép bỏ qua",
+        ]
+    )
+    workbook.save(workbook_path)
+
+    with pytest.raises(BuildError, match="UNSUPPORTED_COLUMNS_WITH_DATA_AT_INDEX:10"):
+        build_dataset(workbook_path, tmp_path / "private")
 
 
 def test_validator_rejects_pii_in_gold(tmp_path: Path) -> None:

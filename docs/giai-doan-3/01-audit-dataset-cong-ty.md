@@ -4,156 +4,138 @@
 
 | Trường | Nội dung |
 |---|---|
-| Ngày audit | 09/09/2026 |
-| Phiên bản | `v1.0` |
-| Trạng thái | `AUDITED_NOT_READY_FOR_RAG_OR_SFT` |
-| Phân loại đề xuất | `D2_COMPANY_REAL` |
-| Cách kiểm tra | Chỉ đọc workbook local; không gọi API ngoài |
-| SHA-256 | `9c38dde8f496f853f72b5bf19d0c538d36503cfb52da1ec03d08bfcbfb9dec03` |
+| Cập nhật | 09/09/2026 |
+| Phiên bản | `v1.1-input-shape-correction` |
+| Trạng thái | `INPUT_SHAPE_CORRECTED; LOCAL_PREFLIGHT_REQUIRED` |
+| Phân loại | `D2_COMPANY_REAL` |
+| Phạm vi xác nhận | Theo workbook nhóm bàn giao: 9 cột nghiệp vụ C–K, không có email/timestamp |
+| Fingerprint và số liệu nội dung | Phải sinh lại bằng pipeline local; không dùng số liệu của audit v1.0 |
 
-Raw workbook nằm trong `dataset/` và đã được chặn bởi `.gitignore`. Không đổi
-tên, sửa trực tiếp hay commit file gốc. Mọi output phát sinh từ nội dung công ty
-cũng phải nằm ở khu vực private/ignored cho tới khi công ty cho phép công bố.
+Raw workbook nằm trong `dataset/` và được `.gitignore` chặn. Không đổi tên, sửa
+trực tiếp hay commit file gốc. Mọi output phát sinh từ nội dung công ty cũng phải
+nằm dưới `data/company_private/`.
+
+> Đính chính bắt buộc: audit v1.0 đã mô tả nhầm một bản xuất biểu mẫu 12 cột có
+> email/timestamp. Đó không phải shape của workbook hiện tại. Các kết luận về email,
+> timestamp, trạng thái `Xong`, số link, duplicate và SHA-256 trong bản cũ không được
+> dùng làm bằng chứng cho file hiện tại.
 
 ## Tổng
 
-Đây là **bảng tổng hợp tri thức thủ tục**, không phải dataset huấn luyện LLM. Nó
-có thể trở thành đầu vào tốt cho RAG sau khi chuẩn hóa và xác minh, nhưng chưa đủ
-điều kiện để đưa thẳng vào chatbot hoặc fine-tune Qwen.
+Đây là bảng tri thức thủ tục hành chính, không phải dataset huấn luyện LLM. Nó là
+đầu vào cho RAG sau khi được chuẩn hóa và review; không đưa thẳng vào Qwen để
+fine-tune.
 
 ```text
-Excel gốc
-→ bỏ cột định danh người nhập
-→ chuẩn hóa Unicode/field/type
-→ xử lý bản ghi trùng và xung đột
-→ bổ sung nguồn, phiên bản, hiệu lực, phạm vi, reviewer
-→ ProcedureRecord + ProcedureFragment
-→ gold questions tách riêng
-→ ingest RAG
+Excel 9 cột private
+→ nhận diện header + chặn cột chưa mapping
+→ chuẩn hóa deterministic
+→ ProcedureRecord + ProcedureFragment + conflict register
+→ review nguồn/xung đột
+→ gold DEV/TEST review độc lập
+→ RAG
+→ Qwen local zero-shot
 ```
 
 ## Phân
 
-### 1. Thống kê cấu trúc
+### 1. Shape đầu vào đã chốt
 
-| Chỉ số | Kết quả |
-|---|---:|
-| Sheet | 1 |
-| Dòng dữ liệu thực | 42 |
-| Cột có nghĩa | 12 |
-| Tên thủ tục exact | 40 |
-| Tên thủ tục sau normalize | 38 |
-| Nhãn lĩnh vực hiện có | 7 |
-| Email người nhập khác nhau | 9 |
-| Dòng có timestamp | 36/42 |
-| Dòng thiếu nơi tiếp nhận | 10/42 |
-| Dòng có ghi chú | 2/42 |
-| Dòng có link biểu mẫu | 3/42 |
-| Dòng trạng thái `Xong` | 42/42 |
+Nhóm xác nhận workbook có chín cột nghiệp vụ từ C đến K. Các cột đã nhìn rõ gồm:
 
-Khoảng thời gian trong cột “Dấu thời gian” là 07/10/2025–18/10/2025. Đây chỉ
-là thời gian nhập biểu mẫu, **không phải ngày hiệu lực hay ngày xác minh thủ tục**.
+1. Tên thủ tục hành chính.
+2. Lĩnh vực.
+3. Hình thức nộp.
+4. Thành phần hồ sơ.
+5. Thời gian giải quyết.
+6. Lệ phí.
+7. Địa điểm tiếp nhận hồ sơ trực tiếp (nếu có).
+8. Ghi chú.
+9. Cột K phải được nhận diện bằng đúng header khi chạy local.
 
-Các nhóm lĩnh vực:
+Pipeline map theo tên header, không theo vị trí. Nếu cột K hoặc bất kỳ cột chưa có
+mapping nào chứa dữ liệu, build phải dừng bằng
+`UNSUPPORTED_COLUMNS_WITH_DATA_AT_INDEX`; một cột chỉ có header nhưng rỗng toàn bộ
+có thể được bỏ. Biến thể đầu vào khác có email/timestamp vẫn được nhận diện, nhưng
+email luôn bị DROP và timestamp không bao giờ được coi là ngày hiệu lực.
 
-| Nhãn hiện tại | Số dòng |
-|---|---:|
-| Hộ tịch | 6 |
-| Lao động – Tiền lương | 1 |
-| Văn hóa – Xã hội | 19 |
-| Kinh tế – Hạ tầng và đô thị | 13 |
-| Giáo dục và đào tạo – hai cách viết | 2 |
-| Chứng thực – sao y | 1 |
+### 2. Những gì chỉ được kết luận sau local preflight
 
-### 2. Điểm tốt
+Không tái sử dụng các con số của audit cũ. Pipeline phải sinh báo cáo mới cho đúng
+workbook hiện tại:
 
-- 42/42 dòng có tên thủ tục, lĩnh vực, hình thức nộp, thành phần hồ sơ, thời gian,
-  lệ phí và trạng thái.
-- Nội dung phủ nhiều nhóm hành chính công thực tế.
-- Nhiều ô “Thành phần hồ sơ” khá chi tiết, phù hợp tách thành fragment theo field.
-- Hình thức nộp đã có ba giá trị dễ chuẩn hóa: trực tiếp, trực tuyến, cả hai.
-- Quy mô nhỏ, phù hợp làm baseline có thể kiểm tra thủ công trước khi mở rộng.
+- SHA-256 nguyên file và `dataset_version`;
+- số dòng nguồn thực, số dòng trống bị bỏ;
+- số thủ tục sau normalize;
+- phân bố lĩnh vực;
+- số field thiếu theo loại;
+- số nhóm title trùng/xung đột;
+- số fragment và gold draft;
+- schema/reference/PII/deterministic result.
 
-### 3. Vấn đề phải xử lý
+Báo cáo chỉ chứa count/hash/error code, không chứa nội dung ô hoặc đường dẫn private.
 
-| Mức | Vấn đề | Ảnh hưởng | Xử lý bắt buộc |
-|---|---|---|---|
-| Blocker | Có email người nhập ở 42/42 dòng | Rò PII/metadata nhân sự | Loại khỏi mọi normalized, log, prompt và report |
-| Blocker | Không có URL/căn cứ nguồn chính thức | Không kiểm tra được claim/citation | Yêu cầu source register hoặc reviewer nghiệp vụ xác nhận |
-| Blocker | Không có procedure code/version/effective date | Nhầm thủ tục hoặc trả thông tin cũ | Bổ sung mã ổn định, phiên bản và thời gian hiệu lực |
-| High | 4 nhóm tên sau normalize bị trùng và nội dung xung đột | Ingest trùng, retrieval trả hai đáp án | Review từng cặp; merge hoặc version, không tự chọn |
-| High | Phạm vi địa phương chưa thành field rõ | Có thể áp dụng nhầm nơi | Tách jurisdiction/receiving authority |
-| High | Lệ phí vừa string vừa number | So sánh/checklist sai | Parse thành cấu trúc amount/currency/condition/raw_text |
-| Medium | Hai cách viết lĩnh vực Giáo dục | Filter bị tách | Map vào taxonomy canonical |
-| Medium | 6 dòng thiếu timestamp nhập | Audit trail không hoàn chỉnh | Giữ null; không tự điền |
-| Medium | 10 dòng thiếu nơi tiếp nhận | Không thể trả lời “nộp ở đâu” | `missing_fields` và abstain cho claim này |
-| Medium | Dấu `?` đang được dùng như bullet ở một số ô | Chunk/answer xấu | Chuẩn hóa thành danh sách, kiểm tra không mất câu |
-| Medium | 6 ô hồ sơ dài hơn 1.000 ký tự | Retrieval field lớn, khó cite chính xác | Tách theo nhóm giấy tờ/trường hợp ngoại lệ |
-| Medium | 3 link Google Drive biểu mẫu | Quyền truy cập/phiên bản không bảo đảm | Tải snapshot khi được phép, hash và gắn source ID |
-| Low | 100 dòng trống trong used range | Parser dễ tạo record rỗng | Bỏ dòng rỗng có kiểm thử |
+### 3. Rủi ro nghiệp vụ vẫn còn dù file không có email
 
-Bốn nhóm trùng/xung đột nằm ở các dòng Excel:
+| Mức | Vấn đề | Cách xử lý |
+|---|---|---|
+| Blocker | Chưa có nguồn/căn cứ chính thức đã xác nhận | Source register hoặc reviewer nghiệp vụ xác nhận nguồn nội bộ |
+| Blocker | Chưa có procedure code/version/effective date đáng tin cậy | Để `null` + `missing_fields`; không tự suy đoán |
+| High | Phạm vi địa phương có thể chỉ nằm trong text | Tách `jurisdiction` và `receiving_authority`, review trước khi dùng |
+| High | Tên trùng có thể chứa nội dung khác nhau | Tạo conflict `OPEN`, procedure `QUARANTINED`, con người quyết định |
+| High | Cột chưa mapping có thể bị mất dữ liệu | Build fail-safe, bổ sung mapping qua change control |
+| Medium | Lệ phí/thời gian có nhiều điều kiện | Giữ `raw_text`; số parse không chắc phải là `null` |
+| Medium | Thành phần hồ sơ dài hoặc có ngoại lệ | Fragment theo field/nhóm nghĩa; reviewer kiểm tra không mất điều kiện |
+| Medium | Nơi tiếp nhận hoặc field khác bị trống | Khai báo `missing_fields`; câu hỏi tương ứng phải abstain |
 
-1. Trợ cấp hưu trí xã hội: 9 và 21.
-2. Xác định mức độ khuyết tật: 10 và 24.
-3. Trợ cấp thờ cúng liệt sĩ: 12 và 16.
-4. Trợ cấp khi người có công từ trần: 15 và 20.
+Không có email trong workbook hiện tại không đồng nghĩa dữ liệu tự động an toàn:
+nội dung tự do vẫn phải qua PII/secret scan và review thủ công.
 
-Không được hợp nhất chỉ bằng fuzzy matching. Một cặp có thể là bản cập nhật,
-khác cấp xử lý hoặc khác đối tượng áp dụng.
+### 4. Trường còn thiếu so với RAG production
 
-### 4. Trường còn thiếu so với contract RAG
+Nếu workbook không cung cấp thì giữ thiếu rõ ràng, không bịa:
 
-Workbook chưa có các field sau:
-
-- `procedure_id`/mã thủ tục ổn định;
-- `source_id`, `source_url`, tên cơ quan ban hành;
+- mã thủ tục chính thức và cơ quan ban hành;
+- URL/snapshot nguồn được phép hiển thị;
 - `jurisdiction` chuẩn hóa;
-- `effective_from`, `effective_to`, `last_verified_at`;
+- ngày hiệu lực, hết hiệu lực và kiểm tra gần nhất;
 - căn cứ pháp lý;
-- đối tượng/điều kiện áp dụng tách riêng;
-- trình tự thực hiện tách riêng;
-- kết quả đầu ra của thủ tục;
-- reviewer và `review_status`;
-- hash/snapshot của biểu mẫu đính kèm.
-
-Nếu công ty không có URL công khai nhưng coi bảng là nguồn nội bộ đã duyệt, cần
-thêm `source_type=COMPANY_APPROVED_INTERNAL`, tên người/vai trò duyệt và version.
-Giao diện phải hiển thị đúng loại nguồn nội bộ, không giả URL chính thức.
+- đối tượng/điều kiện áp dụng;
+- trình tự thực hiện;
+- reviewer và trạng thái phê duyệt.
 
 ### 5. Mức sẵn sàng
 
-| Mục đích | Sẵn sàng? | Lý do |
-|---|---|---|
-| Viết parser/preprocessor | Có | Schema và lỗi đã nhìn thấy rõ |
-| RAG thử nghiệm private | Có điều kiện | Chỉ dùng record đã loại PII và đánh dấu unverified |
-| Demo như hướng dẫn thật | Chưa | Thiếu provenance/effective/reviewer |
-| Tạo gold evaluation | Có điều kiện | Cần reviewer khác người viết answer |
-| Fine-tune trực tiếp từ Excel | Không | Không có instruction-output pairs; dễ học thuộc dữ kiện chưa kiểm chứng |
-| Production | Không | Chưa có governance, nghiệp vụ và freshness policy |
+| Mục đích | Trạng thái |
+|---|---|
+| Parser/validator trên fixture 9 cột | Sẵn sàng kỹ thuật |
+| Build workbook thật | Chờ người được phép chạy local và xử lý header chưa mapping nếu có |
+| RAG fixture | Sẵn sàng kỹ thuật |
+| RAG company demo | Chờ approved subset và source review |
+| Gold TEST | Chờ reviewer thứ hai và đóng băng theo procedure |
+| Fine-tune | Chưa có bằng chứng cần thiết; tiếp tục zero-shot baseline |
+| Production | Chưa sẵn sàng |
 
 ## Hợp
 
 ### Kết luận
 
-Dataset cần **preprocessing chuyên sâu ở tầng dữ liệu**, nhưng chưa cần fine-tune
-model. Thứ tự đúng là:
+Phần Tú được tách thành hai lớp:
 
-1. Bảo vệ raw và lập source register.
-2. Tạo preprocessor deterministic, không dùng Qwen để “tự sửa sự thật”.
-3. Tú cùng người nghiệp vụ xử lý 4 nhóm xung đột và bổ sung provenance.
-4. Minh ingest các record `APPROVED`; record thiếu field vẫn lưu nhưng claim tương
-   ứng phải abstain.
-5. Tạo gold set và chạy template/RAG baseline.
-6. Hoan chạy Qwen3-1.7B local zero-shot rồi phân tích lỗi.
-7. Chỉ tạo SFT/QLoRA dataset khi generation vẫn là bottleneck.
+- lớp kỹ thuật: parser/validator/gold draft, test 9 cột, kiểm soát PII, conflict và
+  deterministic build;
+- lớp nghiệp vụ: xác nhận cột K, nguồn, hiệu lực, conflict, approved subset và gold.
 
-### Câu hỏi cần công ty xác nhận
+AI coding agent có thể hoàn tất lớp kỹ thuật nhưng không được tự ký lớp nghiệp vụ.
+Sau khi người có quyền chạy pipeline và review output private, Minh mới mở ingest,
+Hoan mới chạy benchmark Qwen trên D2.
 
-1. Bảng này có phải nguồn nội bộ đã được nghiệp vụ duyệt không?
-2. Có được lưu normalized content trong Git private hay chỉ ở máy/server nội bộ?
-3. Có được gửi bất kỳ phần nào ra hosted API không? Mặc định của dự án là không.
-4. 4 cặp trùng là bản cập nhật, khác địa bàn hay nhập trùng?
-5. Nguồn gốc/căn cứ và ngày kiểm tra gần nhất của từng thủ tục là gì?
-6. Ai có quyền ký `APPROVED_FOR_DEMO` và `APPROVED_FOR_PRODUCTION`?
-7. 3 file biểu mẫu Google Drive có được tải, lưu snapshot và phân phối nội bộ không?
+### Câu hỏi cần công ty/mentor xác nhận
+
+1. Header đầy đủ và ý nghĩa nghiệp vụ của cột K là gì?
+2. Workbook này có phải nguồn nội bộ đã được duyệt không?
+3. Ai được ký `APPROVED_FOR_DEMO` và `APPROVED_FOR_PRODUCTION`?
+4. Có được lưu normalized D2 trong Git private hay chỉ máy/server nội bộ?
+5. Có được gửi bất kỳ phần D2 nào ra hosted API không? Mặc định dự án là không.
+6. Nguồn gốc, phạm vi và ngày kiểm tra gần nhất của từng thủ tục là gì?
+7. Chính sách cập nhật/freshness và thu hồi corpus cũ là gì?

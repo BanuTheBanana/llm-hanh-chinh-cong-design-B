@@ -39,11 +39,11 @@ khi chạy đúng artifact model và TEST đã khóa từ Tú + retrieval output
 
 ### Kết luận audit đầu vào G3
 
-Workbook công ty hiện có 42 bản ghi, tương ứng 38 tên thủ tục sau chuẩn hóa,
-thuộc 7 nhãn lĩnh vực. Dữ liệu đã có thành phần hồ sơ, thời gian, lệ phí và hình
-thức nộp nhưng có email người nhập, 4 nhóm tên thủ tục trùng/xung đột, kiểu lệ phí
-không đồng nhất và chưa có procedure code, URL/căn cứ nguồn, phạm vi hiệu lực hay
-ngày xác minh. Vì vậy:
+Audit shape đã được đính chính thành chín cột nghiệp vụ C–K không có
+email/timestamp. Số dòng thực, số thủ tục sau chuẩn hóa, phân bố lĩnh vực, số nhóm
+trùng/xung đột và mọi fingerprint phải được pipeline hiện tại đo lại trên đúng
+workbook; không tái sử dụng số liệu từ audit nhầm trước đó. Dữ liệu chưa chứng minh
+có procedure code, URL/căn cứ nguồn, phạm vi hiệu lực hay ngày xác minh. Vì vậy:
 
 ```text
 KHÔNG đưa Excel thẳng vào model
