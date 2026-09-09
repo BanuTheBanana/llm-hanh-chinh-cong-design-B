@@ -30,6 +30,12 @@ def is_below(path: Path, root: Path) -> bool:
     return path == root or root in path.parents
 
 
+def is_forbidden_company_data(path: Path) -> bool:
+    return path.suffix.lower() in FORBIDDEN_DATA_SUFFIXES or any(
+        is_below(path, root) for root in FORBIDDEN_DATA_ROOTS
+    )
+
+
 def repository_paths() -> list[Path]:
     result = subprocess.run(
         ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
@@ -44,22 +50,13 @@ def main() -> int:
     paths = repository_paths()
 
     for path in paths:
-        if (
-            path.suffix.lower() in {".xlsx", ".xls", ".xlsm"}
-            or "company_private" in path.parts
-            or "dataset" in path.parts
-        ):
+        if is_forbidden_company_data(path):
             findings.append("COMPANY_PRIVATE_FILE_FORBIDDEN (path withheld)")
             continue  # Do not read company content, even when force-added to Git.
         if path.name.startswith(".env") and path.name != ".env.example":
             findings.append(f"{path}: local environment file is tracked")
         if path.suffix.lower() in {".key", ".p12", ".pfx"}:
             findings.append(f"{path}: private credential file type is tracked")
-        if path.suffix.lower() in FORBIDDEN_DATA_SUFFIXES:
-            findings.append(f"{path}: spreadsheet source data must not be tracked")
-        if any(is_below(path, root) for root in FORBIDDEN_DATA_ROOTS):
-            findings.append(f"{path}: private or derived company data path is tracked")
-
         try:
             data = path.read_bytes()
         except FileNotFoundError:
