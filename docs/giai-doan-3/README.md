@@ -1,0 +1,28 @@
+# Chỉ mục Giai đoạn 3
+
+## Báo cáo cập nhật
+
+| Trường | Nội dung |
+|---|---|
+| Cập nhật gần nhất | 09/09/2026 |
+| Phiên bản | `v1.0` |
+| Trạng thái | `G3_READY_TO_START_CHECKPOINT_0` |
+
+## Tổng
+
+G3 đưa dữ liệu công ty vào pipeline private, đo RAG thật và thay grounded template
+bằng Qwen3-1.7B chạy local. Không fine-tune trước khi data/retrieval/zero-shot
+baseline chứng minh model là bottleneck.
+
+## Phân
+
+1. [Audit dataset công ty](01-audit-dataset-cong-ty.md).
+2. [Chiến lược và phân công G3](03-chien-luoc-va-phan-cong-giai-doan-3.md).
+3. [Contract grounded hiện tại](../contracts-g2.md).
+4. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
+
+## Hợp
+
+Thứ tự làm: governance → preprocess → review → RAG → gold set → Qwen local
+zero-shot → error analysis → QLoRA có điều kiện. Raw và derived company data không
+được commit lên GitHub.

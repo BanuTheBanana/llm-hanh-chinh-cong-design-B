@@ -10,10 +10,10 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v2.0` |
-| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_COMPLETED_SYNTHETIC_SCOPE` |
+| Phiên bản | `v2.1` |
+| Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_COMPLETED_SYNTHETIC_SCOPE`; `G3_DATA_AUDIT_AND_LOCAL_BASELINE` |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
-| Thay đổi lần này | Chốt G2 theo phạm vi demo kỹ thuật bằng dataset v1 giả lập; dữ liệu công ty, D1 công khai và hosted/local model chuyển sang mốc tiếp theo |
+| Thay đổi lần này | Đã nhận và audit workbook công ty; G3 ưu tiên governance → preprocessing → RAG baseline → Qwen3-1.7B local zero-shot → chỉ QLoRA khi model là bottleneck |
 
 Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](parked/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; sơ đồ nằm trong [`architecture/`](architecture/README.md).
 
@@ -21,6 +21,27 @@ Hồ sơ thực thi và nghiệm thu G1: [Phân công Giai đoạn 1 – Tú, Mi
 Hồ sơ G2: [Phân công Giai đoạn 2](giai-doan-2/02-phan-cong-giai-doan-2.md) và
 [biên bản nghiệm thu](giai-doan-2/NGHIEM-THU-G2.md). Trọng tâm mới trong mục
 **NOW** là đóng release G2 và kiểm kê dataset thật của công ty trước khi ingest.
+
+Hồ sơ G3: [Audit dataset công ty](giai-doan-3/01-audit-dataset-cong-ty.md) và
+[chiến lược/phân công G3](giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md).
+
+### Kết luận audit đầu vào G3
+
+Workbook công ty hiện có 42 bản ghi, tương ứng 38 tên thủ tục sau chuẩn hóa,
+thuộc 7 nhãn lĩnh vực. Dữ liệu đã có thành phần hồ sơ, thời gian, lệ phí và hình
+thức nộp nhưng có email người nhập, 4 nhóm tên thủ tục trùng/xung đột, kiểu lệ phí
+không đồng nhất và chưa có procedure code, URL/căn cứ nguồn, phạm vi hiệu lực hay
+ngày xác minh. Vì vậy:
+
+```text
+KHÔNG đưa Excel thẳng vào model
+KHÔNG fine-tune ngay
+KHÔNG commit raw/derived company data lên GitHub
+
+LÀM: khử PII → normalize → deduplicate/review → bổ sung provenance
+   → ingest RAG → frozen gold set → Qwen local zero-shot → error analysis
+   → QLoRA chỉ khi generation vẫn là bottleneck
+```
 
 ### Bằng chứng hoàn thành G1
 
@@ -619,30 +640,31 @@ Chỉ bắt đầu khi core answer + local model + domain baseline đã đạt g
 
 ## 13. Bảng Now – Next – Later – Parked
 
-### NOW – Đóng release G2 và kiểm kê dữ liệu công ty
+### NOW – G3: chuẩn hóa dữ liệu và Qwen local zero-shot
 
 1. Giữ release `g2-v1.0.0` và corpus `synthetic-demo-v1` chạy xanh.
 2. Không nhập dữ liệu công ty vào `data/demo_synthetic` và không commit dữ liệu
    nội bộ lên GitHub.
 3. Lập inventory: format, dung lượng, license/quyền dùng, PII, phiên bản, phạm vi
    thủ tục, nơi lưu và người duyệt nghiệp vụ.
-4. Chốt dữ liệu nào được phép gửi hosted API; mặc định không gửi nếu chưa duyệt.
-5. Thiết kế import adapter mới dựa trên schema G2, không làm hỏng D0 regression.
+4. Preprocess deterministic, xử lý duplicate/provenance và tạo approved subset.
+5. Ingest RAG, tạo gold DEV/TEST rồi chạy Qwen3-1.7B local non-thinking zero-shot.
+6. Đo riêng data, retrieval, generation, citation, latency và peak VRAM.
 
-### NEXT – Baseline trên dữ liệu được duyệt
+### NEXT – Quyết định cải tiến sau zero-shot
 
-1. Import một phạm vi nhỏ của dataset công ty vào môi trường được phép.
-2. Nhờ người nghiệp vụ tạo/review gold set và evidence.
-3. Chạy retrieval baseline, phân tích lỗi và quyết định có cần embedding hay chưa.
-4. Benchmark hosted nếu được phép hoặc model local nếu dữ liệu phải ở nội bộ.
-5. Chốt baseline để model lightweight phải vượt qua.
+1. Nếu lỗi retrieval: cân nhắc dense embedding/reranker bằng ablation.
+2. Nếu lỗi generation: chuẩn bị SFT hành vi và chạy QLoRA có kiểm soát.
+3. So sánh BF16/Q8/Q5/Q4 và chọn trade-off quality–latency–VRAM.
+4. Chỉ benchmark hosted nếu công ty cho phép loại dữ liệu được gửi.
+5. Mở rộng từ approved subset sang phần còn lại sau review nghiệp vụ.
 
-### LATER – Sau baseline dữ liệu thật
+### LATER – Sau G3
 
-1. Model local ≤2B đầu tiên.
-2. Quantization/benchmark.
-3. Cải thiện RAG/model theo error analysis.
-4. Hoàn thiện Docker/deployment demo.
+1. Case/memory dài hạn theo nhu cầu thực tế.
+2. Queue/streaming và multi-user load test.
+3. Quy trình cập nhật nguồn/hiệu lực định kỳ.
+4. Hoàn thiện deployment và giám sát production-like.
 
 ### PARKED – Không triển khai lúc này
 

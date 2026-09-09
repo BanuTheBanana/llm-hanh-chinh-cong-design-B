@@ -19,6 +19,9 @@ data/*
 !data/demo_public/**
 !data/demo_synthetic/
 !data/demo_synthetic/**
+# Company-provided source data. Keep raw files outside Git until governance,
+# licensing, PII handling and an approved storage location are documented.
+dataset/
 uploads/
 models/
 logs/

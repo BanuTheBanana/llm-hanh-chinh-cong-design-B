@@ -42,6 +42,12 @@ nằm trong repository và không phải điều kiện nghiệm thu G2. Xem
 minh hệ thống RAG chạy đúng trên dữ liệu giả, không chứng minh độ đúng hành chính
 ngoài đời.
 
+**Giai đoạn 3 đã bắt đầu ở checkpoint audit/strategy:** workbook công ty có 42
+bản ghi và 38 tên thủ tục sau chuẩn hóa. Dữ liệu chưa được ingest vì có email,
+duplicate xung đột và thiếu provenance/hiệu lực. Chiến lược đã chốt là preprocess
+và RAG trước, sau đó chạy Qwen3-1.7B local zero-shot; QLoRA chỉ được mở bằng error
+analysis. Raw và derived company data không được commit lên GitHub.
+
 ## Chạy nhanh
 
 Yêu cầu Docker Engine/Desktop và Docker Compose v2:
@@ -77,13 +83,15 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 ## Tài liệu trung tâm
 
 1. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
-2. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
-3. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
-4. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
-5. [Grounded API contract G2](docs/contracts-g2.md)
-6. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
-7. [API contract G1](docs/contracts-g1.md)
-8. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
+2. [Chiến lược và phân công Giai đoạn 3](docs/giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md)
+3. [Audit dataset công ty](docs/giai-doan-3/01-audit-dataset-cong-ty.md)
+4. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
+5. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
+6. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
+7. [Grounded API contract G2](docs/contracts-g2.md)
+8. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
+9. [API contract G1](docs/contracts-g1.md)
+10. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
 
 ## Cấu trúc repository
 
@@ -100,7 +108,8 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 ├── scripts/             # Smoke và repository hygiene checks
 ├── docs/
 │   ├── architecture/    # Sơ đồ tham khảo
-│   ├── giai-doan-2/     # Kế hoạch thực thi G2 hiện tại
+│   ├── giai-doan-3/     # Audit, chiến lược và phân công G3 hiện tại
+│   ├── giai-doan-2/     # Kế hoạch và nghiệm thu G2
 │   ├── archive/         # Tài liệu cũ
 │   └── parked/          # Target architecture chưa triển khai
 ├── .github/workflows/   # Regression G1 + technical gates G2
@@ -115,6 +124,7 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 |---|---|
 | Bản chính đã hoàn tất G1 | `main`, tag `g1-v1.0.0` |
 | Bản G2 synthetic đã nghiệm thu | `g2/integration`, phát hành bằng tag `g2-v1.0.0` |
+| Tích hợp G3 đang thực hiện | `g3/integration` |
 | AI/evaluation G2 của Hoan | `g2/ai-eval-hoan` |
 | Nhánh dữ liệu Tú đã nhập | `data/frontend-tu` |
 | Nhánh RAG Minh đã nhập | `Minh-RAG_test` |
