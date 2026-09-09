@@ -39,6 +39,10 @@ def main() -> int:
     paths = repository_paths()
 
     for path in paths:
+        if (path.suffix.lower() in {".xlsx", ".xls", ".xlsm"}
+                or "company_private" in path.parts or "dataset" in path.parts):
+            findings.append("COMPANY_PRIVATE_FILE_FORBIDDEN (path withheld)")
+            continue  # Do not read company content, even when force-added to Git.
         if path.name.startswith(".env") and path.name != ".env.example":
             findings.append(f"{path}: local environment file is tracked")
         if path.suffix.lower() in {".key", ".p12", ".pfx"}:
