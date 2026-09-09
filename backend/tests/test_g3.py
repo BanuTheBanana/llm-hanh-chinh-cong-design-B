@@ -5,13 +5,16 @@ import json
 import os
 import unicodedata
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 
 from app.rag.corpus import CorpusError
 from app.rag.g3.cli import main
 from app.rag.g3.retrieval import evaluate, retrieve
+from app.rag.g3.runtime import load_active_dataset, retrieve_active_dataset
 from app.rag.g3.validator import FILES, SECTIONS, digest, load
+from app.rag.schemas import RetrievalInput
 
 VERSION = "fictional-g3-v1"
 
@@ -144,7 +147,32 @@ def test_determinism(dataset):
     a = load(dataset, VERSION, 2)
     assert a.fingerprint == load(dataset, VERSION, 2).fingerprint
     assert len(a.accepted) == 2 and a.row_count == 2
-    assert a.report()["readiness"] == "BLOCKED"
+    assert a.report()["readiness"] == "READY_FOR_DEMO"
+
+
+def test_runtime_projects_private_dataset_without_internal_locator(dataset):
+    load_active_dataset.cache_clear()
+    expected_hash = load(dataset, VERSION, 2).fingerprint
+    data = load_active_dataset(str(dataset), VERSION, 2, expected_hash)
+    bundle, status, missing = retrieve_active_dataset(
+        data,
+        RetrievalInput(query="Lệ phí của Mẫu Alpha?"),
+        uuid4(),
+    )
+
+    assert status == "ANSWER" and not missing
+    assert bundle.data_classification == "D2_COMPANY_REAL"
+    assert data.groups[3] == {} and data.groups[4] == {}
+    assert bundle.evidence[0].url is None
+    projection = bundle.model_dump(mode="json")
+    assert "source_uri" not in str(projection)
+    assert "source_locator" not in str(projection)
+
+
+def test_runtime_rejects_a_changed_corpus_under_the_same_version(dataset):
+    load_active_dataset.cache_clear()
+    with pytest.raises(ValueError, match="G3_CORPUS_HASH_MISMATCH"):
+        load_active_dataset(str(dataset), VERSION, 2, "0" * 64)
 
 
 @pytest.mark.parametrize(

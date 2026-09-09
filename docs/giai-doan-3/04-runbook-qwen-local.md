@@ -5,10 +5,10 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật | 09/09/2026 |
-| Phạm vi | `G3-A01/A01-1` – runtime và provider adapter |
+| Phạm vi | `G3-A01/A02/I01` – runtime, D2 và E2E |
 | Code adapter | `IMPLEMENTED_AND_TESTED` |
-| Live llama.cpp trên máy hiện tại | `PASS_D0_END_TO_END` |
-| Dữ liệu được phép ở checkpoint này | Chỉ `D0_SYSTEM_SMOKE` |
+| Live llama.cpp trên máy hiện tại | `PASS_D2_END_TO_END` |
+| Dữ liệu được phép | D0; D2 chỉ khi bật explicit local-only flag |
 | Hosted API | Không dùng |
 | Fine-tune | Chưa được mở |
 
@@ -26,9 +26,9 @@ Backend/RAG D0
 → Backend hydrate nguồn như G2
 ```
 
-`compose.g3.local.yaml` chỉ thay provider grounded từ `template` sang `local`.
-Nó không thay Web/Backend contract và không bật dữ liệu công ty. D2 vẫn bị API
-schema từ chối cho đến khi cả nhóm duyệt một contract riêng.
+`compose.g3.local.yaml` bật provider grounded `local`, mount corpus D2 đã duyệt
+cho demo ở chế độ read-only và pin version/hash. Template vẫn từ chối D2. Local
+provider cũng từ chối D2 nếu thiếu `LOCAL_LLM_ALLOW_D2_COMPANY_DATA=true`.
 
 ## 1. Artifact phải khóa trước khi benchmark
 
@@ -122,18 +122,18 @@ nvidia-smi
 Nếu response có `reasoning_content` hoặc thẻ `<think>`, AI Service sẽ từ chối nó
 thay vì lưu/hiển thị ra ngoài.
 
-## 4. Chạy toàn hệ thống với D0
+## 4. Chạy toàn hệ thống với D2 demo nội bộ
 
 Từ repository root:
 
 ```powershell
 Copy-Item .env.example .env
+$env:G3_PRIVATE_DATASET_HOST_PATH = `
+  'D:/duong-dan-noi-bo/company-tthc-9c38dde8-v1-demo10-v1'
 docker compose `
   -f compose.yaml `
-  -f compose.g2.yaml `
   -f compose.g3.local.yaml `
   --profile full up --build --detach --wait
-python scripts/smoke-g3-local.py
 ```
 
 Health đúng:
@@ -142,7 +142,8 @@ Health đúng:
 Invoke-RestMethod http://127.0.0.1:8001/internal/v2/health
 ```
 
-Kỳ vọng `provider=local`, `external_calls_enabled=false`. Nếu llama-server chưa
+Kỳ vọng `provider=local`, `external_calls_enabled=false`, classification D2 và
+corpus hash khớp. Nếu llama-server chưa
 chạy, health metadata vẫn lên nhưng generate phải trả lỗi provider; vì vậy smoke
 generate mới là readiness cuối.
 
@@ -156,7 +157,10 @@ generate mới là readiness cuối.
 - envelope HTTP 200 sai cấu trúc được map về `AI_PROVIDER_INVALID_RESPONSE`;
 - citation ngoài EvidenceBundle bị từ chối;
 - thinking content bị từ chối;
-- chỉ `D0_SYSTEM_SMOKE` được phép trong A01.
+- D2 chỉ được phép khi explicit local flag bật; health công bố capability để
+  Backend fail-closed;
+- output sai JSON/citation được retry local đúng một lần với seed khác, sau đó
+  vẫn fail nếu chưa hợp lệ.
 
 Giới hạn `LOCAL_LLM_MAX_PROMPT_CHARACTERS` là guard thô, không phải tokenizer.
 Minh vẫn phải trả top 3–5 fragment gọn; benchmark A02 phải ghi prompt token thực
@@ -179,13 +183,23 @@ dữ liệu thật, không quyết định QLoRA trước error analysis.
 
 | Gate | Kết quả |
 |---|---|
-| AI Service test | `63 passed` |
+| AI Service test | `65 passed` |
 | Ruff lint/format | `PASS` |
 | Compose G3 config | `PASS` |
 | llama.cpp + Vulkan trên RTX 5060 Ti 16 GB | `PASS` |
-| Ba câu D0 qua Backend → RAG → Qwen local | `PASS` |
+| D2 Backend → RAG → Qwen local → history | `PASS` |
 | Citation và PostgreSQL history | `PASS` |
 | Hosted/external AI call | `DISABLED` |
+| GPU memory quan sát sau benchmark | 6.724 / 16.311 MiB toàn hệ thống; Windows không cho tách riêng process |
+
+Benchmark TEST khóa cuối: 9 câu, routing 100%, Recall@5 75%, status accuracy
+88,89%, valid generation và citation binding đều 100%. Generation p50 khoảng
+611 ms, p95 khoảng 1.177 ms. Đây là metric kỹ thuật aggregate, chưa phải chứng
+nhận đúng nghiệp vụ/pháp lý.
+
+Số VRAM trên là snapshot toàn máy, có ứng dụng đồ họa khác và không phải peak
+riêng của Qwen. Muốn lập SLA production phải benchmark trên máy sạch có quyền đo
+per-process; không được lấy snapshot này làm mức VRAM của model.
 
 Một lượt quan sát kỹ thuật trực tiếp ghi nhận request cold khoảng `10.486 s`; request
 warm dùng prompt cache khoảng `0.511 s`, tốc độ sinh khoảng `114–126 token/s`. Đây chỉ

@@ -238,4 +238,39 @@ describe('G1 web flow', () => {
     )
     expect(screen.getByText('Nguồn không an toàn').closest('a')).toBeNull()
   })
+
+  it('renders a private reviewed D2 source without inventing a public link', async () => {
+    getConversationsMock.mockResolvedValue([conversationA])
+    const grounding: Grounding = {
+      request_id: '00000000-0000-4000-8000-000000000002',
+      evidence_bundle_id: '10000000-0000-4000-8000-000000000002',
+      status: 'ANSWER',
+      corpus_version: 'private-demo-v1',
+      data_classification: 'D2_COMPANY_REAL',
+      prompt_version: 'g2-grounded-v2',
+      provider: 'local',
+      model: 'Qwen3-1.7B',
+      missing_information: [],
+      sources: [
+        {
+          fragment_id: 'frag_private',
+          source_id: 'src_private',
+          title: 'Nguồn nội bộ đã duyệt',
+          url: null,
+          metadata: {},
+        },
+      ],
+    }
+    getMessagesMock.mockResolvedValue([
+      message('u-2', conversationA.id, 'user', 'Câu hỏi thử'),
+      { ...message('a-2', conversationA.id, 'assistant', 'Câu trả lời thử'), grounding },
+    ])
+    const user = userEvent.setup()
+
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: /Hồ sơ A/ }))
+
+    expect(await screen.findByText('Nguồn nội bộ đã duyệt cho demo.')).toBeInTheDocument()
+    expect(screen.getByText('Nguồn nội bộ đã duyệt').closest('a')).toBeNull()
+  })
 })

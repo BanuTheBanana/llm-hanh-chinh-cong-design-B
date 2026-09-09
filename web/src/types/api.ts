@@ -5,7 +5,7 @@ export type Citation = {
   fragment_id: string
   source_id: string
   title: string
-  url: string
+  url: string | null
   metadata: Record<string, unknown>
 }
 export type Grounding = {
@@ -13,7 +13,7 @@ export type Grounding = {
   evidence_bundle_id: string
   status: GroundingStatus
   corpus_version: string
-  data_classification: 'D0_SYSTEM_SMOKE' | 'D1_PUBLIC_DEMO'
+  data_classification: 'D0_SYSTEM_SMOKE' | 'D1_PUBLIC_DEMO' | 'D2_COMPANY_REAL'
   prompt_version?: string | null
   provider?: string | null
   model?: string | null

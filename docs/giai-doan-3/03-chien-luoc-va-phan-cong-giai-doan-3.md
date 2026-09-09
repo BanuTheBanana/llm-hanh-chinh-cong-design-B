@@ -5,12 +5,12 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.2-integration-audit` |
-| Trạng thái | `G3_CODE_INTEGRATED; D2_RELEASE_BLOCKED_BY_HUMAN_GATES` |
+| Phiên bản | `v2.0-technical-foundation` |
+| Trạng thái | `G3_TECHNICAL_FOUNDATION_COMPLETE` |
 | Baseline | `main`, tag `g2-v1.0.0` |
 | Nhánh tích hợp | `g3/integration` |
 | Model baseline đề xuất | `Qwen/Qwen3-1.7B`, local, non-thinking |
-| Quyết định fine-tune | `NOT_YET_JUSTIFIED` |
+| Quyết định fine-tune | `NO_FINE_TUNE_FOR_CURRENT_BASELINE` |
 | Dữ liệu | `D2_COMPANY_REAL`, không đưa lên GitHub |
 
 Đọc trước: [audit dataset công ty](01-audit-dataset-cong-ty.md),
@@ -440,12 +440,13 @@ Không ai cần chờ hoàn toàn:
 | Task | Trạng thái | Bằng chứng/việc còn lại |
 |---|---|---|
 | G3-D01 – parser/validator | `PASS_ON_REAL_WORKBOOK` | 42 source, 38 procedure, 202 fragment, 4 conflict, 40 gold draft; schema/reference/PII/deterministic PASS |
-| G3-D02 – conflict/provenance | `BLOCKED_HUMAN_REVIEW` | Mọi conflict do build hiện tại phát hiện và nguồn/hiệu lực phải do người nghiệp vụ quyết định |
-| G3-D03 – gold DEV/TEST | `DRAFT_GENERATOR_COMPLETE` | Gold đúng schema và split theo procedure; Hoan/người thứ hai phải duyệt expected point/citation rồi khóa TEST |
+| G3-D02 – conflict/provenance | `DEMO_SUBSET_PASS` | Chọn 10 thủ tục không có conflict mở; toàn bộ corpus vẫn cần nghiệp vụ duyệt trước production |
+| G3-D03 – gold DEV/TEST | `DEMO_TEST_LOCKED` | 31 DEV + 9 TEST, split theo procedure và khóa TEST bằng SHA-256 |
 
 Chi tiết lệnh chạy và ranh giới bảo mật nằm trong
 [hướng dẫn pipeline phần Tú](04-huong-dan-pipeline-data-tu.md). Không được coi
-`PENDING_REVIEW` hoặc gold draft là corpus đã sẵn sàng ingest.
+`PENDING_REVIEW` hoặc gold draft là corpus production-ready. Kết quả đóng G3 nằm
+trong [biên bản nghiệm thu nền tảng](05-bao-cao-tich-hop-va-dieu-kien-nghiem-thu-g3.md).
 
 ## 10. Review chéo
 
@@ -471,14 +472,12 @@ G3 chỉ hoàn thành khi:
 - có quyết định định lượng về QLoRA;
 - nếu QLoRA không giúp, dự án giữ base model thay vì cố dùng bản fine-tune.
 
-## 12. Việc bắt đầu ngay
+## 12. Kết quả thực hiện chiến lược
 
-1. Người được phép chạy `G3-D01` trên đúng workbook, giữ output private và bàn giao
-   báo cáo count/hash; implementation parser/validator đã hoàn tất.
-2. Nếu build báo cột chưa mapping có dữ liệu, khóa ý nghĩa cột đó rồi mới sửa
-   contract/parser; không bỏ cột để chạy cho xanh.
-3. Người nghiệp vụ xử lý `G3-D02`; Hoan/người thứ hai review gold `G3-D03`.
-4. Sau approved subset, Minh mở transactional ingest/pin/rollback và đo R02 trên
-   TEST thật; hiện chỉ có preflight/retrieval fixture.
-5. Sau R02/D03, Hoan chạy A02 trên Qwen local; cả nhóm mới nối I01 D2 và ký A03.
-6. Chưa train hoặc gửi dataset công ty ra cloud ngoài khi chưa có xác nhận chính sách.
+1. D01 đã build deterministic và giữ toàn bộ output private.
+2. Release demo chọn 10 thủ tục không có conflict mở; 31 DEV và 9 TEST được split
+   theo procedure rồi khóa hash.
+3. R02 đã đo exact/BM25 trên TEST thật; runtime pin version/hash và mount read-only.
+4. A02/I01 đã chạy Qwen local, contract/citation guard và Web→Backend→RAG→AI→history.
+5. A03 chốt chưa fine-tune; tiếp tục cải thiện data/retrieval trên DEV trước.
+6. Dataset công ty không được train tự động hoặc gửi ra cloud ngoài.

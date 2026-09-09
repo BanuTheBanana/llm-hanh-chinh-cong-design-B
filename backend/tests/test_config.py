@@ -78,6 +78,34 @@ def test_rag_requires_version_and_fixture_is_forbidden_in_production():
         )
 
 
+def test_g3_d2_requires_rag_and_private_path_and_is_demo_only():
+    with pytest.raises(ValueError, match="RAG_ENABLED"):
+        Settings(
+            _env_file=None,
+            rag_corpus_version="private-v1",
+            g3_d2_enabled=True,
+            g3_private_dataset_path="private",
+            g3_corpus_sha256="a" * 64,
+        )
+    with pytest.raises(ValueError, match="G3_PRIVATE_DATASET_PATH"):
+        Settings(
+            _env_file=None,
+            rag_enabled=True,
+            rag_corpus_version="private-v1",
+            g3_d2_enabled=True,
+        )
+    with pytest.raises(ValueError, match="forbidden in production"):
+        Settings(
+            _env_file=None,
+            app_env="production",
+            rag_enabled=True,
+            rag_corpus_version="private-v1",
+            g3_d2_enabled=True,
+            g3_private_dataset_path="private",
+            g3_corpus_sha256="a" * 64,
+        )
+
+
 @pytest.mark.parametrize(
     "raw",
     [

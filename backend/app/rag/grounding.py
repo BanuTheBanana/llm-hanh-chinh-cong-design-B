@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from app.config import get_settings
 from app.errors import APIError
 from app.rag.corpus import CorpusError
+from app.rag.g3.runtime import load_active_dataset, retrieve_active_dataset
 from app.rag.retrieval import retrieve
 from app.rag.schemas import (
     Citation,
@@ -128,39 +129,57 @@ async def _answer_with_rag(db, query: RetrievalInput, request_id, ai):
     try:
         if not settings.rag_corpus_version:
             raise CorpusError("CORPUS_VERSION_REQUIRED")
-        corpus = await load_corpus(db, settings.rag_corpus_version, settings.rag_allow_fixtures)
-    except (CorpusError, ValidationError) as exc:
+        if settings.g3_d2_enabled:
+            data = load_active_dataset(
+                str(settings.g3_private_dataset_path),
+                settings.rag_corpus_version,
+                settings.g3_expected_rows,
+                settings.g3_corpus_sha256,
+            )
+            bundle, retrieval_status, missing_fields = retrieve_active_dataset(
+                data, query, request_id
+            )
+            corpus_version = data.version
+        else:
+            corpus = await load_corpus(db, settings.rag_corpus_version, settings.rag_allow_fixtures)
+            legacy_result = retrieve(corpus, query, request_id)
+            bundle = legacy_result.bundle
+            retrieval_status = (
+                "NEED_CLARIFICATION" if legacy_result.needs_clarification else "INSUFFICIENT_DATA"
+            )
+            missing_fields = (
+                ["procedure_id hoặc jurisdiction"] if legacy_result.needs_clarification else []
+            )
+            corpus_version = corpus.version
+    except (CorpusError, ValidationError, ValueError) as exc:
         raise APIError(503, "RAG_CORPUS_UNAVAILABLE", "Corpus RAG chưa sẵn sàng.") from exc
-    result = retrieve(corpus, query, request_id)
     await db.commit()  # Release transaction before external generation.
     logger.info(
         "request_id=%s stage=retrieval latency_ms=%.3f hits=%s",
         request_id,
         (time.perf_counter() - started) * 1000,
-        len(result.bundle.evidence),
+        len(bundle.evidence),
     )
-    if not result.bundle.evidence:
-        status = "NEED_CLARIFICATION" if result.needs_clarification else "INSUFFICIENT_DATA"
+    if not bundle.evidence:
+        status = retrieval_status
         text = (
             "Vui lòng cho biết thủ tục hoặc phạm vi địa phương cần tra cứu."
-            if result.needs_clarification
+            if status == "NEED_CLARIFICATION"
             else "Chưa có đủ dữ liệu đã duyệt để trả lời câu hỏi này."
         )
         grounding = Grounding(
             request_id=request_id,
-            evidence_bundle_id=result.bundle.evidence_bundle_id,
+            evidence_bundle_id=bundle.evidence_bundle_id,
             status=status,
-            corpus_version=corpus.version,
-            data_classification=result.bundle.data_classification,
+            corpus_version=corpus_version,
+            data_classification=bundle.data_classification,
             sources=[],
-            missing_information=["procedure_id hoặc jurisdiction"]
-            if result.needs_clarification
-            else [],
+            missing_information=missing_fields,
         )
         return text, grounding.model_dump(mode="json")
     # Never call legacy G1 generation as a fallback for a missing grounded endpoint.
-    answer = await generate_grounded(ai.client, result.bundle)
-    grounding = validate_answer(answer, result.bundle)
+    answer = await generate_grounded(ai.client, bundle)
+    grounding = validate_answer(answer, bundle)
     return answer.answer, grounding.model_dump(mode="json")
 
 

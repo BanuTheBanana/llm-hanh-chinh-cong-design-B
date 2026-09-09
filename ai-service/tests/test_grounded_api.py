@@ -119,6 +119,7 @@ def test_grounded_health_is_separate_from_g1_health(client: TestClient) -> None:
         "provider": "template",
         "prompt_version": "g2-grounded-v2",
         "external_calls_enabled": False,
+        "allowed_data_classifications": ["D0_SYSTEM_SMOKE"],
     }
 
 
@@ -245,14 +246,14 @@ def test_grounded_request_rejects_duplicate_fragments(client: TestClient) -> Non
     assert response.json()["error"]["code"] == "VALIDATION_ERROR"
 
 
-def test_grounded_request_rejects_non_demo_data_classification(client: TestClient) -> None:
+def test_template_rejects_d2_company_data(client: TestClient) -> None:
     body = grounded_body()
     body["data_classification"] = "D2_COMPANY_REAL"
 
     response = client.post("/internal/v2/generate", json=body)
 
-    assert response.status_code == 422
-    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "AI_PROVIDER_DATA_NOT_ALLOWED"
 
 
 def test_template_is_restricted_to_synthetic_d0(client: TestClient) -> None:

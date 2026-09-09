@@ -544,6 +544,9 @@ function GroundingPanel({ grounding }: { grounding: Grounding }) {
       {grounding.data_classification === 'D0_SYSTEM_SMOKE' && (
         <small className="grounding-demo">Dữ liệu mô phỏng D0 — không phải hướng dẫn thực tế.</small>
       )}
+      {grounding.data_classification === 'D2_COMPANY_REAL' && (
+        <small className="grounding-demo">Nguồn nội bộ đã duyệt cho demo.</small>
+      )}
       {grounding.sources.length > 0 && (
         <ol className="source-list" aria-label="Nguồn tham chiếu">
           {grounding.sources.map((source) => {
@@ -577,7 +580,8 @@ function GroundingPanel({ grounding }: { grounding: Grounding }) {
   )
 }
 
-function safeSourceUrl(value: string) {
+function safeSourceUrl(value: string | null) {
+  if (!value) return null
   try {
     const url = new URL(value)
     return url.protocol === 'https:' ? url.toString() : null

@@ -94,21 +94,21 @@ AI không được tự đổi `PENDING_REVIEW` hoặc `QUARANTINED` thành `APP
 |---|---|
 | Preprocess workbook thật | PASS |
 | Schema/reference/PII preflight | PASS |
-| Conflict/provenance review | Chưa hoàn thành |
-| Approved corpus cho RAG | Chưa có |
-| Gold TEST đã khóa | Chưa có |
-| RAG benchmark D2 | Chưa được phép chạy như nghiệm thu |
-| Fine-tune | Chưa có bằng chứng cần; giữ zero-shot baseline |
+| Conflict/provenance review | Demo subset 10 thủ tục: không có conflict mở |
+| Approved corpus cho RAG | Có, `APPROVED_FOR_DEMO`; không phải production |
+| Gold TEST đã khóa | Có, 9 câu/2 procedure, SHA-256 đã pin |
+| RAG benchmark D2 | Hoàn tất aggregate trên TEST khóa |
+| Fine-tune | `NO_FINE_TUNE_FOR_CURRENT_BASELINE` |
 | Production | Chưa sẵn sàng |
 
 ## Hợp
 
 ### Kết luận
 
-G3-D01 đã hoàn thành trên workbook thật về mặt kỹ thuật. Bước kế tiếp không phải
-chỉnh parser mà là review nghiệp vụ: xác nhận nguồn, xử lý bốn conflict, duyệt
-approved subset và duyệt độc lập 40 gold question. Chỉ sau publish gate, Minh mới
-mở ingest D2 và Hoan mới benchmark Qwen trên TEST thật.
+G3-D01 đã hoàn thành trên workbook thật. Một release demo 10 thủ tục không có
+conflict mở đã qua publish gate kỹ thuật, khóa TEST và chạy RAG/Qwen local E2E.
+Bốn conflict và phần dữ liệu ngoài subset vẫn giữ nguyên để người nghiệp vụ xử lý;
+không dùng kết quả demo để tuyên bố toàn bộ workbook production-ready.
 
 ### Câu hỏi cần mentor/công ty xác nhận
 

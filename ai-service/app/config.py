@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     local_llm_presence_penalty: float = Field(default=1.5, ge=-2, le=2)
     local_llm_seed: int = 42
     local_llm_allowed_hosts: str = "localhost,127.0.0.1,::1,local-model,host.docker.internal"
+    local_llm_allow_d2_company_data: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",

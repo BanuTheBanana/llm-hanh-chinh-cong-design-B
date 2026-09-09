@@ -18,7 +18,7 @@ Identifier = Annotated[
     StringConstraints(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9._:-]*$"),
 ]
 GroundedStatus = Literal["ANSWER", "NEED_CLARIFICATION", "INSUFFICIENT_DATA"]
-GroundedDataClassification = Literal["D0_SYSTEM_SMOKE", "D1_PUBLIC_DEMO"]
+GroundedDataClassification = Literal["D0_SYSTEM_SMOKE", "D1_PUBLIC_DEMO", "D2_COMPANY_REAL"]
 
 
 class ChatMessage(BaseModel):
@@ -217,3 +217,4 @@ class GroundedHealthResponse(BaseModel):
     provider: str
     prompt_version: Identifier
     external_calls_enabled: bool
+    allowed_data_classifications: list[GroundedDataClassification]

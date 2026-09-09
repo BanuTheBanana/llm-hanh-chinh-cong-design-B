@@ -23,6 +23,7 @@ from app.db import engine, get_db
 from app.errors import APIError
 from app.models import Conversation, Message, SessionRecord, User, utcnow
 from app.rag.corpus import CorpusError
+from app.rag.g3.runtime import load_active_dataset
 from app.rag.store import load_corpus
 from app.schemas import (
     ConversationInput,
@@ -287,11 +288,29 @@ async def rag_health(
     if not current.rag_enabled:
         return {"status": "disabled"}
     try:
-        corpus = await load_corpus(
-            db,
-            current.rag_corpus_version,
-            current.rag_allow_fixtures,
-        )
+        if current.g3_d2_enabled:
+            data = load_active_dataset(
+                str(current.g3_private_dataset_path),
+                current.rag_corpus_version,
+                current.g3_expected_rows,
+                current.g3_corpus_sha256,
+            )
+            corpus_version = data.version
+            data_classification = "D2_COMPANY_REAL"
+            source_count = len(data.sources)
+            procedure_count = len(data.accepted)
+            fragment_count = len(data.fragments)
+        else:
+            corpus = await load_corpus(
+                db,
+                current.rag_corpus_version,
+                current.rag_allow_fixtures,
+            )
+            corpus_version = corpus.version
+            data_classification = "D0_SYSTEM_SMOKE" if corpus.fixture else "D1_PUBLIC_DEMO"
+            source_count = len(corpus.sources)
+            procedure_count = len(corpus.procedures)
+            fragment_count = len(corpus.fragments)
         response = await ai.client.get(
             current.ai_service_url.rstrip("/") + "/internal/v2/health",
             timeout=current.ai_request_timeout_seconds,
@@ -302,17 +321,24 @@ async def rag_health(
             not isinstance(grounded, dict)
             or grounded.get("status") != "ok"
             or grounded.get("endpoint") != "grounded-v2"
+            or (
+                current.g3_d2_enabled
+                and (
+                    grounded.get("external_calls_enabled") is not False
+                    or "D2_COMPANY_REAL" not in grounded.get("allowed_data_classifications", [])
+                )
+            )
         ):
             raise ValueError("invalid grounded readiness")
     except (CorpusError, httpx.HTTPError, ValueError) as exc:
         raise APIError(503, "RAG_UNAVAILABLE", "RAG hoặc grounded AI chưa sẵn sàng.") from exc
     return {
         "status": "ok",
-        "corpus_version": corpus.version,
-        "data_classification": "D0_SYSTEM_SMOKE" if corpus.fixture else "D1_PUBLIC_DEMO",
-        "sources": len(corpus.sources),
-        "procedures": len(corpus.procedures),
-        "fragments": len(corpus.fragments),
+        "corpus_version": corpus_version,
+        "data_classification": data_classification,
+        "sources": source_count,
+        "procedures": procedure_count,
+        "fragments": fragment_count,
         "grounded_provider": grounded.get("provider"),
         "prompt_version": grounded.get("prompt_version"),
         "external_calls_enabled": grounded.get("external_calls_enabled"),

@@ -123,6 +123,41 @@ async def test_valid_response_sends_locked_llama_cpp_payload(provider_factory):
     assert result.output_tokens == 50
 
 
+async def test_d2_company_data_requires_explicit_local_opt_in(provider_factory):
+    def handler(_: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=make_openai_response())
+
+    restricted = provider_factory(handler)
+    assert "D2_COMPANY_REAL" not in restricted.allowed_data_classifications
+
+    enabled = provider_factory(handler, allow_d2_company_data=True)
+    result = await generate(enabled, data_classification="D2_COMPANY_REAL")
+
+    assert result.status == "ANSWER"
+    assert enabled.external_calls_enabled is False
+
+
+async def test_invalid_grounded_json_contract_is_retried_once(provider_factory):
+    payloads: list[dict[str, object]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        payloads.append(json.loads(request.content))
+        if len(payloads) == 1:
+            return httpx.Response(
+                200,
+                json=make_openai_response(cited_ids=["fragment-not-in-evidence"]),
+            )
+        return httpx.Response(200, json=make_openai_response())
+
+    result = await generate(provider_factory(handler))
+
+    assert result.status == "ANSWER"
+    assert result.cited_fragment_ids == ("frag_001",)
+    assert len(payloads) == 2
+    assert payloads[1]["seed"] == 43
+    assert len(payloads[1]["messages"]) == 3
+
+
 async def test_request_output_tokens_are_capped_by_provider(provider_factory):
     def handler(request: httpx.Request) -> httpx.Response:
         assert json.loads(request.content)["max_tokens"] == 300

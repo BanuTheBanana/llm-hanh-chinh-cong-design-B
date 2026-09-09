@@ -75,7 +75,7 @@ commit hoặc log.
 
 Với `GROUNDED_PROVIDER=local`, xem
 [runbook Qwen local](../docs/giai-doan-3/04-runbook-qwen-local.md). Provider chỉ
-allowlist `D0_SYSTEM_SMOKE` trong checkpoint A01, gọi endpoint HTTP local đã
+allowlist D2 khi `LOCAL_LLM_ALLOW_D2_COMPANY_DATA=true`, gọi endpoint HTTP local đã
 allowlist, ép constrained JSON và kiểm tra lại schema/citation/thinking content.
 HTTP client được reuse trong vòng đời ứng dụng và đóng khi shutdown.
 

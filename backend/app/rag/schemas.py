@@ -30,7 +30,7 @@ Scope = Annotated[
     StringConstraints(min_length=1, max_length=500, strip_whitespace=True, pattern=r"\S"),
 ]
 Status = Literal["ANSWER", "NEED_CLARIFICATION", "INSUFFICIENT_DATA"]
-DataClassification = Literal["D0_SYSTEM_SMOKE", "D1_PUBLIC_DEMO"]
+DataClassification = Literal["D0_SYSTEM_SMOKE", "D1_PUBLIC_DEMO", "D2_COMPANY_REAL"]
 ValidityStatus = Literal["CURRENT", "EXPIRED", "FUTURE", "UNKNOWN"]
 BUSINESS_FIELDS = (
     "applicant_scope",
@@ -147,7 +147,7 @@ class Evidence(Strict):
     procedure_id: ID
     section_type: ID
     title: Title
-    url: Text
+    url: Text | None
     text: GroundedText
     score: float = Field(ge=0, allow_inf_nan=False)
     jurisdiction: Scope | None = None
@@ -224,7 +224,7 @@ class Citation(Strict):
     fragment_id: ID
     source_id: ID
     title: Text
-    url: Text
+    url: Text | None
     metadata: dict
 
 

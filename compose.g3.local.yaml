@@ -1,6 +1,5 @@
-# G3 local-model overlay. llama-server runs on the developer host; this overlay
-# never configures a hosted provider and continues to use only the synthetic D0
-# corpus until the D2 contract is explicitly extended and approved.
+# G3 private-data overlay. llama-server runs on the developer host. The reviewed
+# D2 corpus is mounted read-only and is never sent to a hosted provider.
 services:
   ai-service:
     environment:
@@ -18,6 +17,7 @@ services:
       LOCAL_LLM_PRESENCE_PENALTY: ${LOCAL_LLM_PRESENCE_PENALTY:-1.5}
       LOCAL_LLM_SEED: ${LOCAL_LLM_SEED:-42}
       LOCAL_LLM_ALLOWED_HOSTS: host.docker.internal
+      LOCAL_LLM_ALLOW_D2_COMPANY_DATA: "true"
     extra_hosts:
       - host.docker.internal:host-gateway
     healthcheck:
@@ -34,3 +34,27 @@ services:
   backend:
     environment:
       AI_REQUEST_TIMEOUT_SECONDS: ${AI_REQUEST_TIMEOUT_SECONDS:-35}
+      RAG_ENABLED: "true"
+      RAG_CORPUS_VERSION: ${G3_DATASET_VERSION:-company-tthc-9c38dde8-v1-demo10-v1}
+      RAG_TOP_K: ${RAG_TOP_K:-5}
+      RAG_ALLOW_FIXTURES: "false"
+      G3_D2_ENABLED: "true"
+      G3_PRIVATE_DATASET_PATH: /run/g3-dataset
+      G3_EXPECTED_ROWS: ${G3_EXPECTED_ROWS:-10}
+      G3_CORPUS_SHA256: ${G3_CORPUS_SHA256:-2875694a7cbb0238bfb4ebfdd562166b63f0851077ae824f62bbe234602b7d1e}
+      G3_ALLOW_PRODUCTION: "false"
+    volumes:
+      - type: bind
+        source: ${G3_PRIVATE_DATASET_HOST_PATH:-./.private-g3-dataset}
+        target: /run/g3-dataset
+        read_only: true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8000/health/rag', timeout=3)
+      interval: 5s
+      timeout: 4s
+      retries: 20
+      start_period: 15s

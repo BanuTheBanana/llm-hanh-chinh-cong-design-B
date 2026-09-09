@@ -60,3 +60,16 @@ python scripts/check-repo-hygiene.py
 Gate này chặn file `.env` cục bộ, private-key file và một số định dạng
 token phổ biến bị commit nhầm. Đây là lớp bảo vệ tối thiểu; thành viên vẫn
 không được đưa secret, PII hoặc dữ liệu công ty vào Git.
+
+## Đánh giá corpus G3 nội bộ
+
+Chỉ chạy trên máy nội bộ sau khi đã dựng stack local và cấu hình đường dẫn tới
+release riêng tư:
+
+```powershell
+python scripts/evaluate-g3-private.py
+```
+
+Script từ chối endpoint không phải localhost, kiểm tra fingerprint corpus và
+TEST lock trước khi chạy, rồi chỉ in số liệu tổng hợp. Nội dung câu hỏi, đáp án,
+ID và evidence của dữ liệu công ty không được ghi ra terminal hoặc Git.

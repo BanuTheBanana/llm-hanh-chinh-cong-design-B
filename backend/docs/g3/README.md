@@ -1,8 +1,8 @@
 # G3 của Minh — preflight validator và retrieval offline
 
-Đây là bản chuẩn bị G3-R01/R02, chưa phải importer production hay G3 đã nghiệm thu.
-Đọc REVIEW_REGISTER.md trước khi tích hợp. Đã đọc ba tài liệu G3, machine schema,
-contract G2 và code RAG hiện có. Raw Excel không được mở/parse/gửi API trong lượt này.
+Đây là validator/retrieval G3 và đường kích hoạt read-only cho demo nội bộ, không
+phải importer production. Raw Excel không đi vào runtime; Backend chỉ đọc release
+đã normalize, review và pin version/hash.
 
 ## Có gì mới
 
@@ -19,11 +19,11 @@ contract G2 và code RAG hiện có. Raw Excel không được mở/parse/gửi 
   không cấp quyền tạo symlink.
 - `.gitignore` chặn workbook/private data, repo hygiene chặn cả file force-add.
 
-Không sửa G1/G2 API, DB migrations hoặc provider. Chưa implement persistence,
-activation/rollback D2 vì hash contract và G2→D2 projection chưa khóa.
-Fingerprint deterministic của năm JSONL phục vụ so sánh preflight, không phải bằng chứng
-idempotent DB ingest. `accepted_procedure_ids` chỉ là qua review gate cục bộ;
-`readiness=BLOCKED` mới là trạng thái tổng thể.
+G3 giữ nguyên DB schema G1/G2 và bổ sung projection D2 versioned. Persistence corpus
+chưa đưa vào PostgreSQL theo chủ ý: foundation dùng mount read-only và pin fingerprint
+của năm JSONL. `accepted_procedure_ids` chỉ là qua review gate cục bộ;
+`readiness=READY_FOR_DEMO` chỉ xuất hiện khi không còn procedure bị loại, conflict
+mở hoặc gold chờ review trong release đã chọn.
 
 ## Cài và thử fixture
 
@@ -61,14 +61,14 @@ expected rows để che source bị mất. Không tự đổi PENDING/QUARANTINE
 PII regex là tripwire, có thể false positive/negative; không thay human review/DLP.
 Không gửi output chứa ID công ty ra ngoài nếu chưa có quyền công bố.
 
-## Ingest, pin và rollback
+## Activation, pin và rollback
 
 Hiện `python -m app.rag.g3.cli ingest ...` trả
 `INGEST_BLOCKED_REVIEW_REGISTER_G3_RV_001_002`, exit 1, không ghi DB.
-Chưa có thủ tục activation/rollback D2 được chứng minh. G2 vẫn dùng corpus pin cũ;
-không trỏ RAG_CORPUS_VERSION vào version G3 và không đổi RAG_ENABLED để thử D2.
-Sau sign-off, nối vào store giao dịch hiện có, thêm test ingest lặp không đổi,
-version cũ khác hash bị từ chối, load kiểm hash, rollback bằng pin corpus đã được kiểm.
+G3 foundation chủ ý không chép D2 vào PostgreSQL: nó mount release private
+read-only và kích hoạt bằng `RAG_CORPUS_VERSION` + `G3_CORPUS_SHA256` + row count.
+Cùng version khác hash bị từ chối; rollback là đổi lại ba pin về release cũ đã
+kiểm. Importer DB giao dịch vẫn là hạng mục production sau này.
 
 ## Regression trước khi merge
 

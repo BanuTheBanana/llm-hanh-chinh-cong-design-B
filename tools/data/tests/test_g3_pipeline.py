@@ -7,6 +7,7 @@ import pytest
 from openpyxl import Workbook
 
 from g3_pipeline.builder import BuildError, build_dataset, verify_deterministic
+from g3_pipeline.release_demo import release_demo_subset
 from g3_pipeline.validator import validate_dataset
 
 HEADERS = [
@@ -245,3 +246,40 @@ def test_publish_requires_human_review(tmp_path: Path) -> None:
     assert report["status"] == "FAIL"
     assert report["errors"]["PROCEDURE_REVIEW_PENDING"] == 3
     assert report["errors"]["GOLD_REVIEW_PENDING"] == 9
+
+
+def test_demo_release_is_reviewed_publishable_and_split_by_procedure(tmp_path: Path) -> None:
+    workbook = tmp_path / "synthetic.xlsx"
+    create_workbook(workbook)
+    private_root = tmp_path / "company_private"
+    source = build_dataset(workbook, private_root / "source")
+
+    release = release_demo_subset(
+        source.dataset_dir,
+        private_root / "releases",
+        schema_path(),
+        reviewer_role="PROJECT_OWNER_DELEGATED_REVIEW",
+        reviewed_at="2026-09-09T19:00:00+07:00",
+        demo_size=2,
+    )
+    report = validate_dataset(
+        release.dataset_dir,
+        schema_path(),
+        mode="publish",
+        expected_source_count=2,
+    )
+    procedures = load_jsonl(release.dataset_dir / "normalized/procedures.jsonl")
+    questions = load_jsonl(release.dataset_dir / "gold/questions.jsonl")
+    conflicts = load_jsonl(release.dataset_dir / "quarantine/conflicts.jsonl")
+    split_by_procedure: dict[str, set[str]] = {}
+    for question in questions:
+        if question["procedure_id"] is not None:
+            split_by_procedure.setdefault(question["procedure_id"], set()).add(question["split"])
+
+    assert report["status"] == "PASS", report
+    assert len(procedures) == 2
+    assert conflicts == []
+    assert all(row["review"]["status"] == "APPROVED_FOR_DEMO" for row in procedures)
+    assert all(len(splits) == 1 for splits in split_by_procedure.values())
+    assert {next(iter(splits)) for splits in split_by_procedure.values()} == {"DEV", "TEST"}
+    assert release.report["test_lock_sha256"]

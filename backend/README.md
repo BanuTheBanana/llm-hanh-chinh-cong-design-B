@@ -100,6 +100,11 @@ uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-lo
 | `RAG_CORPUS_VERSION` | rỗng | Version corpus immutable đã ingest; bắt buộc khi bật RAG |
 | `RAG_TOP_K` | `5` | Số fragment, giới hạn 1–8 |
 | `RAG_ALLOW_FIXTURES` | `false` | Chỉ opt-in D0; cấu hình production bị từ chối |
+| `G3_D2_ENABLED` | `false` | Bật corpus D2 private read-only; yêu cầu RAG và các pin bên dưới |
+| `G3_PRIVATE_DATASET_PATH` | rỗng | Thư mục 5 JSONL private, không nằm trong Git |
+| `G3_EXPECTED_ROWS` | `10` | Số source row của release demo đã khóa |
+| `G3_CORPUS_SHA256` | rỗng | Fingerprint bắt buộc; cùng version khác hash bị từ chối |
+| `G3_ALLOW_PRODUCTION` | `false` | Fail-closed, release demo không chạy production mặc định |
 | `GROUNDED_MAX_OUTPUT_TOKENS` | `500` | Ngân sách output AI v2, giới hạn 32–2048 |
 | `AI_REQUEST_TIMEOUT_SECONDS` | `10` | Deadline tổng khi gọi AI |
 | `SESSION_COOKIE_NAME` | `g1_session` | Tên opaque cookie |

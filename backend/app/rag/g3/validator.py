@@ -108,6 +108,19 @@ class Dataset:
 
     def report(self):
         # IDs are schema validated and PII scanned; no titles/text/locators.
+        conflicts = self.groups[3]
+        gold = self.groups[4]
+        open_conflicts = sum(row["status"] == "OPEN" for row in conflicts.values())
+        pending_gold_reviews = sum(
+            row["reviewer_role"] == "PENDING_SECOND_REVIEW" for row in gold.values()
+        )
+        blockers = []
+        if self.rejected:
+            blockers.append("PROCEDURES_NOT_APPROVED")
+        if open_conflicts:
+            blockers.append("OPEN_CONFLICTS")
+        if pending_gold_reviews:
+            blockers.append("GOLD_REVIEW_PENDING")
         return {
             "dataset_version": self.version,
             "schema_version": "g3-data-v1",
@@ -117,13 +130,13 @@ class Dataset:
             "source_count": len(self.sources),
             "fragment_count": len(self.fragments),
             "accounted_rows": self.row_count,
+            "accepted_records": len(self.accepted),
+            "rejected_records": len(self.rejected),
+            "open_conflicts": open_conflicts,
+            "pending_gold_reviews": pending_gold_reviews,
             "validation": "PASS",
-            "readiness": "BLOCKED",
-            "blockers": [
-                "SOURCE_HASH_CONVENTION_UNRESOLVED",
-                "RAW_HASH_VERIFICATION_NOT_PERFORMED",
-                "D2_GENERATION_CONTRACT_NOT_APPROVED",
-            ],
+            "readiness": "BLOCKED" if blockers else "READY_FOR_DEMO",
+            "blockers": blockers,
         }
 
 

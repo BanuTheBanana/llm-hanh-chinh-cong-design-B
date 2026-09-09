@@ -27,6 +27,11 @@ class Settings(BaseSettings):
     rag_corpus_version: str = ""
     rag_top_k: int = Field(default=5, ge=1, le=8)
     rag_allow_fixtures: bool = False
+    g3_d2_enabled: bool = False
+    g3_private_dataset_path: Path | None = None
+    g3_expected_rows: int = Field(default=10, ge=1)
+    g3_corpus_sha256: str = ""
+    g3_allow_production: bool = False
     # Root Compose provides the origin; AIClient owns the internal route path.
     ai_service_url: str = "http://localhost:8001"
     ai_request_timeout_seconds: float = Field(default=10, gt=0, le=120)
@@ -43,6 +48,17 @@ class Settings(BaseSettings):
             raise ValueError("RAG_CORPUS_VERSION is required when RAG_ENABLED=true.")
         if self.rag_allow_fixtures and self.app_env.lower() in {"production", "prod"}:
             raise ValueError("RAG fixtures are forbidden in production.")
+        if self.g3_d2_enabled:
+            if not self.rag_enabled:
+                raise ValueError("RAG_ENABLED=true is required when G3_D2_ENABLED=true.")
+            if self.g3_private_dataset_path is None:
+                raise ValueError("G3_PRIVATE_DATASET_PATH is required when G3_D2_ENABLED=true.")
+            if len(self.g3_corpus_sha256) != 64 or any(
+                character not in "0123456789abcdef" for character in self.g3_corpus_sha256
+            ):
+                raise ValueError("G3_CORPUS_SHA256 must pin the approved private corpus.")
+            if self.app_env.lower() in {"production", "prod"} and not self.g3_allow_production:
+                raise ValueError("G3 D2 demo data is forbidden in production by default.")
         return self
 
     @property

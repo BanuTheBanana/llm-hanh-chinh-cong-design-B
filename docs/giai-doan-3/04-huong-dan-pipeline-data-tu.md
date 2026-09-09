@@ -7,7 +7,7 @@
 | Cập nhật gần nhất | 09/09/2026 |
 | Phiên bản công cụ | `g3-preprocess-v3` |
 | Contract | `g3-data-v1` |
-| Trạng thái kỹ thuật | Workbook thật preflight PASS; chờ review nghiệp vụ |
+| Trạng thái kỹ thuật | Workbook preflight PASS; demo release 10 thủ tục publish PASS |
 | Phân loại dữ liệu | `D2_COMPANY_REAL`, chỉ xử lý local |
 
 ## Tổng
@@ -21,8 +21,8 @@ Excel private
 → build deterministic
 → JSONL private PENDING/QUARANTINED
 → preflight schema/reference/PII
-→ người nghiệp vụ xử lý conflict và duyệt nguồn
-→ Hoan review gold, khóa TEST
+→ reviewer có thẩm quyền chọn subset không conflict và cấp sign-off demo
+→ khóa TEST theo procedure + hash
 → publish gate
 → Minh ingest approved subset
 ```
@@ -53,6 +53,23 @@ uv run --project tools/data hcc-validate-company-data `
 
 Lệnh chỉ in trạng thái, version, count và mã lỗi; không in nội dung ô Excel.
 
+Sau khi có sign-off demo rõ vai trò và thời điểm, tạo release riêng; lệnh build
+ban đầu không tự phê duyệt:
+
+```powershell
+uv run --project tools/data hcc-release-demo-data `
+  --source data/company_private/company-tthc-9c38dde8-v1 `
+  --output-root data/company_private `
+  --schema docs/giai-doan-3/schema/data-contract-v1.schema.json `
+  --reviewer-role PROJECT_OWNER_DELEGATED_REVIEW `
+  --reviewed-at 2026-09-09T19:15:00+07:00 `
+  --demo-size 10
+```
+
+Release tool chỉ chọn procedure không có conflict mở, split DEV/TEST ổn định,
+ghi TEST lock và chạy publish validator. Sign-off này là quyền dùng demo kỹ thuật,
+không thay thế review đúng/sai pháp lý của chuyên gia nghiệp vụ.
+
 ## Các file private được tạo
 
 ```text
@@ -66,7 +83,7 @@ data/company_private/<dataset_version>/
 └── DATA_CARD.md
 ```
 
-`gold/questions.jsonl` mới chỉ là bản nháp bán tự động. Mọi câu đều mang
+Trong output build gốc, `gold/questions.jsonl` chỉ là bản nháp bán tự động. Mọi câu mang
 `reviewer_role=PENDING_SECOND_REVIEW`; không được dùng TEST chính thức trước khi
 Hoan/người thứ hai kiểm từng expected point và citation.
 
@@ -110,7 +127,7 @@ Không sửa trực tiếp output để “cho validator xanh” nếu chưa có
 
 ## Hợp – điều kiện bàn giao Minh
 
-Chỉ chạy `--mode publish` sau review. Bàn giao khi lệnh trả `PASS`, deterministic
-rebuild pass, 42 nguồn được accounting, không conflict mở trong approved subset,
-PII sạch và gold references hợp lệ. Nếu chưa đạt, Minh chỉ dùng fixture hư cấu để
-phát triển importer, không ingest corpus công ty.
+Chỉ chạy `--mode publish` sau sign-off. Bàn giao release khi lệnh trả `PASS`,
+deterministic rebuild pass, mọi row trong subset được accounting, không conflict
+mở, PII sạch và gold references hợp lệ. Toàn bộ 42 nguồn chỉ được publish khi toàn
+bộ corpus đạt các gate tương tự; demo subset không tự mở quyền cho phần còn lại.

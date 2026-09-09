@@ -9,7 +9,9 @@ from app.providers.local_grounded import LocalGroundedProvider
 from app.providers.mock import MockProvider
 from app.providers.template_grounded import TemplateGroundedProvider
 
-LocalProviderKey = tuple[str, str, float, int, int, int, float, float, int, float, float, int, str]
+LocalProviderKey = tuple[
+    str, str, float, int, int, int, float, float, int, float, float, int, bool, str
+]
 
 
 def get_provider(settings: Settings = Depends(get_settings)) -> AIProvider:
@@ -51,6 +53,7 @@ def _local_provider_key(settings: Settings) -> LocalProviderKey:
         settings.local_llm_min_p,
         settings.local_llm_presence_penalty,
         settings.local_llm_seed,
+        settings.local_llm_allow_d2_company_data,
         settings.local_llm_allowed_hosts,
     )
 
@@ -73,6 +76,7 @@ def _create_local_grounded_provider(settings: Settings) -> LocalGroundedProvider
             min_p=settings.local_llm_min_p,
             presence_penalty=settings.local_llm_presence_penalty,
             seed=settings.local_llm_seed,
+            allow_d2_company_data=settings.local_llm_allow_d2_company_data,
             allowed_hosts=allowed_hosts,
         )
     except ValueError as exc:

@@ -42,11 +42,12 @@ nằm trong repository và không phải điều kiện nghiệm thu G2. Xem
 minh hệ thống RAG chạy đúng trên dữ liệu giả, không chứng minh độ đúng hành chính
 ngoài đời.
 
-**Giai đoạn 3 đã bắt đầu ở checkpoint audit/strategy:** workbook công ty có 42
-bản ghi và 38 tên thủ tục sau chuẩn hóa. Dữ liệu chưa được ingest vì có email,
-duplicate xung đột và thiếu provenance/hiệu lực. Chiến lược đã chốt là preprocess
-và RAG trước, sau đó chạy Qwen3-1.7B local zero-shot; QLoRA chỉ được mở bằng error
-analysis. Raw và derived company data không được commit lên GitHub.
+**Giai đoạn 3 đã hoàn tất ở mức nền tảng kỹ thuật demo nội bộ:** từ workbook thật,
+pipeline tạo một release 10 thủ tục/49 fragment, khóa 31 DEV + 9 TEST, chạy
+exact/BM25 và Qwen3-1.7B Q8_0 local qua Backend/Web với citation và PostgreSQL
+history. D2 được mount read-only, pin version/hash và không được gửi tới hosted API.
+QLoRA chưa có căn cứ nên chưa thực hiện. Đây chưa phải chứng nhận đúng nghiệp vụ
+hoặc production release; raw/derived company data không được commit lên GitHub.
 
 ## Chạy nhanh
 
@@ -79,13 +80,13 @@ Khi chạy overlay Qwen local của G3, dùng smoke tương ứng (không dùng 
 khóa `provider=template`):
 
 ```powershell
-python scripts/smoke-g3-local.py
+$env:G3_PRIVATE_DATASET_HOST_PATH = 'D:/duong-dan-noi-bo/<release-demo>'
+docker compose -f compose.yaml -f compose.g3.local.yaml `
+  --profile full up --build --detach --wait
 ```
 
-Mở `http://localhost:3000` và hỏi về “khai sinh Sao Mai”, “căn cước Ánh Trăng”
-hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong một câu hỏi dài tự nhiên.
-Đây là dataset D0 giả có cảnh báo rõ, không phải hướng dẫn hành chính thực tế. Readiness G2 ở
-`http://localhost:8000/health/rag`.
+Mở `http://localhost:3000`. Chỉ dùng release D2 đã duyệt cho demo; không sao chép
+nội dung workbook vào log/chat ngoài. Readiness ở `http://localhost:8000/health/rag`.
 
 ## Tài liệu trung tâm
 
@@ -94,13 +95,14 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 3. [Audit dataset công ty](docs/giai-doan-3/01-audit-dataset-cong-ty.md)
 4. [Data contract G3 giữa Tú và Minh](docs/giai-doan-3/02-contract-data-g3.md)
 5. [Runbook Qwen3-1.7B local](docs/giai-doan-3/04-runbook-qwen-local.md)
-6. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
-7. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
-8. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
-9. [Grounded API contract G2](docs/contracts-g2.md)
-10. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
-11. [API contract G1](docs/contracts-g1.md)
-12. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
+6. [Contract D2 Giai đoạn 3](docs/contracts-g3.md)
+7. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
+8. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
+9. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
+10. [Grounded API contract G2](docs/contracts-g2.md)
+11. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
+12. [API contract G1](docs/contracts-g1.md)
+13. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
 
 ## Cấu trúc repository
 
@@ -124,7 +126,7 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 ├── .github/workflows/   # Regression G1 + technical gates G2
 ├── compose.yaml         # Full G1 stack và health dependencies
 ├── compose.g2.yaml      # Overlay D0: ingest fixture + bật grounded RAG
-├── compose.g3.local.yaml # Overlay D0: thay template bằng Qwen local
+├── compose.g3.local.yaml # Overlay D2 private: Qwen local + mount read-only
 └── .env.example         # Cấu hình demo, không có secret thật
 ```
 
@@ -134,7 +136,7 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 |---|---|
 | Bản chính đã hoàn tất G1 | `main`, tag `g1-v1.0.0` |
 | Bản G2 synthetic đã nghiệm thu | `g2/integration`, phát hành bằng tag `g2-v1.0.0` |
-| Tích hợp G3 đang thực hiện | `g3/integration` |
+| Nền tảng G3 đã hoàn tất, chờ merge | `g3/integration` |
 | AI/evaluation G2 của Hoan | `g2/ai-eval-hoan` |
 | Nhánh dữ liệu Tú đã nhập | `data/frontend-tu` |
 | Nhánh RAG Minh đã nhập | `Minh-RAG_test` |

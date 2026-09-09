@@ -5,8 +5,8 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.5-integration-audit` |
-| Trạng thái | `G3_C1_REAL_PREFLIGHT_PASS; D2_RELEASE_BLOCKED_BY_HUMAN_GATES` |
+| Phiên bản | `v2.0-technical-foundation` |
+| Trạng thái | `G3_TECHNICAL_FOUNDATION_COMPLETE` |
 
 ## Tổng
 
@@ -26,10 +26,11 @@ baseline chứng minh model là bottleneck.
 8. [Báo cáo test G3 Backend](../../backend/docs/g3/TEST_REPORT.md).
 9. [Báo cáo tích hợp và checklist đóng G3](05-bao-cao-tich-hop-va-dieu-kien-nghiem-thu-g3.md).
 10. [Contract grounded hiện tại](../contracts-g2.md).
-11. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
+11. [Contract D2 runtime G3](../contracts-g3.md).
+12. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
 
 ## Hợp
 
 Thứ tự làm: governance → preprocess → review → RAG → gold set → Qwen local
-zero-shot → error analysis → QLoRA có điều kiện. Raw và derived company data không
-được commit lên GitHub.
+zero-shot → error analysis → QLoRA có điều kiện. G3 đã đóng ở mức demo nội bộ
+căn bản; raw và derived company data không được commit lên GitHub.

@@ -289,6 +289,7 @@ def create_app() -> FastAPI:
             provider=provider.name,
             prompt_version=PROMPT_VERSION,
             external_calls_enabled=provider.external_calls_enabled,
+            allowed_data_classifications=sorted(provider.allowed_data_classifications),
         )
 
     return application

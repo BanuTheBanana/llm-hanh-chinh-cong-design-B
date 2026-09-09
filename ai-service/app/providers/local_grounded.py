@@ -69,6 +69,7 @@ class LocalGroundedProvider(GroundedProvider):
         min_p: float = 0.0,
         presence_penalty: float = 1.5,
         seed: int = 42,
+        allow_d2_company_data: bool = False,
         allowed_hosts: frozenset[str] = DEFAULT_LOCAL_ALLOWED_HOSTS,
         client: httpx.AsyncClient | None = None,
     ) -> None:
@@ -83,6 +84,9 @@ class LocalGroundedProvider(GroundedProvider):
         self._min_p = min_p
         self._presence_penalty = presence_penalty
         self._seed = seed
+        self.allowed_data_classifications = frozenset(
+            {"D0_SYSTEM_SMOKE", "D2_COMPANY_REAL"} if allow_d2_company_data else {"D0_SYSTEM_SMOKE"}
+        )
         self._validate_generation_config()
         self._client = client or httpx.AsyncClient(
             timeout=httpx.Timeout(timeout_seconds),
@@ -136,38 +140,7 @@ class LocalGroundedProvider(GroundedProvider):
 
         await self._client.aclose()
 
-    async def generate_grounded(
-        self,
-        *,
-        query: str,
-        evidence: Sequence[GroundingEvidenceFragment],
-        as_of: date | None,
-        data_classification: GroundedDataClassification,
-        max_output_tokens: int,
-    ) -> GroundedGenerationResult:
-        if data_classification not in self.allowed_data_classifications:
-            raise AssertionError("service boundary must reject unsupported classifications")
-
-        messages = build_grounded_messages(query=query, evidence=evidence, as_of=as_of)
-        prompt_characters = sum(len(message["content"]) for message in messages)
-        if prompt_characters > self._max_prompt_characters:
-            raise ProviderResponseError("local model prompt exceeds configured safe budget")
-
-        payload = {
-            "model": self.model_name,
-            "messages": messages,
-            "stream": False,
-            "max_tokens": min(max_output_tokens, self._max_output_tokens),
-            "temperature": self._temperature,
-            "top_p": self._top_p,
-            "top_k": self._top_k,
-            "min_p": self._min_p,
-            "presence_penalty": self._presence_penalty,
-            "seed": self._seed,
-            "response_format": {"type": "json_object"},
-            "json_schema": GROUNDED_OUTPUT_JSON_SCHEMA,
-        }
-
+    async def _request_completion(self, payload: dict[str, object]) -> tuple[str, int, int]:
         try:
             response = await self._client.post(f"{self._base_url}/chat/completions", json=payload)
             response.raise_for_status()
@@ -219,11 +192,78 @@ class LocalGroundedProvider(GroundedProvider):
             raise ProviderResponseError("local model returned invalid prompt token usage")
         if type(output_tokens) is not int or output_tokens < 0:
             raise ProviderResponseError("local model returned invalid completion token usage")
+        return raw_content, input_tokens, output_tokens
 
-        validated = parse_and_validate_grounded_output(
-            raw_text=raw_content,
-            allowed_fragment_ids={fragment.fragment_id for fragment in evidence},
-        )
+    async def generate_grounded(
+        self,
+        *,
+        query: str,
+        evidence: Sequence[GroundingEvidenceFragment],
+        as_of: date | None,
+        data_classification: GroundedDataClassification,
+        max_output_tokens: int,
+    ) -> GroundedGenerationResult:
+        if data_classification not in self.allowed_data_classifications:
+            raise AssertionError("service boundary must reject unsupported classifications")
+
+        messages = build_grounded_messages(query=query, evidence=evidence, as_of=as_of)
+        prompt_characters = sum(len(message["content"]) for message in messages)
+        if prompt_characters > self._max_prompt_characters:
+            raise ProviderResponseError("local model prompt exceeds configured safe budget")
+
+        payload = {
+            "model": self.model_name,
+            "messages": messages,
+            "stream": False,
+            "max_tokens": min(max_output_tokens, self._max_output_tokens),
+            "temperature": self._temperature,
+            "top_p": self._top_p,
+            "top_k": self._top_k,
+            "min_p": self._min_p,
+            "presence_penalty": self._presence_penalty,
+            "seed": self._seed,
+            "response_format": {"type": "json_object"},
+            "json_schema": GROUNDED_OUTPUT_JSON_SCHEMA,
+        }
+
+        allowed_fragment_ids = {fragment.fragment_id for fragment in evidence}
+        input_tokens = 0
+        output_tokens = 0
+        for attempt in range(2):
+            raw_content, used_input, used_output = await self._request_completion(payload)
+            input_tokens += used_input
+            output_tokens += used_output
+            try:
+                validated = parse_and_validate_grounded_output(
+                    raw_text=raw_content,
+                    allowed_fragment_ids=allowed_fragment_ids,
+                )
+                break
+            except ProviderResponseError:
+                if attempt == 1:
+                    raise
+                retry_messages = [
+                    *messages,
+                    {
+                        "role": "user",
+                        "content": (
+                            "Hãy tạo lại đúng một JSON object theo schema. "
+                            "Nếu status là ANSWER, cited_fragment_ids phải chứa ít nhất "
+                            "một fragment_id có trong EVIDENCE; không thêm ID mới."
+                        ),
+                    },
+                ]
+                if sum(len(message["content"]) for message in retry_messages) > (
+                    self._max_prompt_characters
+                ):
+                    raise ProviderResponseError(
+                        "local model retry prompt exceeds configured safe budget"
+                    ) from None
+                payload = {
+                    **payload,
+                    "messages": retry_messages,
+                    "seed": self._seed + 1,
+                }
         return GroundedGenerationResult(
             answer=validated.answer,
             status=validated.status,
