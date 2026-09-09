@@ -8,7 +8,7 @@
 | Nhánh | `g2/integration` |
 | Kết luận kỹ thuật | `G2_I01_D0_TECHNICAL_PASS` |
 | Kết luận nghiệp vụ | `G2_FINAL_NOT_PASSED` |
-| Dữ liệu runtime | `fixture-v1`, `D0_SYSTEM_SMOKE`, hoàn toàn giả |
+| Dữ liệu runtime | `synthetic-demo-v1`, `D0_SYSTEM_SMOKE`, hoàn toàn giả |
 
 ## Tổng
 
@@ -34,8 +34,10 @@ review dữ liệu D1.
 | Web unit/component | `10 passed` |
 | Web ESLint + production build | Pass |
 | Offline grounded evaluation D0 | 8/8 case, strict safety pass |
+| Data D0 synthetic publish gate | Pass: 3 source, 3 procedure, 24 fragment, 33 question |
+| Retrieval D0 synthetic | DEV 23/23 và TEST 10/10 pass; Recall@5 = 1.0 |
 | Data D1 technical preflight | Pass: 4 source, 1 procedure, 10 fragment, 10 question |
-| Docker Compose G2 readiness | PostgreSQL/AI/Backend/Web healthy; corpus `fixture-v1` |
+| Docker Compose G2 readiness | PostgreSQL/AI/Backend/Web healthy; corpus `synthetic-demo-v1` |
 | API end-to-end smoke | Pass, gồm answer/binding/citation/history |
 | Chromium G2 E2E | Pass: login, answer + source, reload vẫn còn grounding |
 | OpenAPI/schema catalog regeneration | Khớp runtime Pydantic/FastAPI hiện tại |
@@ -46,6 +48,10 @@ Retrieval fixture hiện có 10 câu DEV; report chi tiết nằm tại
 đều 1.0 trên fixture nhỏ được tạo để kiểm tra kỹ thuật. Latency thay đổi theo mỗi
 run và được lưu trong artifact; không dùng số đó làm SLA hay kết luận chất lượng
 D1.
+
+Dataset phát triển đầy đủ hơn ở `data/demo_synthetic` có 23 DEV + 10 TEST; cả hai
+split không có câu fail, Recall@5 = 1.0, MRR lần lượt 0.7595 và 0.75. Đây vẫn chỉ
+là D0 hư cấu, không phải bằng chứng nghiệp vụ.
 
 Grounded evaluation có 8 case giả bao phủ answer, empty evidence, ranking,
 clarification, evidence không liên quan, hiệu lực, prompt injection và retrieval

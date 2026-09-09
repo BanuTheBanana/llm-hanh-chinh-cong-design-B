@@ -1,0 +1,8 @@
+D0 giả lập – Đăng ký khai tử Mây Trắng dành cho thân nhân hoặc người đại diện tại Huyện Gió, Thành phố Demo.
+D0 giả lập – Hồ sơ khai tử Mây Trắng được tiếp nhận tại Bộ phận Một cửa Xã Cầu Mây.
+D0 giả lập – Có thể khai báo trước trên Cổng Dịch vụ Demo và nộp bản mô phỏng tại Xã Cầu Mây.
+D0 giả lập – Hồ sơ khai tử Mây Trắng gồm Phiếu D0-KT03, giấy báo tử mô phỏng và thẻ Mây của người khai.
+D0 giả lập – Các bước thực hiện quy trình khai tử Mây Trắng gồm khai báo, nộp hồ sơ giả, kiểm tra D0 và nhận trích lục thử nghiệm.
+D0 giả lập – Lệ phí khai tử Mây Trắng là 0 đơn vị thử nghiệm; đây không phải quy định thật.
+D0 giả lập – Thời gian xử lý khai tử Mây Trắng là 3 ngày mô phỏng.
+D0 giả lập – Căn cứ của khai tử Mây Trắng là Quy tắc D0-KT-2026, một văn bản hoàn toàn hư cấu.

@@ -1,0 +1,28 @@
+{
+  "request_id": "00000000-0000-4000-8000-000000000101",
+  "evidence_bundle_id": "10000000-0000-4000-8000-000000000101",
+  "corpus_version": "synthetic-demo-v1",
+  "data_classification": "D0_SYSTEM_SMOKE",
+  "query": "Lệ phí của Đăng ký khai sinh Sao Mai là bao nhiêu?",
+  "evidence": [
+    {
+      "fragment_id": "frag_birth_star_fees",
+      "source_id": "src_synthetic_birth_star",
+      "procedure_id": "synthetic_birth_star",
+      "section_type": "FEES",
+      "title": "[D0 GIẢ LẬP] Đăng ký khai sinh Sao Mai",
+      "text": "D0 giả lập – Lệ phí khai sinh Sao Mai là 5 đơn vị thử nghiệm; đây không phải mức phí thật.",
+      "jurisdiction": "DEMO_CITY",
+      "effective_from": null,
+      "effective_to": null,
+      "validity_status": "UNKNOWN",
+      "url": "https://fixture.invalid/d0/birth_star",
+      "score": 1.0,
+      "metadata": {
+        "synthetic": true,
+        "procedure_version": "synthetic-demo-v1"
+      }
+    }
+  ],
+  "as_of": null
+}

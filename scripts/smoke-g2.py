@@ -37,27 +37,45 @@ def main() -> int:
         api.request("POST", "/api/v1/auth/login", {"display_name": f"g2-{uuid4().hex[:8]}"})
         conversation = api.request("POST", "/api/v1/conversations", {}, 201)
         path = f"/api/v1/conversations/{conversation['id']}/messages"
-        pair = api.request(
-            "POST",
-            path,
-            {
-                "client_message_id": str(uuid4()),
-                "content": "Thủ tục demo sao xanh có lệ phí bao nhiêu?",
-            },
+        checks = (
+            (
+                "khai sinh sao mai",
+                "src_synthetic_birth_star",
+                "https://fixture.invalid/d0/birth_star",
+            ),
+            (
+                "căn cước ánh trăng",
+                "src_synthetic_identity_moon",
+                "https://fixture.invalid/d0/identity_moon",
+            ),
+            (
+                "khai tử mây trắng",
+                "src_synthetic_death_cloud",
+                "https://fixture.invalid/d0/death_cloud",
+            ),
         )
-        assistant = pair["assistant_message"]
-        grounding = assistant["grounding"]
-        assert assistant["content"].startswith("BẢN MÔ PHỎNG D0")
-        assert grounding["status"] == "ANSWER"
-        assert grounding["corpus_version"] == "fixture-v1"
-        assert grounding["data_classification"] == "D0_SYSTEM_SMOKE"
-        assert grounding["prompt_version"] == "g2-grounded-v2"
-        assert grounding["provider"] == "template"
-        assert grounding["sources"][0]["fragment_id"] == "frag_fees"
-        assert grounding["sources"][0]["url"] == "https://fixture.invalid/synthetic"
+        expected_groundings = []
+        for content, source_id, source_url in checks:
+            pair = api.request(
+                "POST",
+                path,
+                {"client_message_id": str(uuid4()), "content": content},
+            )
+            assistant = pair["assistant_message"]
+            grounding = assistant["grounding"]
+            assert assistant["content"].startswith("BẢN MÔ PHỎNG D0")
+            assert grounding["status"] == "ANSWER"
+            assert grounding["corpus_version"] == "synthetic-demo-v1"
+            assert grounding["data_classification"] == "D0_SYSTEM_SMOKE"
+            assert grounding["prompt_version"] == "g2-grounded-v2"
+            assert grounding["provider"] == "template"
+            assert grounding["sources"][0]["source_id"] == source_id
+            assert grounding["sources"][0]["url"] == source_url
+            expected_groundings.append(grounding)
         history = api.request("GET", path)
-        assert len(history) == 2 and history[1]["grounding"] == grounding
-        print("PASS - G2 D0 full-stack grounded answer, citation and history are valid.")
+        assert len(history) == 6
+        assert [history[index]["grounding"] for index in (1, 3, 5)] == expected_groundings
+        print("PASS - all three G2 D0 procedures have valid answers, citations and history.")
         return 0
     except Exception as error:  # noqa: BLE001 - smoke CLI maps failures to exit code.
         print(f"FAIL - {error}", file=sys.stderr)

@@ -10,10 +10,10 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.8` |
+| Phiên bản | `v1.9` |
 | Trạng thái | `G1_COMPLETED_ON_MAIN`; `G2_I01_D0_TECHNICAL_PASS`; G2/D1 chưa nghiệm thu |
 | Nguồn thay đổi | Phản hồi của người có kinh nghiệm: thu nhỏ phạm vi, tạo bot chạy được trước, tách UI/Backend/AI qua API, thêm tính năng theo thứ tự |
-| Thay đổi lần này | Ghép Data/RAG/AI, sửa contract và dữ liệu, hoàn tất lát cắt D0 qua Compose/API/Web; giữ D1 và hosted provider sau review/approval |
+| Thay đổi lần này | Bổ sung corpus D0 hoàn chỉnh 3 thủ tục/33 câu để nhóm tiếp tục phát triển khi nguồn D1 khó truy cập; D1 và hosted vẫn giữ sau review/approval |
 
 Tài liệu chi tiết trước đây đã được cất tại [Target Architecture v1.2](parked/kien-truc-muc-tieu-v1.2/00-workflow-tong-quat.md). Chỉ mở lại từng module khi backlog có trigger; sơ đồ nằm trong [`architecture/`](architecture/README.md).
 
@@ -617,7 +617,7 @@ Chỉ bắt đầu khi core answer + local model + domain baseline đã đạt g
 ### NOW – Hoàn tất dữ liệu D1 và Gate G2
 
 1. Giữ checkpoint D0 trên `g2/integration` chạy xanh và không nhập dữ liệu thật
-   vào fixture “sao xanh”.
+   vào `data/demo_synthetic`.
 2. Review chéo spike đăng ký khai sinh; lấy nguồn chi tiết chính thức có thành
    phần hồ sơ và trình tự, không suy đoán các field còn thiếu.
 3. Mở rộng thành 2–3 thủ tục và 30–50 tình huống giả có gold source, reviewer

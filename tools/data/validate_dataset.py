@@ -1,4 +1,4 @@
-"""Reproducible technical and publish gates for the G2 public demo corpus."""
+"""Reproducible technical and publish gates for D0/D1 G2 datasets."""
 
 from __future__ import annotations
 
@@ -28,7 +28,10 @@ BUSINESS_FIELDS = (
     "processing_time",
     "legal_bases",
 )
-ALLOWED_DOMAINS = {"vanban.chinhphu.vn", "vpub.hochiminhcity.gov.vn"}
+CLASSIFICATION_DOMAINS = {
+    "D0_SYSTEM_SMOKE": {"fixture.invalid"},
+    "D1_PUBLIC_DEMO": {"vanban.chinhphu.vn", "vpub.hochiminhcity.gov.vn"},
+}
 
 
 def digest(data: bytes) -> str:
@@ -77,6 +80,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default=".")
     parser.add_argument("--dataset", default="data/demo_public")
+    parser.add_argument(
+        "--classification",
+        choices=tuple(CLASSIFICATION_DOMAINS),
+        default="D1_PUBLIC_DEMO",
+    )
     parser.add_argument("--mode", choices=("preflight", "publish"), default="preflight")
     args = parser.parse_args()
 
@@ -128,7 +136,7 @@ def main() -> int:
         if (
             url.scheme != "https"
             or url.hostname != domain
-            or domain not in ALLOWED_DOMAINS
+            or domain not in CLASSIFICATION_DOMAINS[args.classification]
             or url.username
             or url.password
         ):
@@ -145,12 +153,16 @@ def main() -> int:
                 errors.append(f"RAW_MISSING:{source_id}")
             else:
                 expected = source.get("content_sha256")
-                if not isinstance(expected, str) or not HASH_PATTERN.fullmatch(expected):
+                if not isinstance(expected, str) or not HASH_PATTERN.fullmatch(
+                    expected
+                ):
                     errors.append(f"RAW_HASH_INVALID:{source_id}")
                 elif actual != expected:
                     errors.append(f"RAW_HASH_MISMATCH:{source_id}")
-        publish_gate(source.get("review_status") == "APPROVED", f"SOURCE_PENDING:{source_id}")
-        if source.get("usage") != "D1_PUBLIC_DEMO":
+        publish_gate(
+            source.get("review_status") == "APPROVED", f"SOURCE_PENDING:{source_id}"
+        )
+        if source.get("usage") != args.classification:
             errors.append(f"SOURCE_CLASSIFICATION_INVALID:{source_id}")
 
     for fragment_id, fragment in fragments.items():
@@ -160,21 +172,29 @@ def main() -> int:
             errors.append(f"BROKEN_FRAGMENT_REFERENCE:{fragment_id}")
         text = fragment.get("text")
         expected = fragment.get("content_sha256")
-        if not isinstance(text, str) or not isinstance(expected, str) or digest(
-            text.encode("utf-8")
-        ) != expected:
+        if (
+            not isinstance(text, str)
+            or not isinstance(expected, str)
+            or digest(text.encode("utf-8")) != expected
+        ):
             errors.append(f"FRAGMENT_HASH_MISMATCH:{fragment_id}")
         source = sources.get(str(source_id), {})
         if str(source.get("raw_path", "")).lower().endswith(".rar"):
             locator = fragment.get("source_locator")
             if not isinstance(locator, dict):
                 errors.append(f"ARCHIVE_LOCATOR_REQUIRED:{fragment_id}")
-            elif not HASH_PATTERN.fullmatch(str(locator.get("inner_content_sha256", ""))):
+            elif not HASH_PATTERN.fullmatch(
+                str(locator.get("inner_content_sha256", ""))
+            ):
                 errors.append(f"INNER_HASH_INVALID:{fragment_id}")
 
     for procedure_id, procedure in procedures.items():
         source_ids = procedure.get("source_ids")
-        if not isinstance(source_ids, list) or not source_ids or not set(source_ids) <= sources.keys():
+        if (
+            not isinstance(source_ids, list)
+            or not source_ids
+            or not set(source_ids) <= sources.keys()
+        ):
             errors.append(f"BROKEN_PROCEDURE_SOURCE:{procedure_id}")
         provenance = procedure.get("field_evidence")
         if not isinstance(provenance, dict):
@@ -183,14 +203,25 @@ def main() -> int:
         for field in BUSINESS_FIELDS:
             values = procedure.get(field)
             refs = provenance.get(field)
-            if not isinstance(values, list) or not isinstance(refs, list) or len(values) != len(refs):
+            if (
+                not isinstance(values, list)
+                or not isinstance(refs, list)
+                or len(values) != len(refs)
+            ):
                 errors.append(f"PROVENANCE_LENGTH:{procedure_id}:{field}")
                 continue
             for group in refs:
-                if not isinstance(group, list) or not group or not set(group) <= fragments.keys():
+                if (
+                    not isinstance(group, list)
+                    or not group
+                    or not set(group) <= fragments.keys()
+                ):
                     errors.append(f"BROKEN_PROVENANCE:{procedure_id}:{field}")
         publish_gate(
-            all(procedure.get(field) for field in ("applicant_scope", "required_documents", "steps")),
+            all(
+                procedure.get(field)
+                for field in ("applicant_scope", "required_documents", "steps")
+            ),
             f"PROCEDURE_INCOMPLETE:{procedure_id}",
         )
 
@@ -202,14 +233,18 @@ def main() -> int:
             errors.append(f"BROKEN_GOLD_PROCEDURE:{question_id}")
         if not isinstance(source_ids, list) or not set(source_ids) <= sources.keys():
             errors.append(f"BROKEN_GOLD_SOURCE:{question_id}")
-        if not isinstance(fragment_ids, list) or not set(fragment_ids) <= fragments.keys():
+        if (
+            not isinstance(fragment_ids, list)
+            or not set(fragment_ids) <= fragments.keys()
+        ):
             errors.append(f"BROKEN_GOLD_FRAGMENT:{question_id}")
         if question.get("contains_pii") is not False:
             errors.append(f"PII_FLAG_NOT_FALSE:{question_id}")
         reviewer = question.get("reviewer")
         publish_gate(
             isinstance(reviewer, str)
-            and reviewer not in {"PENDING_SECOND_REVIEW", "minh_or_hoan", question.get("author")},
+            and reviewer
+            not in {"PENDING_SECOND_REVIEW", "minh_or_hoan", question.get("author")},
             f"GOLD_REVIEW_PENDING:{question_id}",
         )
         if question.get("expected_status") == "INSUFFICIENT_DATA" and (
@@ -219,13 +254,29 @@ def main() -> int:
 
     fixture_dir = dataset / "fixtures"
     try:
-        bundle = json.loads((fixture_dir / "evidence_bundle.json").read_text(encoding="utf-8"))
-        request = json.loads((fixture_dir / "grounding_request.json").read_text(encoding="utf-8"))
-        answer = json.loads((fixture_dir / "grounded_answer.json").read_text(encoding="utf-8"))
-        binding = ("request_id", "evidence_bundle_id", "corpus_version", "data_classification")
-        if any(bundle.get(key) != request.get(key) or request.get(key) != answer.get(key) for key in binding):
+        bundle = json.loads(
+            (fixture_dir / "evidence_bundle.json").read_text(encoding="utf-8")
+        )
+        request = json.loads(
+            (fixture_dir / "grounding_request.json").read_text(encoding="utf-8")
+        )
+        answer = json.loads(
+            (fixture_dir / "grounded_answer.json").read_text(encoding="utf-8")
+        )
+        binding = (
+            "request_id",
+            "evidence_bundle_id",
+            "corpus_version",
+            "data_classification",
+        )
+        if any(
+            bundle.get(key) != request.get(key) or request.get(key) != answer.get(key)
+            for key in binding
+        ):
             errors.append("FIXTURE_BINDING_MISMATCH")
-        if any(key in request for key in ("history", "url", "score", "metadata")) or any(
+        if any(
+            key in request for key in ("history", "url", "score", "metadata")
+        ) or any(
             any(key in item for key in ("url", "score", "metadata"))
             for item in request.get("evidence", [])
         ):
@@ -237,18 +288,25 @@ def main() -> int:
         errors.append("FIXTURE_INVALID")
 
     referenced_sources = {
-        source_id for procedure in procedures.values() for source_id in procedure.get("source_ids", [])
+        source_id
+        for procedure in procedures.values()
+        for source_id in procedure.get("source_ids", [])
     }
     for source_id in sorted(sources.keys() - referenced_sources):
         warnings.append(f"SOURCE_NOT_USED_BY_PROCEDURE:{source_id}")
 
     publish_gate(2 <= len(procedures) <= 3, "PUBLISH_SCOPE_REQUIRES_2_TO_3_PROCEDURES")
-    publish_gate(30 <= len(questions) <= 50, "PUBLISH_SCOPE_REQUIRES_30_TO_50_QUESTIONS")
-    publish_gate(any(q.get("split") == "TEST" for q in questions.values()), "TEST_SPLIT_REQUIRED")
+    publish_gate(
+        30 <= len(questions) <= 50, "PUBLISH_SCOPE_REQUIRES_30_TO_50_QUESTIONS"
+    )
+    publish_gate(
+        any(q.get("split") == "TEST" for q in questions.values()), "TEST_SPLIT_REQUIRED"
+    )
 
     report = {
         "status": "PASS" if not errors else "FAIL",
         "mode": args.mode,
+        "classification": args.classification,
         "records": {
             "sources": len(sources),
             "procedures": len(procedures),

@@ -32,6 +32,7 @@ G1 chưa có RAG, Qwen, fine-tune, Case, memory dài hạn, queue hay Socket.IO.
 **Checkpoint G2-I01 đã hoàn tất kỹ thuật trên `g2/integration` bằng dữ liệu giả
 D0:** Backend ingest/retrieve corpus version hóa, gọi grounded AI v2, kiểm tra
 binding/citation, lưu nguồn và Web hiển thị nguồn qua một Docker Compose overlay.
+Corpus phát triển hiện có 3 thủ tục hư cấu, 24 fragment và 33 câu hỏi DEV/TEST.
 Đây chưa phải nghiệm thu toàn bộ G2: dữ liệu công khai D1 mới có một spike đang
 chờ review chéo, chưa đủ 2–3 thủ tục/30–50 câu và hosted provider chưa được công
 ty phê duyệt.
@@ -63,8 +64,9 @@ docker compose -f compose.yaml -f compose.g2.yaml --profile full up --build --de
 python scripts/smoke-g2.py
 ```
 
-Mở `http://localhost:3000` và hỏi về “thủ tục demo sao xanh”. Đây là fixture
-giả có cảnh báo rõ, không phải hướng dẫn hành chính thực tế. Readiness G2 ở
+Mở `http://localhost:3000` và hỏi “khai sinh sao mai”, “căn cước ánh trăng”
+hoặc “khai tử mây trắng”. Đây là dataset D0 giả có cảnh báo rõ, không phải hướng
+dẫn hành chính thực tế. Readiness G2 ở
 `http://localhost:8000/health/rag`.
 
 ## Tài liệu trung tâm
@@ -84,6 +86,7 @@ giả có cảnh báo rõ, không phải hướng dẫn hành chính thực tế
 ├── web/                 # React/TypeScript, Vitest, Playwright, Nginx
 ├── backend/             # FastAPI, PostgreSQL, SQLAlchemy, Alembic
 ├── ai-service/          # FastAPI, provider interface, MockProvider
+├── data/demo_synthetic/ # Corpus D0 hoàn chỉnh để dev/test, không có giá trị pháp lý
 ├── data/demo_public/    # Spike D1 công khai; chưa publish khi review còn PENDING
 ├── evaluation/          # Fixture và report evaluation G2 offline
 ├── tools/data/          # Downloader bảo thủ và data quality validator

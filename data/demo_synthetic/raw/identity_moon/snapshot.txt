@@ -1,0 +1,8 @@
+D0 giả lập – Cấp thẻ căn cước Ánh Trăng dành cho cư dân từ 14 tuổi của Quận Ngân Hà, Thành phố Demo.
+D0 giả lập – Hồ sơ thẻ Ánh Trăng được tiếp nhận tại Trạm Dịch vụ Ngân Hà số 2.
+D0 giả lập – Cách nộp hồ sơ thẻ Ánh Trăng là đặt lịch trên Cổng Dịch vụ Demo rồi đến trực tiếp Trạm Ngân Hà số 2.
+D0 giả lập – Hồ sơ thẻ Ánh Trăng gồm Phiếu D0-CC02, mã cư dân thử nghiệm và ảnh chân dung mô phỏng.
+D0 giả lập – Các bước thực hiện quy trình thẻ Ánh Trăng gồm đặt lịch, đối chiếu dữ liệu giả, chụp ảnh thử và nhận phiếu hẹn D0.
+D0 giả lập – Lệ phí cấp thẻ Ánh Trăng là 9 đơn vị thử nghiệm; đây không phải mức phí thật.
+D0 giả lập – Thời gian xử lý thẻ Ánh Trăng là 4 ngày mô phỏng.
+D0 giả lập – Căn cứ của thẻ Ánh Trăng là Quy tắc D0-CC-2026, một văn bản hoàn toàn hư cấu.

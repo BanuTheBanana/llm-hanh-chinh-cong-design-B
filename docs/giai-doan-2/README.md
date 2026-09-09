@@ -5,7 +5,7 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.3` |
+| Phiên bản | `v1.4` |
 | Trạng thái | `G2_I01_D0_TECHNICAL_PASS; G2_FINAL_BLOCKED_BY_D1_AND_HOSTED_APPROVAL` |
 | Nhánh tích hợp | `g2/integration` |
 | Baseline | `main`, tag `g1-v1.0.0` |
@@ -25,12 +25,15 @@ G2/D1 nghiệp vụ: nguồn công khai được review → 2–3 thủ tục �
 ```
 
 Vì vậy nhóm đã chứng minh được kiến trúc và contract chạy thật nhưng chưa được
-tuyên bố chatbot trả lời hành chính chính xác. D0 chỉ dùng thủ tục giả “sao xanh”.
+tuyên bố chatbot trả lời hành chính chính xác. D0 dùng ba thủ tục hư cấu trong
+`data/demo_synthetic`.
 
 ## Phân
 
 ### Phần đã hoàn thành kỹ thuật
 
+- Bộ `data/demo_synthetic` hoàn chỉnh cho phát triển: 3 thủ tục hư cấu, 24
+  fragment, 33 câu DEV/TEST; D0 publish gate và retrieval 33/33 pass.
 - Tú: spike dữ liệu công khai được sửa đường dẫn, hash, provenance và nội dung
   theo PDF; technical preflight pass.
 - Minh: ingest version hóa, exact/keyword/BM25 retrieval và canonical

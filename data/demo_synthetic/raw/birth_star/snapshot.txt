@@ -1,0 +1,8 @@
+D0 giả lập – Đăng ký khai sinh Sao Mai dành cho cha, mẹ hoặc người giám hộ tại Thành phố Demo.
+D0 giả lập – Hồ sơ khai sinh Sao Mai được tiếp nhận tại Bộ phận Một cửa Phường Mặt Trời, Thành phố Demo.
+D0 giả lập – Có thể nộp hồ sơ khai sinh Sao Mai trực tiếp hoặc qua Cổng Dịch vụ Demo.
+D0 giả lập – Hồ sơ khai sinh Sao Mai gồm Phiếu D0-KS01, thẻ Sao Mai của người nộp và giấy chứng sinh mô phỏng.
+D0 giả lập – Các bước thực hiện quy trình khai sinh Sao Mai gồm gửi hồ sơ, nhận mã D0, kiểm tra mô phỏng và nhận kết quả thử nghiệm.
+D0 giả lập – Lệ phí khai sinh Sao Mai là 5 đơn vị thử nghiệm; đây không phải mức phí thật.
+D0 giả lập – Thời gian xử lý khai sinh Sao Mai là 2 ngày mô phỏng.
+D0 giả lập – Căn cứ của khai sinh Sao Mai là Quy tắc D0-KS-2026, một văn bản hoàn toàn hư cấu.

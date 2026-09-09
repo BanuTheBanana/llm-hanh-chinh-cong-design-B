@@ -89,21 +89,21 @@ Content-Type: application/json
 {
   "request_id": "00000000-0000-4000-8000-000000000001",
   "evidence_bundle_id": "10000000-0000-4000-8000-000000000001",
-  "corpus_version": "fixture-v1",
+  "corpus_version": "synthetic-demo-v1",
   "data_classification": "D0_SYSTEM_SMOKE",
-  "query": "Thủ tục demo sao xanh có lệ phí bao nhiêu?",
+  "query": "Lệ phí của Đăng ký khai sinh Sao Mai là bao nhiêu?",
   "evidence": [
     {
-      "fragment_id": "frag_fees",
-      "source_id": "src_synthetic",
-      "procedure_id": "proc_demo",
+      "fragment_id": "frag_birth_star_fees",
+      "source_id": "src_synthetic_birth_star",
+      "procedure_id": "synthetic_birth_star",
       "section_type": "FEES",
-      "title": "Thủ tục demo sao xanh — hoàn toàn giả",
-      "text": "Thủ tục demo sao xanh: lệ phí là 7 đơn vị giả lập.",
-      "jurisdiction": "DEMO_SCOPE",
-      "effective_from": "2026-01-01",
-      "effective_to": "2026-12-31",
-      "validity_status": "CURRENT"
+      "title": "[D0 GIẢ LẬP] Đăng ký khai sinh Sao Mai",
+      "text": "D0 giả lập – Lệ phí khai sinh Sao Mai là 5 đơn vị thử nghiệm; đây không phải mức phí thật.",
+      "jurisdiction": "DEMO_CITY",
+      "effective_from": null,
+      "effective_to": null,
+      "validity_status": "UNKNOWN"
     }
   ],
   "as_of": "2026-09-08",
@@ -138,12 +138,12 @@ interactive tiếp tục bị tắt cho tới khi có policy và gate riêng.
 {
   "request_id": "00000000-0000-4000-8000-000000000001",
   "evidence_bundle_id": "10000000-0000-4000-8000-000000000001",
-  "corpus_version": "fixture-v1",
+  "corpus_version": "synthetic-demo-v1",
   "data_classification": "D0_SYSTEM_SMOKE",
   "prompt_version": "g2-grounded-v2",
   "answer": "...",
   "status": "ANSWER",
-  "cited_fragment_ids": ["frag_fees"],
+  "cited_fragment_ids": ["frag_birth_star_fees"],
   "missing_information": [],
   "provider": "template",
   "model": "template-grounded-v2",

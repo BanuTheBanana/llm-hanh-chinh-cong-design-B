@@ -8,7 +8,7 @@
 | Trạng thái kỹ thuật | D0 offline integrated; D1 pending review |
 | AI contract | `g2-grounded-v0.2`, prompt `g2-grounded-v2` |
 | Endpoint AI | `POST /internal/v2/generate` |
-| Corpus chạy Compose G2 | `fixture-v1`, `D0_SYSTEM_SMOKE` |
+| Corpus chạy Compose G2 | `synthetic-demo-v1`, `D0_SYSTEM_SMOKE` |
 
 ## Tổng quan
 
@@ -39,8 +39,9 @@ docker compose -f compose.yaml -f compose.g2.yaml --profile full up --build --de
 python scripts/smoke-g2.py
 ```
 
-Mở `http://localhost:3000`. D0 chỉ là dữ liệu giả “sao xanh”; câu trả lời phải
-hiện cảnh báo mô phỏng và citation. Kiểm tra readiness tại
+Mở `http://localhost:3000`. D0 gồm ba thủ tục hư cấu trong
+`data/demo_synthetic`; câu trả lời phải hiện cảnh báo mô phỏng và citation.
+Kiểm tra readiness tại
 `http://localhost:8000/health/rag`.
 
 Tắt stack:
@@ -56,8 +57,8 @@ Chạy từ `backend/` hoặc dùng đường dẫn tương đương:
 ```powershell
 uv run --frozen python -m app.rag.cli validate `
   --repo-root .. `
-  --dataset backend/tests/fixtures/rag `
-  --version fixture-v1 `
+  --dataset data/demo_synthetic `
+  --version synthetic-demo-v1 `
   --allow-domain fixture.invalid `
   --allow-fixture
 ```

@@ -41,7 +41,9 @@ def main() -> int:
         print("DOWNLOAD_REJECTED: URL must be HTTPS on an allowlisted official domain.")
         return 2
     if not output.is_relative_to(raw_root) or output.exists():
-        print("DOWNLOAD_REJECTED: output must be a new file under data/demo_public/raw.")
+        print(
+            "DOWNLOAD_REJECTED: output must be a new file under data/demo_public/raw."
+        )
         return 2
     if args.timeout <= 0 or args.max_bytes <= 0:
         print("DOWNLOAD_REJECTED: timeout and max-bytes must be positive.")
@@ -53,7 +55,9 @@ def main() -> int:
     try:
         robots.read()
     except OSError:
-        print("DOWNLOAD_BLOCKED: robots.txt could not be verified; use an approved manual export.")
+        print(
+            "DOWNLOAD_BLOCKED: robots.txt could not be verified; use an approved manual export."
+        )
         return 3
     if not robots.can_fetch(USER_AGENT, args.url):
         print("DOWNLOAD_BLOCKED: robots.txt does not allow this URL.")
@@ -84,9 +88,13 @@ def main() -> int:
         return 4
 
     value = hashlib.sha256(output.read_bytes()).hexdigest()
-    print(f"DOWNLOAD_OK path={output.relative_to(root).as_posix()} bytes={output.stat().st_size}")
+    print(
+        f"DOWNLOAD_OK path={output.relative_to(root).as_posix()} bytes={output.stat().st_size}"
+    )
     print(f"sha256={value}")
-    print("NEXT: add manifest metadata and obtain a second human review; download is not approval.")
+    print(
+        "NEXT: add manifest metadata and obtain a second human review; download is not approval."
+    )
     return 0
 
 

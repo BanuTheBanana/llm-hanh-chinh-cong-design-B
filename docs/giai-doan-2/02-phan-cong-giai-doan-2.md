@@ -10,10 +10,10 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.3` |
+| Phiên bản | `v1.4` |
 | Trạng thái | `G2_I01_D0_TECHNICAL_PASS; G2_FINAL_BLOCKED_BY_D1_AND_HOSTED_APPROVAL` |
 | Baseline bắt đầu | `main`, tag `g1-v1.0.0` |
-| Thay đổi lần này | Đã ghép ba branch, sửa contract/data/RAG, chạy D0 end-to-end qua Compose/API/Web; chưa công nhận D1 |
+| Thay đổi lần này | Hoàn thiện thêm `data/demo_synthetic`: 3 thủ tục/24 fragment/33 câu, validator và retrieval DEV/TEST pass; chưa công nhận D1 |
 | Dữ liệu được phép | D0 fixture; D1 công khai chỉ sau publish/review gate; D2 không được gửi ra ngoài |
 
 ---

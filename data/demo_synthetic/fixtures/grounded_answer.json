@@ -1,0 +1,20 @@
+{
+  "request_id": "00000000-0000-4000-8000-000000000101",
+  "evidence_bundle_id": "10000000-0000-4000-8000-000000000101",
+  "corpus_version": "synthetic-demo-v1",
+  "data_classification": "D0_SYSTEM_SMOKE",
+  "prompt_version": "g2-grounded-v2",
+  "answer": "BẢN MÔ PHỎNG D0 - KHÔNG PHẢI HƯỚNG DẪN: D0 giả lập – Lệ phí khai sinh Sao Mai là 5 đơn vị thử nghiệm; đây không phải mức phí thật.",
+  "status": "ANSWER",
+  "cited_fragment_ids": [
+    "frag_birth_star_fees"
+  ],
+  "missing_information": [],
+  "provider": "template",
+  "model": "template-grounded-v2",
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+  },
+  "latency_ms": 0
+}

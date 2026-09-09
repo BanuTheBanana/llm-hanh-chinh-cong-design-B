@@ -16,6 +16,8 @@ dist/
 data/*
 !data/demo_public/
 !data/demo_public/**
+!data/demo_synthetic/
+!data/demo_synthetic/**
 uploads/
 models/
 logs/

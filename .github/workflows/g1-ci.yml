@@ -20,6 +20,12 @@ jobs:
       - run: python scripts/check-repo-hygiene.py
       - name: Validate public-data draft consistency
         run: python tools/data/validate_dataset.py --root . --mode preflight
+      - name: Validate complete synthetic D0 dataset
+        run: >-
+          python tools/data/validate_dataset.py --root .
+          --dataset data/demo_synthetic
+          --classification D0_SYSTEM_SMOKE
+          --mode publish
 
   ai-service:
     runs-on: ubuntu-latest

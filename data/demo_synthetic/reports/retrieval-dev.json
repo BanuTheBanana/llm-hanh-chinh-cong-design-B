@@ -1,0 +1,440 @@
+{
+  "corpus_version": "synthetic-demo-v1",
+  "corpus_sha256": "4cac864a1bff101f46e7e64dad5364bd9eab568c63b01be1d774c8407cb22b64",
+  "synthetic_fixture": true,
+  "split": "DEV",
+  "top_k": 5,
+  "metric_scope": "retrieval only; not answer quality or legal correctness",
+  "positive_gold_queries": 21,
+  "query_count": 23,
+  "recall_at_k": 1.0,
+  "mrr": 0.7595238095238095,
+  "latency_ms": {
+    "p50": 0.3184000015608035,
+    "p95": 0.7436000014422461
+  },
+  "failed_question_ids": [],
+  "results": [
+    {
+      "question_id": "q_d0_001",
+      "retrieved_ids": [
+        "frag_birth_star_applicant_scope",
+        "frag_birth_star_receiving_authority",
+        "frag_birth_star_submission_methods",
+        "frag_birth_star_required_documents",
+        "frag_birth_star_steps"
+      ],
+      "gold_fragment_ids": [
+        "frag_birth_star_applicant_scope"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.6685
+    },
+    {
+      "question_id": "q_d0_002",
+      "retrieved_ids": [
+        "frag_birth_star_applicant_scope",
+        "frag_birth_star_submission_methods",
+        "frag_birth_star_required_documents",
+        "frag_birth_star_receiving_authority",
+        "frag_birth_star_steps"
+      ],
+      "gold_fragment_ids": [
+        "frag_birth_star_receiving_authority"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.25,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3527
+    },
+    {
+      "question_id": "q_d0_003",
+      "retrieved_ids": [
+        "frag_birth_star_submission_methods",
+        "frag_birth_star_applicant_scope",
+        "frag_birth_star_required_documents",
+        "frag_birth_star_processing_time",
+        "frag_birth_star_fees"
+      ],
+      "gold_fragment_ids": [
+        "frag_birth_star_submission_methods"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3335
+    },
+    {
+      "question_id": "q_d0_004",
+      "retrieved_ids": [
+        "frag_birth_star_applicant_scope",
+        "frag_birth_star_legal_bases",
+        "frag_birth_star_required_documents",
+        "frag_birth_star_processing_time",
+        "frag_birth_star_submission_methods"
+      ],
+      "gold_fragment_ids": [
+        "frag_birth_star_required_documents"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.3333333333333333,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3427
+    },
+    {
+      "question_id": "q_d0_005",
+      "retrieved_ids": [
+        "frag_birth_star_steps",
+        "frag_birth_star_applicant_scope",
+        "frag_birth_star_processing_time",
+        "frag_birth_star_fees",
+        "frag_birth_star_legal_bases"
+      ],
+      "gold_fragment_ids": [
+        "frag_birth_star_steps"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3144
+    },
+    {
+      "question_id": "q_d0_006",
+      "retrieved_ids": [
+        "frag_birth_star_fees",
+        "frag_birth_star_applicant_scope",
+        "frag_birth_star_legal_bases",
+        "frag_birth_star_processing_time",
+        "frag_birth_star_required_documents"
+      ],
+      "gold_fragment_ids": [
+        "frag_birth_star_fees"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.305
+    },
+    {
+      "question_id": "q_d0_007",
+      "retrieved_ids": [
+        "frag_birth_star_processing_time",
+        "frag_birth_star_applicant_scope",
+        "frag_birth_star_receiving_authority",
+        "frag_birth_star_required_documents",
+        "frag_birth_star_submission_methods"
+      ],
+      "gold_fragment_ids": [
+        "frag_birth_star_processing_time"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3006
+    },
+    {
+      "question_id": "q_d0_011",
+      "retrieved_ids": [
+        "frag_identity_moon_applicant_scope",
+        "frag_identity_moon_receiving_authority",
+        "frag_identity_moon_submission_methods",
+        "frag_identity_moon_required_documents",
+        "frag_identity_moon_fees"
+      ],
+      "gold_fragment_ids": [
+        "frag_identity_moon_applicant_scope"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3174
+    },
+    {
+      "question_id": "q_d0_012",
+      "retrieved_ids": [
+        "frag_identity_moon_applicant_scope",
+        "frag_identity_moon_submission_methods",
+        "frag_identity_moon_receiving_authority",
+        "frag_identity_moon_required_documents",
+        "frag_identity_moon_fees"
+      ],
+      "gold_fragment_ids": [
+        "frag_identity_moon_receiving_authority"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.3333333333333333,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3102
+    },
+    {
+      "question_id": "q_d0_013",
+      "retrieved_ids": [
+        "frag_identity_moon_applicant_scope",
+        "frag_identity_moon_submission_methods",
+        "frag_identity_moon_fees",
+        "frag_identity_moon_legal_bases",
+        "frag_identity_moon_processing_time"
+      ],
+      "gold_fragment_ids": [
+        "frag_identity_moon_submission_methods"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.5,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3201
+    },
+    {
+      "question_id": "q_d0_014",
+      "retrieved_ids": [
+        "frag_identity_moon_applicant_scope",
+        "frag_identity_moon_fees",
+        "frag_identity_moon_legal_bases",
+        "frag_identity_moon_processing_time",
+        "frag_identity_moon_required_documents"
+      ],
+      "gold_fragment_ids": [
+        "frag_identity_moon_required_documents"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.2,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3063
+    },
+    {
+      "question_id": "q_d0_015",
+      "retrieved_ids": [
+        "frag_identity_moon_steps",
+        "frag_identity_moon_applicant_scope",
+        "frag_identity_moon_fees",
+        "frag_identity_moon_legal_bases",
+        "frag_identity_moon_processing_time"
+      ],
+      "gold_fragment_ids": [
+        "frag_identity_moon_steps"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3086
+    },
+    {
+      "question_id": "q_d0_016",
+      "retrieved_ids": [
+        "frag_identity_moon_fees",
+        "frag_identity_moon_applicant_scope",
+        "frag_identity_moon_legal_bases",
+        "frag_identity_moon_processing_time",
+        "frag_identity_moon_submission_methods"
+      ],
+      "gold_fragment_ids": [
+        "frag_identity_moon_fees"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3023
+    },
+    {
+      "question_id": "q_d0_017",
+      "retrieved_ids": [
+        "frag_identity_moon_applicant_scope",
+        "frag_identity_moon_processing_time",
+        "frag_identity_moon_receiving_authority",
+        "frag_identity_moon_fees",
+        "frag_identity_moon_legal_bases"
+      ],
+      "gold_fragment_ids": [
+        "frag_identity_moon_processing_time"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.5,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.2968
+    },
+    {
+      "question_id": "q_d0_021",
+      "retrieved_ids": [
+        "frag_death_cloud_applicant_scope",
+        "frag_death_cloud_receiving_authority",
+        "frag_death_cloud_steps",
+        "frag_death_cloud_required_documents",
+        "frag_death_cloud_submission_methods"
+      ],
+      "gold_fragment_ids": [
+        "frag_death_cloud_applicant_scope"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3289
+    },
+    {
+      "question_id": "q_d0_022",
+      "retrieved_ids": [
+        "frag_death_cloud_applicant_scope",
+        "frag_death_cloud_steps",
+        "frag_death_cloud_receiving_authority",
+        "frag_death_cloud_required_documents",
+        "frag_death_cloud_submission_methods"
+      ],
+      "gold_fragment_ids": [
+        "frag_death_cloud_receiving_authority"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.3333333333333333,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3256
+    },
+    {
+      "question_id": "q_d0_023",
+      "retrieved_ids": [
+        "frag_death_cloud_submission_methods",
+        "frag_death_cloud_applicant_scope",
+        "frag_death_cloud_required_documents",
+        "frag_death_cloud_steps",
+        "frag_death_cloud_processing_time"
+      ],
+      "gold_fragment_ids": [
+        "frag_death_cloud_submission_methods"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3213
+    },
+    {
+      "question_id": "q_d0_024",
+      "retrieved_ids": [
+        "frag_death_cloud_applicant_scope",
+        "frag_death_cloud_required_documents",
+        "frag_death_cloud_legal_bases",
+        "frag_death_cloud_processing_time",
+        "frag_death_cloud_receiving_authority"
+      ],
+      "gold_fragment_ids": [
+        "frag_death_cloud_required_documents"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.5,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3226
+    },
+    {
+      "question_id": "q_d0_025",
+      "retrieved_ids": [
+        "frag_death_cloud_steps",
+        "frag_death_cloud_applicant_scope",
+        "frag_death_cloud_processing_time",
+        "frag_death_cloud_fees",
+        "frag_death_cloud_legal_bases"
+      ],
+      "gold_fragment_ids": [
+        "frag_death_cloud_steps"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3184
+    },
+    {
+      "question_id": "q_d0_026",
+      "retrieved_ids": [
+        "frag_death_cloud_fees",
+        "frag_death_cloud_applicant_scope",
+        "frag_death_cloud_required_documents",
+        "frag_death_cloud_legal_bases",
+        "frag_death_cloud_processing_time"
+      ],
+      "gold_fragment_ids": [
+        "frag_death_cloud_fees"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3163
+    },
+    {
+      "question_id": "q_d0_027",
+      "retrieved_ids": [
+        "frag_death_cloud_processing_time",
+        "frag_death_cloud_applicant_scope",
+        "frag_death_cloud_receiving_authority",
+        "frag_death_cloud_required_documents",
+        "frag_death_cloud_steps"
+      ],
+      "gold_fragment_ids": [
+        "frag_death_cloud_processing_time"
+      ],
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_status": "ANSWER",
+      "expected_status": "ANSWER",
+      "pass": true,
+      "latency_ms": 0.3128
+    },
+    {
+      "question_id": "q_d0_031",
+      "retrieved_ids": [],
+      "gold_fragment_ids": [],
+      "recall_at_k": null,
+      "reciprocal_rank": null,
+      "retrieval_status": "NEED_CLARIFICATION",
+      "expected_status": "NEED_CLARIFICATION",
+      "pass": true,
+      "latency_ms": 0.7516
+    },
+    {
+      "question_id": "q_d0_032",
+      "retrieved_ids": [],
+      "gold_fragment_ids": [],
+      "recall_at_k": null,
+      "reciprocal_rank": null,
+      "retrieval_status": "NEED_CLARIFICATION",
+      "expected_status": "NEED_CLARIFICATION",
+      "pass": true,
+      "latency_ms": 0.7436
+    }
+  ]
+}
