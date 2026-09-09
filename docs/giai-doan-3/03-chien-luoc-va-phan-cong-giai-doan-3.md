@@ -14,6 +14,7 @@
 | Dữ liệu | `D2_COMPANY_REAL`, không đưa lên GitHub |
 
 Đọc trước: [audit dataset công ty](01-audit-dataset-cong-ty.md),
+[data contract Tú–Minh](02-contract-data-g3.md),
 [contract G2](../contracts-g2.md) và
 [chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
 
@@ -166,7 +167,7 @@ Code parser/validator được commit; dữ liệu output tiếp tục ignored. 
 - title/alias/category/submission method;
 - documents, processing time, fee, receiving authority;
 - jurisdiction/effective dates hoặc `null` rõ ràng;
-- `missing_fields`, `review_status`, reviewer role và last verified time.
+- `missing_fields`, `review.status`, reviewer role và last verified time.
 
 Gate:
 
@@ -304,7 +305,8 @@ Branch: `g3/rag-minh`
 
 ### Công việc
 
-1. Chốt schema extension với Tú; không để importer phụ thuộc tên cột tùy tiện.
+1. Implement consumer của `g3-data-v1` cùng Tú; không để importer đọc Excel hay
+   phụ thuộc tên cột tùy tiện.
 2. Viết CLI import/validate từ normalized private path, không upload raw Excel.
 3. Chỉ ingest record đúng version và review status cho phép.
 4. Version corpus mới; hỗ trợ rollback và idempotent ingest.

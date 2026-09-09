@@ -17,9 +17,11 @@ baseline chứng minh model là bottleneck.
 ## Phân
 
 1. [Audit dataset công ty](01-audit-dataset-cong-ty.md).
-2. [Chiến lược và phân công G3](03-chien-luoc-va-phan-cong-giai-doan-3.md).
-3. [Contract grounded hiện tại](../contracts-g2.md).
-4. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
+2. [Data contract G3 giữa Tú và Minh](02-contract-data-g3.md).
+3. [Machine-readable JSON Schema](schema/data-contract-v1.schema.json).
+4. [Chiến lược và phân công G3](03-chien-luoc-va-phan-cong-giai-doan-3.md).
+5. [Contract grounded hiện tại](../contracts-g2.md).
+6. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
 
 ## Hợp
 

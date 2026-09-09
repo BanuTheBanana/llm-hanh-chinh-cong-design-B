@@ -23,7 +23,12 @@ Hồ sơ G2: [Phân công Giai đoạn 2](giai-doan-2/02-phan-cong-giai-doan-2.m
 **NOW** là đóng release G2 và kiểm kê dataset thật của công ty trước khi ingest.
 
 Hồ sơ G3: [Audit dataset công ty](giai-doan-3/01-audit-dataset-cong-ty.md) và
+[data contract Tú–Minh](giai-doan-3/02-contract-data-g3.md), sau đó đọc
 [chiến lược/phân công G3](giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md).
+
+Contract `g3-data-v1` là ranh giới đã khóa: Tú tạo private JSONL đúng schema,
+Minh chỉ ingest record đủ review gate. Mọi thay đổi field/enum/nullability phải
+đổi `schema_version`, cập nhật validator và được Tú–Minh cùng xác nhận.
 
 ### Kết luận audit đầu vào G3
 

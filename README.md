@@ -85,13 +85,14 @@ hoặc “khai tử Mây Trắng”; tên thủ tục có thể nằm trong mộ
 1. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
 2. [Chiến lược và phân công Giai đoạn 3](docs/giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md)
 3. [Audit dataset công ty](docs/giai-doan-3/01-audit-dataset-cong-ty.md)
-4. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
-5. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
-6. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
-7. [Grounded API contract G2](docs/contracts-g2.md)
-8. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
-9. [API contract G1](docs/contracts-g1.md)
-10. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
+4. [Data contract G3 giữa Tú và Minh](docs/giai-doan-3/02-contract-data-g3.md)
+5. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
+6. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
+7. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
+8. [Grounded API contract G2](docs/contracts-g2.md)
+9. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
+10. [API contract G1](docs/contracts-g1.md)
+11. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
 
 ## Cấu trúc repository
 
