@@ -5,8 +5,8 @@
 | Trường | Nội dung |
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
-| Phiên bản | `v1.3` |
-| Trạng thái | `G3_C1_TOOLING_READY; G3_A01_PASS_D0_E2E; HUMAN_REVIEW_REQUIRED` |
+| Phiên bản | `v1.4-integration` |
+| Trạng thái | `G3_C1_A01_R01_R02_TECHNICAL_PASS; D2_INTEGRATION_WAITING_FOR_REVIEWED_DATA` |
 
 ## Tổng
 
@@ -22,8 +22,10 @@ baseline chứng minh model là bottleneck.
 4. [Chiến lược và phân công G3](03-chien-luoc-va-phan-cong-giai-doan-3.md).
 5. [Hướng dẫn pipeline dữ liệu phần Tú](04-huong-dan-pipeline-data-tu.md).
 6. [Runbook Qwen3-1.7B local](04-runbook-qwen-local.md).
-7. [Contract grounded hiện tại](../contracts-g2.md).
-8. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
+7. [Runbook validator và retrieval G3 của Minh](../../backend/docs/g3/README.md).
+8. [Báo cáo test G3 Backend](../../backend/docs/g3/TEST_REPORT.md).
+9. [Contract grounded hiện tại](../contracts-g2.md).
+10. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
 
 ## Hợp
 
