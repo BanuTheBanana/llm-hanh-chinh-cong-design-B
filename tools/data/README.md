@@ -8,6 +8,9 @@
   24 fragment và 33 câu hỏi; không truy cập Internet.
 - `crawl_or_download.py`: chỉ tải một URL HTTPS thuộc allowlist, tôn trọng
   `robots.txt`, giới hạn dung lượng và không ghi đè snapshot cũ.
+- `g3_pipeline`: parser, validator và gold-draft builder cho workbook công ty G3.
+  Công cụ chỉ chạy local, output luôn nằm ở vùng `data/company_private/` bị ignore.
+  Xem [hướng dẫn phần Tú](../../docs/giai-doan-3/04-huong-dan-pipeline-data-tu.md).
 
 Không công cụ nào tự chuyển `review_status` sang `APPROVED`. Việc đó cần người
 review thứ hai và mentor xác nhận phạm vi sử dụng.

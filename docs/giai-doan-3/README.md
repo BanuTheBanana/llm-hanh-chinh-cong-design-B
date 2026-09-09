@@ -6,7 +6,7 @@
 |---|---|
 | Cập nhật gần nhất | 09/09/2026 |
 | Phiên bản | `v1.0` |
-| Trạng thái | `G3_READY_TO_START_CHECKPOINT_0` |
+| Trạng thái | `G3_C1_TOOLING_READY_REVIEW_REQUIRED` |
 
 ## Tổng
 
@@ -22,6 +22,7 @@ baseline chứng minh model là bottleneck.
 4. [Chiến lược và phân công G3](03-chien-luoc-va-phan-cong-giai-doan-3.md).
 5. [Contract grounded hiện tại](../contracts-g2.md).
 6. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
+7. [Hướng dẫn pipeline dữ liệu phần Tú](04-huong-dan-pipeline-data-tu.md).
 
 ## Hợp
 
