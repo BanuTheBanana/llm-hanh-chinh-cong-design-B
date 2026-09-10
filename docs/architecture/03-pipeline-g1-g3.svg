@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="900" viewBox="0 0 1100 900">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#99A6B8"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#4F86C6"/>
+    </marker>
+    <style>
+      .title { font: 700 25px Arial, sans-serif; fill: #243447; }
+      .subtitle { font: 14px Arial, sans-serif; fill: #65758B; }
+      .box-title { font: 700 15px Arial, sans-serif; fill: #0A4B8C; text-anchor: middle; }
+      .side-title { font: 700 14px Arial, sans-serif; fill: #30343B; text-anchor: middle; }
+      .box-sub { font: 14px Arial, sans-serif; fill: #1557A0; text-anchor: middle; }
+      .side-sub { font: 13px Arial, sans-serif; fill: #4B5563; text-anchor: middle; }
+      .edge-label { font: 11px Arial, sans-serif; fill: #6B7280; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect width="1100" height="900" fill="#FFFFFF"/>
+
+  <text x="55" y="53" class="title">Pipeline tổng quan hệ thống G1–G3</text>
+  <text x="57" y="79" class="subtitle">Luồng hỏi đáp hành chính có lưu lịch sử, truy xuất nguồn và kiểm tra an toàn</text>
+
+  <g fill="none" stroke="#99A6B8" stroke-width="1.5" marker-end="url(#arrow)">
+    <path d="M315 170 V205"/>
+    <path d="M315 275 V315" marker-start="url(#arrow)"/>
+    <path d="M315 390 V430"/>
+    <path d="M315 505 V545"/>
+    <path d="M315 627 V670"/>
+  </g>
+  <g fill="none" stroke="#99A6B8" stroke-width="1.3">
+    <path d="M510 353 H700" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+    <path d="M510 468 H700" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  </g>
+  <path d="M120 708 H70 V353 H120" fill="none" stroke="#4F86C6" stroke-width="1.5" stroke-dasharray="6 6" marker-end="url(#arrowBlue)"/>
+
+  <text x="340" y="299" class="edge-label">HTTP</text>
+  <text x="365" y="529" class="edge-label">Top-k evidence</text>
+  <text x="375" y="652" class="edge-label">Grounded answer</text>
+  <text x="605" y="345" class="edge-label">Lưu / đọc</text>
+  <text x="605" y="460" class="edge-label">Truy xuất</text>
+  <text x="74" y="535" class="edge-label" transform="rotate(-90 74 535)">Câu trả lời + nguồn</text>
+
+  <g>
+    <rect x="120" y="105" width="390" height="65" rx="11" fill="#FFFFFF" stroke="#D8DEE8" stroke-width="1.4"/>
+    <text x="315" y="133" class="side-title">Người dùng</text>
+    <text x="315" y="154" class="side-sub">Nhập câu hỏi</text>
+  </g>
+  <g>
+    <rect x="120" y="205" width="390" height="70" rx="11" fill="#EAF4FF" stroke="#7CB5F3" stroke-width="1.5"/>
+    <text x="315" y="235" class="box-title">Frontend</text>
+    <text x="315" y="258" class="box-sub">Giao diện chat • gửi/nhận HTTP</text>
+  </g>
+  <g>
+    <rect x="120" y="315" width="390" height="75" rx="11" fill="#EAF4FF" stroke="#7CB5F3" stroke-width="1.5"/>
+    <text x="315" y="347" class="box-title">Core Backend</text>
+    <text x="315" y="370" class="box-sub">Xác thực • điều phối • lưu tin nhắn</text>
+  </g>
+  <g>
+    <rect x="120" y="430" width="390" height="75" rx="11" fill="#EAF4FF" stroke="#7CB5F3" stroke-width="1.5"/>
+    <text x="315" y="462" class="box-title">RAG Retrieval</text>
+    <text x="315" y="485" class="box-sub">Tìm thủ tục và tạo Evidence Bundle</text>
+  </g>
+  <g>
+    <rect x="120" y="545" width="390" height="82" rx="11" fill="#EAF4FF" stroke="#7CB5F3" stroke-width="1.5"/>
+    <text x="315" y="579" class="box-title">AI Service / Provider</text>
+    <text x="315" y="603" class="box-sub">G1: Mock  •  G2: Grounded Template  •  G3: Local Qwen</text>
+  </g>
+  <g>
+    <rect x="120" y="670" width="390" height="75" rx="11" fill="#EAF4FF" stroke="#7CB5F3" stroke-width="1.5"/>
+    <text x="315" y="702" class="box-title">Kiểm tra và phản hồi an toàn</text>
+    <text x="315" y="725" class="box-sub">Kiểm nguồn • thử lại • hỏi lại/từ chối</text>
+  </g>
+
+  <g>
+    <rect x="700" y="318" width="305" height="70" rx="11" fill="#FFFFFF" stroke="#D8DEE8" stroke-width="1.4"/>
+    <text x="852.5" y="347" class="side-title">PostgreSQL</text>
+    <text x="852.5" y="370" class="side-sub">Người dùng • hội thoại • lịch sử</text>
+  </g>
+  <g>
+    <rect x="700" y="425" width="305" height="85" rx="11" fill="#FFFFFF" stroke="#D8DEE8" stroke-width="1.4"/>
+    <text x="852.5" y="453" class="side-title">Kho tri thức thủ tục</text>
+    <text x="852.5" y="477" class="side-sub">G2: dữ liệu giả lập</text>
+    <text x="852.5" y="497" class="side-sub">G3: dữ liệu công ty đã chuẩn hóa</text>
+  </g>
+
+  <rect x="120" y="795" width="885" height="58" rx="9" fill="#F7F9FC" stroke="#D8DEE8"/>
+  <text x="562.5" y="819" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#42526E">
+    <tspan font-weight="700">Tiến hóa qua 3 giai đoạn:</tspan>
+    <tspan> G1 dựng khung + Mock  →  G2 thêm RAG + Grounded Template</tspan>
+  </text>
+  <text x="562.5" y="840" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#42526E">→  G3 dùng dữ liệu thật + Qwen chạy local</text>
+</svg>

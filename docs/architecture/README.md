@@ -16,6 +16,11 @@ Nếu cần hai file độc lập:
 | Tổng quan | [01-tong-quan.drawio](01-tong-quan.drawio) | [01-tong-quan.png](01-tong-quan.png) | [01-tong-quan.svg](01-tong-quan.svg) |
 | Chi tiết | [02-chi-tiet.drawio](02-chi-tiet.drawio) | [02-chi-tiet.png](02-chi-tiet.png) | [02-chi-tiet.svg](02-chi-tiet.svg) |
 
+Pipeline gọn dùng trong báo cáo G1–G3 có file chỉnh sửa
+[03-pipeline-g1-g3.drawio](03-pipeline-g1-g3.drawio), bản
+[PNG](03-pipeline-g1-g3.png), bản [SVG](03-pipeline-g1-g3.svg) và
+[ảnh đã dùng trong báo cáo](04-pipeline-bao-cao-g1-g3.png).
+
 ## Mở và sửa trong draw.io
 
 1. Mở ứng dụng draw.io hoặc diagrams.net.
