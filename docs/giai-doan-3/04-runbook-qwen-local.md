@@ -30,6 +30,11 @@ Backend/RAG D0
 cho demo ở chế độ read-only và pin version/hash. Template vẫn từ chối D2. Local
 provider cũng từ chối D2 nếu thiếu `LOCAL_LLM_ALLOW_D2_COMPANY_DATA=true`.
 
+Khi demo qua Docker Desktop, áp dụng thêm `compose.g3.docker.yaml`. Overlay này
+chạy `llama-server` bằng CUDA ngay trong project G3, mount file GGUF và chat
+template ở chế độ read-only, rồi cho AI Service gọi qua mạng nội bộ Docker. Model
+vẫn là Qwen3-1.7B; `llama-server` chỉ là runtime.
+
 ## 1. Artifact phải khóa trước khi benchmark
 
 Ghi lại manifest sau, không để trống rồi tuyên bố kết quả:

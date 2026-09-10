@@ -28,6 +28,7 @@ baseline chứng minh model là bottleneck.
 10. [Báo cáo tích hợp và checklist đóng G3](05-bao-cao-tich-hop-va-dieu-kien-nghiem-thu-g3.md).
 11. [Contract grounded hiện tại](../contracts-g2.md).
 12. [Contract D2 runtime G3](../contracts-g3.md).
+13. [Hướng dẫn mở demo G1, G2 và G3 trên Docker Desktop](../huong-dan-demo-docker-g1-g2-g3.md).
 12. [Chiến lược trung tâm](../00-chien-luoc-trien-khai-tu-nho-den-lon.md).
 
 ## Hợp
