@@ -23,6 +23,13 @@ type RetryTurn = {
 
 const ACTIVE_CONVERSATION_KEY = 'g1-active-conversation-id'
 const UNAUTHORIZED_MESSAGE = 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.'
+const APP_STAGE = import.meta.env.VITE_APP_STAGE?.trim().toUpperCase() || 'G1'
+const STAGE_LABEL =
+  APP_STAGE === 'G3'
+    ? 'G3 / LOCAL QWEN'
+    : APP_STAGE === 'G2'
+      ? 'G2 / SYNTHETIC RAG'
+      : 'G1 / SYSTEM SMOKE'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -355,7 +362,7 @@ function App() {
     return (
       <main className="login-screen">
         <section className="login-panel">
-          <p className="eyebrow">G1 / SYSTEM SMOKE</p>
+          <p className="eyebrow">{STAGE_LABEL}</p>
           <h1>Trợ lý hành chính</h1>
           <p className="intro">Đăng nhập demo để bắt đầu một cuộc hội thoại.</p>
           <form onSubmit={handleLogin} className="login-form">
@@ -390,7 +397,7 @@ function App() {
     <main className="app-shell">
       <aside className="sidebar">
         <div className="brand-block">
-          <p className="eyebrow">G1 / WORKSPACE</p>
+          <p className="eyebrow">{APP_STAGE} / WORKSPACE</p>
           <h1>Hành chính</h1>
         </div>
         <button
@@ -466,7 +473,7 @@ function App() {
             <EmptyState
               mark="02"
               title="Cuộc trò chuyện đang trống"
-              description="Gửi một tin nhắn đầu tiên để kiểm tra đường ống G1."
+              description={`Gửi một tin nhắn đầu tiên để kiểm tra hệ thống ${APP_STAGE}.`}
             />
           ) : (
             messages.map((message) => (

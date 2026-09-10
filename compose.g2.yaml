@@ -1,6 +1,11 @@
 # Offline G2 overlay. It ingests only the synthetic D0 fixture and never calls
 # an external provider. Run together with compose.yaml; do not use for D1/D2.
 services:
+  web:
+    build:
+      args:
+        VITE_APP_STAGE: G2
+
   rag-init:
     build:
       context: ./backend

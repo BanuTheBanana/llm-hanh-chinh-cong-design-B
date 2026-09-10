@@ -1,6 +1,11 @@
 # G3 private-data overlay. llama-server runs on the developer host. The reviewed
 # D2 corpus is mounted read-only and is never sent to a hosted provider.
 services:
+  web:
+    build:
+      args:
+        VITE_APP_STAGE: G3
+
   ai-service:
     environment:
       GROUNDED_PROVIDER: local
