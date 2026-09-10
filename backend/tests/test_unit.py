@@ -9,6 +9,7 @@ import httpx
 import pytest
 from pydantic import ValidationError
 from starlette.requests import Request
+from starlette.responses import Response
 
 from app.ai import AIClient
 from app.config import Settings, get_settings
@@ -35,6 +36,7 @@ def test_settings_match_root_environment(monkeypatch):
     monkeypatch.setenv("LLM_MAX_OUTPUT_TOKENS", "512")
     monkeypatch.setenv("SESSION_COOKIE_SECURE", "true")
     monkeypatch.setenv("WEB_ORIGIN", "https://web.example")
+    monkeypatch.setenv("WEB_ORIGINS", "https://preview.example, https://web.example/")
 
     settings = Settings(_env_file=None)
 
@@ -43,6 +45,10 @@ def test_settings_match_root_environment(monkeypatch):
     assert settings.llm_max_output_tokens == 512
     assert settings.session_cookie_secure is True
     assert settings.web_origin == "https://web.example"
+    assert settings.allowed_web_origins == (
+        "https://web.example",
+        "https://preview.example",
+    )
 
 
 def test_ai_output_accepts_future_provider_names():
@@ -79,6 +85,33 @@ async def test_unhandled_error_log_is_correlated_without_exception_data(caplog):
     assert request_id in caplog.text
     assert "error_type=RuntimeError" in caplog.text
     assert "sensitive-exception-data" not in caplog.text
+
+
+async def test_explicit_loopback_origin_allows_browser_cross_site_header(monkeypatch):
+    monkeypatch.setattr(get_settings(), "web_origins", "http://127.0.0.1:3000")
+    request = Request(
+        {
+            "type": "http",
+            "http_version": "1.1",
+            "method": "POST",
+            "scheme": "http",
+            "path": "/api/v1/auth/login",
+            "raw_path": b"/api/v1/auth/login",
+            "query_string": b"",
+            "headers": [
+                (b"origin", b"http://127.0.0.1:3000"),
+                (b"sec-fetch-site", b"cross-site"),
+            ],
+            "client": ("127.0.0.1", 1234),
+            "server": ("test", 80),
+        }
+    )
+
+    async def accepted(_request):
+        return Response(status_code=204)
+
+    response = await trace_request(request, accepted)
+    assert response.status_code == 204
 
 
 async def test_ai_contract_success(monkeypatch):

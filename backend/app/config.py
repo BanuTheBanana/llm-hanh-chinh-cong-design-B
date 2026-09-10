@@ -41,9 +41,19 @@ class Settings(BaseSettings):
     session_cookie_secure: bool = False
     session_ttl_seconds: int = Field(default=86400, gt=0)
     web_origin: str = "http://localhost:3000"
+    web_origins: str = ""
+
+    @property
+    def allowed_web_origins(self) -> tuple[str, ...]:
+        """Return the primary Web origin plus explicitly configured local aliases."""
+        candidates = [self.web_origin, *self.web_origins.split(",")]
+        normalized = (origin.strip().rstrip("/") for origin in candidates if origin.strip())
+        return tuple(dict.fromkeys(normalized))
 
     @model_validator(mode="after")
     def validate_rag_safety(self):
+        if not self.allowed_web_origins:
+            raise ValueError("At least one Web origin is required.")
         if self.rag_enabled and not self.rag_corpus_version.strip():
             raise ValueError("RAG_CORPUS_VERSION is required when RAG_ENABLED=true.")
         if self.rag_allow_fixtures and self.app_env.lower() in {"production", "prod"}:

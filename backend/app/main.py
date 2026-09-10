@@ -73,9 +73,14 @@ async def trace_request(request: Request, call_next):
     try:
         # SameSite cookies plus explicit Origin validation for browser mutations.
         origin = request.headers.get("origin")
+        fetch_site = request.headers.get("sec-fetch-site")
+        forbidden_origin = (
+            origin.rstrip("/") not in settings.allowed_web_origins
+            if origin is not None
+            else fetch_site == "cross-site"
+        )
         if request.method in {"POST", "PUT", "PATCH", "DELETE"} and (
-            (origin is not None and origin != settings.web_origin)
-            or request.headers.get("sec-fetch-site") == "cross-site"
+            forbidden_origin
         ):
             response = error_response(request, 403, "FORBIDDEN_ORIGIN", "Origin không hợp lệ.")
         else:
@@ -119,7 +124,7 @@ async def trace_request(request: Request, call_next):
 # Outer CORS wrapper also decorates normalized error responses.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.web_origin],
+    allow_origins=list(settings.allowed_web_origins),
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type"],
