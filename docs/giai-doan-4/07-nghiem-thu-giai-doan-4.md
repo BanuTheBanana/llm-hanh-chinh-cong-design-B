@@ -1,17 +1,20 @@
 # Nghiệm thu Giai đoạn 4
 
-Ngày nghiệm thu: **11/09/2026**. Runtime release candidate:
-`00b2c0378e1ba2ea8f69856cf59e3b35049602bf`.
+Ngày nghiệm thu: **11/09/2026**. Các candidate đã mở release gate:
+`00b2c0378e1ba2ea8f69856cf59e3b35049602bf` (TEST_V2) và
+`824fd50e923f30c3103f833099e5cb68781c1205` (TEST_V3).
 
 ## Kết luận
 
 **G4 chưa đạt gate phát hành.** Hệ thống đã tích hợp đầy đủ phần Hoan, Minh và Tú,
-chạy ổn trên DEV, PostgreSQL, Docker Qwen local và Web. Tuy nhiên TEST_V2 độc lập
-cho kết quả chuỗi hội thoại nhiều lượt 85%, thấp hơn ngưỡng nội bộ 90%.
+chạy ổn trên DEV, PostgreSQL, Docker Qwen local và Web. TEST_V2 đạt 85% chuỗi
+hội thoại. TEST_V3 mới, sau khi sửa contract và khóa nhãn theo nguồn, chỉ đạt 5%; vì
+vậy không được tuyên bố G4 hoàn thành.
 
-Không dùng lỗi TEST_V2 để sửa code và không chạy lại bộ này. Muốn nghiệm thu lần
-tiếp theo phải phát triển bằng DEV/fixture hư cấu, sau đó tạo một TEST_V3 mới và
-khóa trước khi chấm.
+Không chạy lại hoặc dùng nội dung lỗi của TEST_V2/TEST_V3 để tuning. Lỗi tổng quát
+về câu nối tiếp dài đã được bổ sung bằng fixture hư cấu và DEV. Candidate hiện tại
+`439e1d7f46f9f689cc6ee754cea163fdbc33d3f3` cần một TEST_V4 mới, được giữ kín và
+khóa trước khi chấm đúng một lần.
 
 ## Thành phần đã hoàn thành
 
@@ -65,11 +68,35 @@ Hash TEST_V2:
 Hash corpus phục vụ:
 `3cf57b03c3c10d580e1dfe298b08728dd910198379c80bc30c338ed6d0e99181`.
 
+## Kết quả TEST_V3 khóa
+
+Gói Tú gửi ban đầu chưa đúng contract: thiếu metadata schema/review/PII, target
+`question` chưa trỏ tới lượt user cuối và một số gold label không khớp corpus. Leader
+đã sửa nhãn theo nguồn đã duyệt, kiểm schema/source/hash/leakage rồi khóa bản reviewed
+trước khi chấm. TEST_V2 cũ gửi kèm không được sử dụng.
+
+| Chỉ số | Kết quả | Gate |
+|---|---:|---:|
+| Số scenario | 40 | — |
+| Có căn cứ / abstain an toàn | 35 / 5 | — |
+| Field accuracy | 75% | ≥90% — không đạt |
+| Routing accuracy | 7,5% | ≥90% — không đạt |
+| Status accuracy | 22,5% | ≥90% — không đạt |
+| Recall@5 | 2,86% | ≥90% — không đạt |
+| MRR@5 | 0,0286 | — |
+| AnswerPlan đúng | 5% | ≥90% — không đạt |
+| Multi-turn chain | 5% | ≥90% — không đạt |
+| Lỗi claim trọng yếu | 28 | 0 — không đạt |
+
+Hash TEST_V3 reviewed:
+`bab36260dc4a920d6f315b73a0414834d90fedd9ea6c2bf7986a3bc12566d1a1`.
+Kết quả và marker một-lần chỉ lưu local trong `evaluation/reports/` bị Git-ignore.
+
 ## Xác minh kỹ thuật
 
-- Backend: 214 passed, 1 skipped; Ruff sạch.
+- Backend: 219 passed, 1 skipped; Ruff sạch.
 - AI service: 68 passed; Ruff sạch.
-- Data tools: 12 passed; Ruff sạch.
+- Data tools: 14 passed; các file G4 mới qua Ruff.
 - Web: 12 passed; build và ESLint sạch.
 - Migration database dùng một lần: `upgrade head → downgrade 0002 → upgrade head`
   đều qua; Docker đang ở `0003_g4_context`.
@@ -79,9 +106,9 @@ Hash corpus phục vụ:
 
 ## Việc tiếp theo để đạt G4.1
 
-1. Chỉ dùng DEV và fixture hư cấu để mở rộng robustness cho câu nối tiếp; không xem
-   ba ca TEST_V2 lỗi và không đổi threshold theo số TEST.
-2. Tú/reviewer tạo TEST_V3 mới, tách procedure/paraphrase với DEV và không giao đáp
-   án cho người sửa code.
-3. Đóng băng commit/config mới, chạy regression/Docker, rồi chấm TEST_V3 đúng một lần.
+1. Giữ TEST_V2/TEST_V3 đã dùng ở trạng thái lưu trữ; không chạy lại và không đổi
+   threshold theo kết quả TEST.
+2. Tú/reviewer tạo TEST_V4 mới, tách paraphrase/hội thoại với DEV và hai TEST cũ;
+   không giao câu hỏi hoặc gold cho người sửa code.
+3. Đóng băng commit/config mới, chạy regression/Docker, rồi chấm TEST_V4 đúng một lần.
 4. Chỉ gắn tag phát hành G4 khi toàn bộ gate, gồm multi-turn ≥90%, đều đạt.

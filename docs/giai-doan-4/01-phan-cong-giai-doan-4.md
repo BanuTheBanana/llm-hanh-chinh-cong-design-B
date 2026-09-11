@@ -22,6 +22,9 @@ Tài liệu nghiên cứu và lý do chọn phạm vi nằm tại [định hư�
 - Release candidate `00b2c03` đã được chấm TEST_V2 đúng một lần. Các gate tổng thể
   và claim trọng yếu đạt, nhưng multi-turn đạt 85%, thấp hơn ngưỡng 90%; vì vậy G4
   chưa được nghiệm thu phát hành. TEST_V2 tiếp tục khóa và không dùng để tuning.
+- TEST_V3 của Tú đã được leader sửa contract/nhãn, khóa và chấm đúng một lần trên
+  `824fd50`; kết quả 5% multi-turn nên tiếp tục không đạt. Candidate `439e1d7` đã
+  sửa lớp câu nối tiếp tổng quát bằng fixture hư cấu/DEV và đang chờ TEST_V4 mới.
 
 ## Thứ tự triển khai
 
