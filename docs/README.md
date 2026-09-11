@@ -2,6 +2,9 @@
 
 ## Tài liệu trung tâm
 
+Lộ trình sau nền tảng cơ bản: [Chiến lược dài hạn và chặng G5](lo-trinh-phat-trien-he-thong.md).
+Tài liệu này định hướng các chặng lớn; biên bản từng giai đoạn vẫn lưu kết quả thực tế.
+
 1. [Chiến lược triển khai từ nhỏ đến lớn](00-chien-luoc-trien-khai-tu-nho-den-lon.md)
 2. [Định hướng Giai đoạn 4](giai-doan-4/00-nghien-cuu-va-dinh-huong-g4.md)
 3. [Phân công Giai đoạn 4](giai-doan-4/01-phan-cong-giai-doan-4.md)
@@ -17,7 +20,8 @@
 13. [Hồ sơ phân công và nghiệm thu Giai đoạn 1](01-phan-cong-giai-doan-1.md)
 14. [Chỉ mục Giai đoạn 1](giai-doan-1/README.md)
 
-Chiến lược là roadmap đang có hiệu lực. Phân công G4 là task board hiện tại.
+Lộ trình dài hạn định hướng công việc sau G4; chiến lược từ nhỏ đến lớn lưu kế hoạch
+nền tảng G1–G3. Phân công G4 và biên bản nghiệm thu lưu tiến độ cùng các hạn chế còn lại.
 G1/G2/G3 đã nghiệm thu và tiếp tục được giữ làm regression baseline.
 
 ## Nhóm tài liệu
@@ -25,7 +29,7 @@ G1/G2/G3 đã nghiệm thu và tiếp tục được giữ làm regression basel
 | Thư mục | Vai trò | Trạng thái |
 |---|---|---|
 | `architecture/` | Sơ đồ hệ thống và file nguồn draw.io | Tham khảo |
-| `giai-doan-4/` | Nghiên cứu, phạm vi và task board G4 | Bắt đầu |
+| `giai-doan-4/` | Nghiên cứu, triển khai, đánh giá và bàn giao G4 | Đã tích hợp; gate chất lượng chưa đạt |
 | `giai-doan-3/` | Audit data, Qwen local, tích hợp và nghiệm thu G3 | Đã hoàn tất nền tảng cơ bản |
 | `giai-doan-2/` | Kế hoạch và biên bản nghiệm thu G2 | Đã hoàn tất |
 | `archive/` | Tài liệu cũ, giữ lại lịch sử quyết định | Lưu trữ |

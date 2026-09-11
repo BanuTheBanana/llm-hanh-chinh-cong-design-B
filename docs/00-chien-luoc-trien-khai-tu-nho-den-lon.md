@@ -1,6 +1,9 @@
 # Chiến lược triển khai từ nhỏ đến lớn – Trợ lý hành chính công
 
-> **Đây là kế hoạch thực thi đang có hiệu lực.**  
+> **Cập nhật 11/09/2026:** Kế hoạch dưới đây lưu cách xây nền tảng G1–G3.
+> Công việc sau G4 theo [lộ trình dài hạn và chặng G5](lo-trinh-phat-trien-he-thong.md).
+> Các trạng thái ở phần lịch sử bên dưới không thay thế biên bản nghiệm thu mới nhất.
+>
 > Mục tiêu: giúp nhóm ba người tạo được sản phẩm chạy thật sớm, sau đó tăng dần độ chính xác, tính lightweight và các tính năng hệ thống qua từng cổng nghiệm thu.  
 > Các kiến trúc Case/RAG/queue/verifier đầy đủ trước đây được giữ làm **Target Architecture / Backlog**, không triển khai đồng thời ở giai đoạn đầu.  
 > Cách trình bày: **Tổng → Phân → Hợp**.

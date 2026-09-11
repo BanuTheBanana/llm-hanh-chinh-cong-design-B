@@ -1,5 +1,9 @@
 # Nghiệm thu Giai đoạn 4
 
+> Cập nhật định hướng: xem [lộ trình dài hạn và chặng G5](../lo-trinh-phat-trien-he-thong.md).
+> Giữ nguyên kết quả G4 dưới đây. Không cần tạo TEST_V4 ngay để tiếp tục phát triển;
+> việc dùng bộ cũ làm chẩn đoán/regression và nghiệm thu cuối chặng theo mục 5 của lộ trình.
+
 Ngày nghiệm thu: **11/09/2026**. Các candidate đã mở release gate:
 `00b2c0378e1ba2ea8f69856cf59e3b35049602bf` (TEST_V2) và
 `824fd50e923f30c3103f833099e5cb68781c1205` (TEST_V3).
@@ -11,10 +15,11 @@ chạy ổn trên DEV, PostgreSQL, Docker Qwen local và Web. TEST_V2 đạt 85%
 hội thoại. TEST_V3 mới, sau khi sửa contract và khóa nhãn theo nguồn, chỉ đạt 5%; vì
 vậy không được tuyên bố G4 hoàn thành.
 
-Không chạy lại hoặc dùng nội dung lỗi của TEST_V2/TEST_V3 để tuning. Lỗi tổng quát
-về câu nối tiếp dài đã được bổ sung bằng fixture hư cấu và DEV. Candidate hiện tại
-`439e1d7f46f9f689cc6ee754cea163fdbc33d3f3` cần một TEST_V4 mới, được giữ kín và
-khóa trước khi chấm đúng một lần.
+Lỗi tổng quát về câu nối tiếp dài đã được bổ sung bằng fixture hư cấu và DEV trên
+candidate `439e1d7f46f9f689cc6ee754cea163fdbc33d3f3`. Đề xuất lúc ghi biên bản là
+tạo TEST_V4 để nghiệm thu tiếp. Theo lộ trình dài hạn mới, việc phát triển tiếp tục
+trên bộ phát triển/regression; bộ đánh giá độc lập mới dành cho cuối chặng lớn.
+Bộ TEST cũ nếu dùng phân tích lỗi phải ghi rõ đã mở và không còn là holdout độc lập.
 
 ## Thành phần đã hoàn thành
 
@@ -104,7 +109,10 @@ Kết quả và marker một-lần chỉ lưu local trong `evaluation/reports/` 
 - Chromium thật: đăng nhập, gửi câu, hiển thị citation và reload history qua.
 - Repository hygiene: không phát hiện secret hoặc dữ liệu công ty trong candidate.
 
-## Việc tiếp theo để đạt G4.1
+## Đề xuất nghiệm thu G4.1 tại thời điểm ghi biên bản (lịch sử)
+
+Danh sách dưới đây giữ lại lịch sử quyết định. Công việc sắp tới theo G5.1 trong
+lộ trình dài hạn; không yêu cầu tạo TEST_V4 ngay.
 
 1. Giữ TEST_V2/TEST_V3 đã dùng ở trạng thái lưu trữ; không chạy lại và không đổi
    threshold theo kết quả TEST.
