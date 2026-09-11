@@ -139,6 +139,32 @@ def test_context_refresh_provenance_switch_and_isolation(g4_data):
     assert other.pending_clarification == "procedure_id"
 
 
+@pytest.mark.parametrize(
+    ("followup", "field"),
+    [
+        (
+            "Bạn vui lòng cho biết cụ thể cơ quan nào sẽ tiếp nhận hồ sơ này?",
+            "receiving_authority",
+        ),
+        ("Tôi muốn hỏi rõ thêm chính xác phải chuẩn bị những giấy tờ gì?", "required_documents"),
+        ("Vậy bạn cho tôi biết cụ thể mức lệ phí cần nộp?", "fees"),
+        ("Còn thời gian giải quyết chi tiết là bao lâu?", "processing_times"),
+    ],
+)
+def test_polite_verbose_followup_keeps_active_procedure(g4_data, followup, field):
+    first = uuid4()
+    _, state, _ = prepare_turn(
+        g4_data, RetrievalInput(query="Mẫu Alpha cần giấy tờ gì?"), None, first
+    )
+
+    query, state, context = prepare_turn(g4_data, RetrievalInput(query=followup), state, uuid4())
+
+    assert query.filters.procedure_id == "fictional-alpha"
+    assert query.field_intents == [field]
+    assert state.active_procedure_id == "fictional-alpha"
+    assert context.source_message_ids["active_procedure_id"] == first
+
+
 def test_explicit_unknown_does_not_inherit(g4_data):
     _, state, _ = prepare_turn(g4_data, RetrievalInput(query="Mẫu Alpha lệ phí?"), None, uuid4())
     _, state, _ = prepare_turn(g4_data, RetrievalInput(query="Zzzzzzz giấy tờ gì?"), state, uuid4())

@@ -10,6 +10,8 @@ PATTERNS = {
         r"\b(?:den|toi) (?:dau|co quan nao)\b",
         r"\b(?:o dau|tai dau|co quan nao)\b",
         r"\b(?:noi nop|noi tiep nhan|dia diem|co quan tiep nhan|don vi tiep nhan)\b",
+        r"\b(?:co quan|don vi|bo phan) (?:nao )?(?:tiep nhan|giai quyet|xu ly)\b",
+        r"\b(?:ai|noi nao) (?:tiep nhan|giai quyet|xu ly)\b",
     ),
     "required_documents": (
         r"\b(?:giay to|thanh phan ho so|ho so gom|ho so can (?:nhung )?gi)\b",
@@ -19,6 +21,7 @@ PATTERNS = {
     "fees": (r"\b(?:phi|le phi|bao nhieu tien|ton bao nhieu|chi phi|mien phi|fees)\b",),
     "processing_times": (
         r"\b(?:thoi gian|bao lau|may ngay|bao nhieu ngay|thoi han|hen tra|khi nao co ket qua)\b",
+        r"\b(?:giai quyet|xu ly) (?:trong )?(?:bao lau|may ngay)\b",
     ),
     "submission_methods": (
         r"\b(?:hinh thuc|phuong thuc|truc tuyen|online|buu dien|buu chinh|nop cach nao)\b",

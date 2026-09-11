@@ -32,7 +32,8 @@ FOLLOWUP_WORDS = frozenset(
     "con nua vay thi a ah nhe nhe nho the du kien giai quyet ket qua mat ton "
     "nhan du hoan tat xong dau den can toi co quan don vi xin hoi biet giup minh em anh "
     "va hoac chuan bi giay to nop gui cach lieu khong duoc la nhu the nao "
-    "quy phuong thuc mang buu dien chinh buoc cac".split()
+    "quy phuong thuc mang buu dien chinh buoc cac ban cho muon ro cu chi tiet xac them "
+    "thong tin ve vui long noi phai muc se".split()
 )
 
 
