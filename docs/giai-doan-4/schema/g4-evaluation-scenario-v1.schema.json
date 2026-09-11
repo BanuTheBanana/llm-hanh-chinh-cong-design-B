@@ -31,7 +31,7 @@
     "scenario_version": {"const": "g4-eval-scenario-v1"},
     "scenario_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
     "dataset_version": {"type": "string", "minLength": 1, "maxLength": 128},
-    "split": {"enum": ["DEV", "TEST_V2"]},
+    "split": {"enum": ["DEV", "TEST_V2", "TEST_V3"]},
     "scenario_group_id": {"type": "string", "minLength": 1, "maxLength": 256},
     "procedure_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
     "procedure_title": {"type": "string", "minLength": 1, "maxLength": 1000},
@@ -98,6 +98,9 @@
         }
       }
     },
+    "scored_turn_index": {"type": "integer", "minimum": 0, "maximum": 8},
+    "scored_turn_role": {"const": "user"},
+    "answer_visibility": {"const": "private_gold_only"},
     "contains_pii": {"const": false},
     "review": {
       "type": "object",

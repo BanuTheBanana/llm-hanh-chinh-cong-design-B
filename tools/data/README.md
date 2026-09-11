@@ -65,3 +65,14 @@ Khi kiểm tra dữ liệu D0, phải truyền rõ:
 ```text
 --dataset data/demo_synthetic --classification D0_SYSTEM_SMOKE
 ```
+
+## Hidden TEST_V3
+
+TEST_V3 không được sinh hoặc lưu trong Git. Leader/reviewer dùng
+`g3_pipeline.g4_release_test` để chuẩn hóa nhãn theo corpus đã duyệt, kiểm tra schema,
+PII, source binding, trùng DEV/TEST_V2 và khóa SHA-256. Công cụ chỉ in thống kê và mã
+lỗi; không in câu hỏi, đáp án hoặc evidence riêng tư.
+
+Hai lệnh `prepare-lock` và `validate` bắt buộc nhận đường dẫn private tới corpus,
+TEST_V3, DEV, TEST_V2 cùng hai schema trong `docs/giai-doan-4/schema/`. Sau khi khóa,
+không dùng TEST_V3 để sửa retrieval, prompt hoặc model.

@@ -1,4 +1,4 @@
-"""Run the locked TEST_V2 once after the release commit is frozen.
+"""Run a locked G4 release test once after the release commit is frozen.
 
 Only aggregate metrics and immutable hashes are emitted. The one-time marker and
 result must remain under the ignored evaluation/reports directory.
@@ -21,7 +21,12 @@ sys.path.insert(0, str(ROOT / "backend"))
 from app.rag.answer_plan import build_answer_plan, plan_citations, render_plan
 from app.rag.g3.runtime import retrieve_active_dataset
 from app.rag.g3.validator import load_serving
-from app.rag.g4.evaluation import benchmark, prepare_scenario_target, read_locked_test_v2
+from app.rag.g4.evaluation import (
+    benchmark,
+    prepare_scenario_target,
+    read_locked_test_v2,
+    read_locked_test_v3,
+)
 from app.rag.retrieval import normalize
 
 
@@ -38,7 +43,11 @@ def private_output(path: Path) -> Path:
 
 def frozen_commit(expected: str) -> str:
     actual = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, check=True, capture_output=True, text=True
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
     ).stdout.strip()
     if actual != expected:
         raise ValueError("RELEASE_COMMIT_MISMATCH")
@@ -133,6 +142,8 @@ def main() -> int:
     parser.add_argument("--commit", required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--marker", type=Path, required=True)
+    parser.add_argument("--split", choices=("TEST_V2", "TEST_V3"), default="TEST_V2")
+    parser.add_argument("--test-dir", type=Path)
     parser.add_argument("--acknowledge-locked-test", action="store_true")
     args = parser.parse_args()
 
@@ -140,15 +151,35 @@ def main() -> int:
         raise ValueError("LOCKED_TEST_ACKNOWLEDGEMENT_REQUIRED")
     commit = frozen_commit(args.commit)
     dataset = args.dataset.resolve()
-    manifest_path = dataset / "g4_eval" / "scenario_manifest.json"
-    test_path = dataset / "g4_eval" / "scenario_test_v2.jsonl"
+    test_dir = args.test_dir.resolve() if args.test_dir else dataset / "g4_eval"
+    if args.split == "TEST_V2":
+        manifest_path = test_dir / "scenario_manifest.json"
+        test_path = test_dir / "scenario_test_v2.jsonl"
+    else:
+        manifest_path = test_dir / "scenario_test_v3_manifest.json"
+        test_path = test_dir / "scenario_test_v3.jsonl"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if (
-        manifest.get("scenario_set") != "G4-01-evaluation-v4"
-        or manifest.get("review_status") != "LOCKED"
-        or manifest.get("test_v2_lock", {}).get("status") != "LOCKED"
-        or manifest.get("dataset_version") != args.version
-    ):
+    if args.split == "TEST_V2":
+        manifest_ok = (
+            manifest.get("scenario_set") == "G4-01-evaluation-v4"
+            and manifest.get("review_status") == "LOCKED"
+            and manifest.get("test_v2_lock", {}).get("status") == "LOCKED"
+            and manifest.get("dataset_version") == args.version
+        )
+        expected_hash = manifest.get("sha256", {}).get("test_v2")
+    else:
+        manifest_ok = (
+            manifest.get("schema_version") == "g4-release-test-manifest-v1"
+            and manifest.get("split") == "TEST_V3"
+            and manifest.get("review_status") == "LOCKED"
+            and manifest.get("answer_visibility") == "PRIVATE_GOLD_ONLY"
+            and manifest.get("recipient") == "Hoan only"
+            and "model_tuning" in manifest.get("do_not_use_for", [])
+            and manifest.get("validation") == {"status": "PASS", "errors": {}}
+            and manifest.get("dataset_version") == args.version
+        )
+        expected_hash = manifest.get("sha256", {}).get("test")
+    if not manifest_ok:
         raise ValueError("LOCKED_MANIFEST_REQUIRED")
 
     marker = private_output(args.marker)
@@ -161,29 +192,34 @@ def main() -> int:
         "started_at": datetime.now(timezone.utc).isoformat(),
         "commit": commit,
         "scenario_set": manifest["scenario_set"],
-        "test_v2_sha256_expected": manifest["sha256"]["test_v2"],
+        "split": args.split,
+        "test_sha256_expected": expected_hash,
         "corpus_sha256_expected": args.corpus_sha256,
     }
     with marker.open("x", encoding="utf-8", newline="\n") as stream:
         json.dump(attempt, stream, indent=2)
         stream.write("\n")
 
-    rows, test_hash = read_locked_test_v2(test_path, acknowledged=True)
-    if test_hash != manifest["sha256"]["test_v2"]:
+    reader = read_locked_test_v2 if args.split == "TEST_V2" else read_locked_test_v3
+    rows, test_hash = reader(test_path, acknowledged=True)
+    if test_hash != expected_hash:
         raise ValueError("LOCKED_TEST_HASH_MISMATCH")
     data = load_serving(dataset, args.version, 10)
-    if data.fingerprint != args.corpus_sha256 or data.report()["readiness"] != "READY_FOR_DEMO":
+    if (
+        data.fingerprint != args.corpus_sha256
+        or data.report()["readiness"] != "READY_FOR_DEMO"
+    ):
         raise ValueError("APPROVED_SERVING_CORPUS_REQUIRED")
 
-    metrics = evaluate_rows(data, rows)
+    metrics = evaluate_rows(data, rows, expected_split=args.split)
     gate_passed = metrics.pop("gate_passed")
     result = {
         "schema_version": "g4-release-result-v1",
         "status": "PASS" if gate_passed else "FAIL",
-        "split": "TEST_V2",
+        "split": args.split,
         "commit": commit,
         "scenario_set": manifest["scenario_set"],
-        "test_v2_sha256": test_hash,
+        "test_sha256": test_hash,
         "corpus_sha256": data.fingerprint,
         **metrics,
     }

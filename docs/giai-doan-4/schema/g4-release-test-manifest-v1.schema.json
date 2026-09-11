@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/g4-release-test-manifest-v1.schema.json",
+  "title": "G4 hidden release-test manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dataset_version",
+    "scenario_set",
+    "generated_at",
+    "author_role",
+    "reviewer_role",
+    "reviewed_at",
+    "review_status",
+    "split",
+    "split_strategy",
+    "schema_file",
+    "procedure_count",
+    "scenario_count",
+    "multi_turn_count",
+    "field_counts",
+    "answer_visibility",
+    "recipient",
+    "do_not_use_for",
+    "files",
+    "sha256",
+    "validation"
+  ],
+  "properties": {
+    "schema_version": {"const": "g4-release-test-manifest-v1"},
+    "dataset_version": {"type": "string", "minLength": 1},
+    "scenario_set": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "author_role": {"type": "string", "minLength": 1, "maxLength": 64},
+    "reviewer_role": {"type": "string", "minLength": 1, "maxLength": 64},
+    "reviewed_at": {"type": "string", "format": "date-time"},
+    "review_status": {"const": "LOCKED"},
+    "split": {"const": "TEST_V3"},
+    "split_strategy": {"const": "HIDDEN_MULTITURN_PARAPHRASE"},
+    "schema_file": {"type": "string", "minLength": 1},
+    "procedure_count": {"const": 10},
+    "scenario_count": {"const": 40},
+    "multi_turn_count": {"const": 40},
+    "field_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receiving_authority", "required_documents", "fees", "processing_times"],
+      "properties": {
+        "receiving_authority": {"const": 10},
+        "required_documents": {"const": 10},
+        "fees": {"const": 10},
+        "processing_times": {"const": 10}
+      }
+    },
+    "answer_visibility": {"const": "PRIVATE_GOLD_ONLY"},
+    "recipient": {"const": "Hoan only"},
+    "do_not_use_for": {
+      "type": "array",
+      "uniqueItems": true,
+      "contains": {"const": "model_tuning"},
+      "items": {"type": "string", "minLength": 1}
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["test"],
+      "properties": {"test": {"const": "scenario_test_v3.jsonl"}}
+    },
+    "sha256": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["test"],
+      "properties": {"test": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "errors"],
+      "properties": {
+        "status": {"const": "PASS"},
+        "errors": {"type": "object", "maxProperties": 0}
+      }
+    }
+  }
+}

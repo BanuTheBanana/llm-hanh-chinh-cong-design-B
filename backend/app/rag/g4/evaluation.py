@@ -25,7 +25,7 @@ def _read_scenarios(path, *, filename, split):
     rows = [
         json.loads(line, object_pairs_hook=pairs) for line in raw.decode("utf-8-sig").splitlines()
     ]
-    require(bool(rows), "EMPTY_DEV")
+    require(bool(rows), f"EMPTY_{split}")
     seen = set()
     for row in rows:
         require(isinstance(row, dict) and row.get("split") == split, f"{split}_ONLY")
@@ -35,23 +35,39 @@ def _read_scenarios(path, *, filename, split):
         )
         require(row["scenario_id"] not in seen, f"DUPLICATE_{split}_ID")
         seen.add(row["scenario_id"])
-        require(type(row["is_multiturn"]) is bool, "DEV_MULTITURN_TYPE")
-        require(isinstance(row["question"], str), "DEV_QUERY_TYPE")
-        require(row["field_expected"] in SECTIONS, "DEV_UNKNOWN_FIELD")
+        require(type(row["is_multiturn"]) is bool, f"{split}_MULTITURN_TYPE")
+        require(isinstance(row["question"], str), f"{split}_QUERY_TYPE")
+        require(row["field_expected"] in SECTIONS, f"{split}_UNKNOWN_FIELD")
         require(
             row["expected_status"] in {"ANSWER", "NEED_CLARIFICATION", "INSUFFICIENT_DATA"},
-            "DEV_UNKNOWN_STATUS",
+            f"{split}_UNKNOWN_STATUS",
         )
-        require(row["conversation_turns"] == len(row["turns"]), "DEV_TURN_COUNT")
+        require(row["conversation_turns"] == len(row["turns"]), f"{split}_TURN_COUNT")
         roles = [turn.get("role") for turn in row["turns"]]
-        require(all(isinstance(turn.get("text"), str) for turn in row["turns"]), "DEV_TURN_TEXT")
-        require(roles[-1:] == ["user"], "DEV_FINAL_USER_TURN")
-        require(row["question"] == row["turns"][-1]["text"], "DEV_TARGET_TURN_MISMATCH")
+        require(
+            all(isinstance(turn.get("text"), str) for turn in row["turns"]),
+            f"{split}_TURN_TEXT",
+        )
+        require(roles[-1:] == ["user"], f"{split}_FINAL_USER_TURN")
+        require(
+            row["question"] == row["turns"][-1]["text"],
+            f"{split}_TARGET_TURN_MISMATCH",
+        )
         if row["is_multiturn"]:
-            require(roles == ["user", "assistant", "user"], "DEV_MULTITURN_STRUCTURE")
+            require(
+                roles == ["user", "assistant", "user"],
+                f"{split}_MULTITURN_STRUCTURE",
+            )
         else:
-            require(roles == ["user"], "DEV_SINGLE_TURN_STRUCTURE")
-        require(row["review"]["status"] == "APPROVED", "DEV_REVIEW_REQUIRED")
+            require(roles == ["user"], f"{split}_SINGLE_TURN_STRUCTURE")
+        if split == "TEST_V3":
+            require(row.get("scored_turn_index") == 2, "TEST_V3_SCORED_TURN_INDEX")
+            require(row.get("scored_turn_role") == "user", "TEST_V3_SCORED_TURN_ROLE")
+            require(
+                row.get("answer_visibility") == "private_gold_only",
+                "TEST_V3_ANSWER_VISIBILITY",
+            )
+        require(row["review"]["status"] == "APPROVED", f"{split}_REVIEW_REQUIRED")
         label = row["gold_label"]
         for a, b in [
             ("field", "field_expected"),
@@ -59,7 +75,7 @@ def _read_scenarios(path, *, filename, split):
             ("fragment_ids", "gold_fragment_ids"),
             ("status", "expected_status"),
         ]:
-            require(label[a] == row[b], "DEV_LABEL_MISMATCH")
+            require(label[a] == row[b], f"{split}_LABEL_MISMATCH")
     return rows, hashlib.sha256(raw).hexdigest()
 
 
@@ -70,6 +86,11 @@ def read_dev(path):
 def read_locked_test_v2(path, *, acknowledged=False):
     require(acknowledged, "LOCKED_TEST_ACKNOWLEDGEMENT_REQUIRED")
     return _read_scenarios(path, filename="scenario_test_v2.jsonl", split="TEST_V2")
+
+
+def read_locked_test_v3(path, *, acknowledged=False):
+    require(acknowledged, "LOCKED_TEST_ACKNOWLEDGEMENT_REQUIRED")
+    return _read_scenarios(path, filename="scenario_test_v3.jsonl", split="TEST_V3")
 
 
 def prepare_scenario_target(data, row, top_k):

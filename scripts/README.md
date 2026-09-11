@@ -73,3 +73,11 @@ python scripts/evaluate-g3-private.py
 Script từ chối endpoint không phải localhost, kiểm tra fingerprint corpus và
 TEST lock trước khi chạy, rồi chỉ in số liệu tổng hợp. Nội dung câu hỏi, đáp án,
 ID và evidence của dữ liệu công ty không được ghi ra terminal hoặc Git.
+
+## Release gate G4
+
+`evaluate-g4-release.py` hỗ trợ TEST_V2 và TEST_V3 đã khóa. TEST_V3 phải nằm ngoài
+Git, qua validator dữ liệu và được leader duyệt trước. Lệnh yêu cầu đúng commit sạch,
+hash corpus, cờ xác nhận và đường dẫn output/marker thuộc `evaluation/reports/` đang
+được Git-ignore. Mỗi cặp marker/output chỉ được tạo một lần và kết quả chỉ chứa số
+tổng hợp.

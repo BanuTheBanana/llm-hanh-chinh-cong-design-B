@@ -113,3 +113,38 @@ def test_release_metrics_on_fictional_test_scenario(release_evaluator, tmp_path)
     assert result["gate_passed"] is True
     assert result["plan_answer_accuracy"] == 1
     assert result["critical_claim_errors"] == 0
+
+
+def test_locked_test_v3_requires_final_user_target(tmp_path):
+    from app.rag.corpus import CorpusError
+    from app.rag.g4.evaluation import read_locked_test_v3
+
+    path = tmp_path / "scenario_test_v3.jsonl"
+    row = {
+        "scenario_version": "g4-eval-scenario-v1",
+        "scenario_id": "fictional-v3-001",
+        "split": "TEST_V3",
+        "field_expected": "fees",
+        "expected_status": "ANSWER",
+        "question": "Câu đầu bị chấm nhầm",
+        "is_multiturn": True,
+        "conversation_turns": 3,
+        "turns": [
+            {"role": "user", "text": "Tôi hỏi thủ tục giả lập."},
+            {"role": "assistant", "text": "Bạn muốn hỏi nội dung nào?"},
+            {"role": "user", "text": "Lệ phí là bao nhiêu?"},
+        ],
+        "review": {"status": "APPROVED"},
+        "gold_label": {
+            "status": "ANSWER",
+            "procedure_id": "fictional-alpha",
+            "field": "fees",
+            "fragment_ids": ["fictional-alpha:fees:001"],
+        },
+        "procedure_id": "fictional-alpha",
+        "gold_fragment_ids": ["fictional-alpha:fees:001"],
+    }
+    path.write_text(json.dumps(row, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    with pytest.raises(CorpusError, match="TEST_V3_TARGET_TURN_MISMATCH"):
+        read_locked_test_v3(path, acknowledged=True)
