@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/g4-evaluation-scenario-v1.schema.json",
+  "title": "G4 evaluation scenario",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scenario_version",
+    "scenario_id",
+    "dataset_version",
+    "split",
+    "scenario_group_id",
+    "procedure_id",
+    "procedure_title",
+    "field_expected",
+    "question",
+    "expected_status",
+    "gold_fragment_ids",
+    "gold_label",
+    "gold_answer",
+    "expected_points",
+    "must_include",
+    "must_exclude",
+    "is_multiturn",
+    "conversation_turns",
+    "turns",
+    "contains_pii",
+    "review"
+  ],
+  "properties": {
+    "scenario_version": {"const": "g4-eval-scenario-v1"},
+    "scenario_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "dataset_version": {"type": "string", "minLength": 1, "maxLength": 128},
+    "split": {"enum": ["DEV", "TEST_V2"]},
+    "scenario_group_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "procedure_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "procedure_title": {"type": "string", "minLength": 1, "maxLength": 1000},
+    "field_expected": {
+      "enum": [
+        "receiving_authority",
+        "required_documents",
+        "fees",
+        "processing_times",
+        "submission_methods",
+        "steps"
+      ]
+    },
+    "question": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "expected_status": {"enum": ["ANSWER", "INSUFFICIENT_DATA"]},
+    "gold_fragment_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 8,
+      "items": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"}
+    },
+    "gold_label": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "procedure_id", "field", "fragment_ids"],
+      "properties": {
+        "status": {"enum": ["ANSWER", "INSUFFICIENT_DATA"]},
+        "procedure_id": {"type": "string", "minLength": 1},
+        "field": {"$ref": "#/$defs/field"},
+        "fragment_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 8,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "gold_answer": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "oneOf": [
+          {"type": "string", "minLength": 1},
+          {"type": "object"}
+        ]
+      }
+    },
+    "expected_points": {"$ref": "#/$defs/textList"},
+    "must_include": {"$ref": "#/$defs/textList"},
+    "must_exclude": {"$ref": "#/$defs/textList"},
+    "is_multiturn": {"type": "boolean"},
+    "conversation_turns": {"type": "integer", "minimum": 1, "maximum": 9},
+    "turns": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "text"],
+        "properties": {
+          "role": {"enum": ["user", "assistant"]},
+          "text": {"type": "string", "minLength": 1, "maxLength": 8000}
+        }
+      }
+    },
+    "contains_pii": {"const": false},
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["author_role", "status", "reviewer_role", "reviewed_at", "decision", "flags"],
+      "properties": {
+        "author_role": {"type": "string", "minLength": 1, "maxLength": 64},
+        "status": {"enum": ["PENDING_REVIEW", "APPROVED"]},
+        "reviewer_role": {"type": ["string", "null"], "maxLength": 64},
+        "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+        "decision": {
+          "type": ["string", "null"],
+          "enum": [null, "APPROVED_AGAINST_NORMALIZED_SOURCE", "APPROVED_FOR_RAW_TEXT_ONLY"]
+        },
+        "flags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 128}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "field": {
+      "enum": [
+        "receiving_authority",
+        "required_documents",
+        "fees",
+        "processing_times",
+        "submission_methods",
+        "steps"
+      ]
+    },
+    "textList": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 50,
+      "items": {"type": "string", "minLength": 1, "maxLength": 8000}
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"is_multiturn": {"const": true}}},
+      "then": {
+        "properties": {
+          "conversation_turns": {"minimum": 3},
+          "turns": {"minItems": 3}
+        }
+      },
+      "else": {
+        "properties": {
+          "conversation_turns": {"const": 1},
+          "turns": {"maxItems": 1}
+        }
+      }
+    }
+  ]
+}

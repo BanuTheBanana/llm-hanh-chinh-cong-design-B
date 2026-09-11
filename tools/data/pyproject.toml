@@ -15,6 +15,10 @@ dev = ["pytest>=8,<9", "ruff>=0.11,<1"]
 hcc-build-company-data = "g3_pipeline.builder:main"
 hcc-release-demo-data = "g3_pipeline.release_demo:main"
 hcc-validate-company-data = "g3_pipeline.validator:main"
+hcc-g4-coverage = "g3_pipeline.coverage_tu_g4:main"
+hcc-build-g4-evaluation = "g3_pipeline.g4_tu_scenarios:main"
+hcc-validate-g4-evaluation = "g3_pipeline.g4_tu_validator:main"
+hcc-lock-g4-evaluation = "g3_pipeline.g4_tu_review:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/g4-evaluation-manifest-v1.schema.json",
+  "title": "G4 evaluation manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dataset_version",
+    "scenario_set",
+    "generated_at",
+    "author_role",
+    "reviewer_role",
+    "reviewed_at",
+    "review_status",
+    "split_strategy",
+    "schema_file",
+    "procedure_count",
+    "dev_count",
+    "test_v2_count",
+    "multi_turn_count",
+    "ambiguous_source_field_count",
+    "category_overlap_count",
+    "dev_procedure_ids",
+    "test_v2_procedure_ids",
+    "files",
+    "sha256",
+    "test_v2_lock"
+  ],
+  "properties": {
+    "schema_version": {"const": "g4-eval-manifest-v1"},
+    "dataset_version": {"type": "string", "minLength": 1},
+    "scenario_set": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "author_role": {"type": "string", "minLength": 1},
+    "reviewer_role": {"type": ["string", "null"], "maxLength": 64},
+    "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+    "review_status": {"enum": ["PENDING_REVIEW", "LOCKED"]},
+    "split_strategy": {"const": "PROCEDURE_ID_HOLDOUT"},
+    "schema_file": {"type": "string", "minLength": 1},
+    "procedure_count": {"const": 10},
+    "dev_count": {"const": 80},
+    "test_v2_count": {"const": 40},
+    "multi_turn_count": {"type": "integer", "minimum": 20},
+    "ambiguous_source_field_count": {"type": "integer", "minimum": 0},
+    "category_overlap_count": {"type": "integer", "minimum": 0},
+    "dev_procedure_ids": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "test_v2_procedure_ids": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dev", "test_v2"],
+      "properties": {
+        "dev": {"const": "g4_eval/scenario_dev.jsonl"},
+        "test_v2": {"const": "g4_eval/scenario_test_v2.jsonl"}
+      }
+    },
+    "sha256": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dev", "test_v2"],
+      "properties": {
+        "dev": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "test_v2": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "test_v2_lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "recipient", "do_not_use_for"],
+      "properties": {
+        "status": {"enum": ["PENDING_REVIEW", "LOCKED"]},
+        "recipient": {"const": "Hoan only"},
+        "do_not_use_for": {
+          "type": "array",
+          "contains": {"const": "model_tuning"},
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}
