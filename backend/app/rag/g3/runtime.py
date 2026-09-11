@@ -6,7 +6,7 @@ from pathlib import Path
 from uuid import UUID, uuid5
 
 from app.rag.g3.retrieval import retrieve
-from app.rag.g3.validator import Dataset, load
+from app.rag.g3.validator import Dataset, load_serving
 from app.rag.schemas import Evidence, EvidenceBundle, RetrievalInput
 
 
@@ -14,14 +14,13 @@ from app.rag.schemas import Evidence, EvidenceBundle, RetrievalInput
 def load_active_dataset(
     path: str, version: str, expected_rows: int, expected_sha256: str
 ) -> Dataset:
-    data = load(Path(path), version, expected_rows)
+    data = load_serving(Path(path), version, expected_rows)
     if data.fingerprint != expected_sha256:
         raise ValueError("G3_CORPUS_HASH_MISMATCH")
     if data.report()["readiness"] != "READY_FOR_DEMO":
         raise ValueError("G3_DATASET_NOT_READY")
-    # Evaluation-only gold/TEST and conflict records must not remain in the
-    # serving process after release validation. Retrieval needs only these
-    # three reviewed groups.
+    # Gold/evaluation files are never opened. Conflict records have been validated;
+    # retrieval retains only the three corpus groups.
     return Dataset(
         version=data.version,
         groups=[data.sources, data.procedures, data.fragments, {}, {}],
@@ -49,6 +48,8 @@ def retrieve_active_dataset(
         query.top_k,
         procedure_id=query.filters.procedure_id,
         as_of=query.filters.as_of.isoformat() if query.filters.as_of else None,
+        jurisdiction=query.filters.jurisdiction,
+        field_intents=query.field_intents,
     )
     evidence = []
     for item in found["evidence"]:

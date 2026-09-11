@@ -34,3 +34,10 @@ logs/
 # Generated evaluation reports; keep only the directory placeholder in Git.
 evaluation/reports/*
 !evaluation/reports/.gitkeep
+
+# G4 local data and evaluations
+company_private/
+**/company_private/
+**/g4_eval/
+*.rar
+*.xlsx

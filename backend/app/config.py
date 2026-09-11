@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     g3_expected_rows: int = Field(default=10, ge=1)
     g3_corpus_sha256: str = ""
     g3_allow_production: bool = False
+    g4_answer_plan_enabled: bool = False
     # Root Compose provides the origin; AIClient owns the internal route path.
     ai_service_url: str = "http://localhost:8001"
     ai_request_timeout_seconds: float = Field(default=10, gt=0, le=120)
@@ -52,6 +53,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_rag_safety(self):
+        if self.g4_answer_plan_enabled and not self.g3_d2_enabled:
+            raise ValueError("G4 AnswerPlan currently requires the approved G3 D2 corpus.")
         if not self.allowed_web_origins:
             raise ValueError("At least one Web origin is required.")
         if self.rag_enabled and not self.rag_corpus_version.strip():

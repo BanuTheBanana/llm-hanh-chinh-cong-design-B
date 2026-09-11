@@ -25,11 +25,13 @@ const ACTIVE_CONVERSATION_KEY = 'g1-active-conversation-id'
 const UNAUTHORIZED_MESSAGE = 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.'
 const APP_STAGE = import.meta.env.VITE_APP_STAGE?.trim().toUpperCase() || 'G1'
 const STAGE_LABEL =
-  APP_STAGE === 'G3'
-    ? 'G3 / LOCAL QWEN'
-    : APP_STAGE === 'G2'
-      ? 'G2 / SYNTHETIC RAG'
-      : 'G1 / SYSTEM SMOKE'
+  APP_STAGE === 'G4'
+    ? 'G4 / KIỂM CHỨNG EVIDENCE'
+    : APP_STAGE === 'G3'
+      ? 'G3 / LOCAL QWEN'
+      : APP_STAGE === 'G2'
+        ? 'G2 / SYNTHETIC RAG'
+        : 'G1 / SYSTEM SMOKE'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -553,6 +555,13 @@ function GroundingPanel({ grounding }: { grounding: Grounding }) {
       )}
       {grounding.data_classification === 'D2_COMPANY_REAL' && (
         <small className="grounding-demo">Nguồn nội bộ đã duyệt cho demo.</small>
+      )}
+      {grounding.verification && grounding.status === 'ANSWER' && (
+        <small className="grounding-demo">
+          {grounding.verification.fallback_used
+            ? 'Trích xuất nguyên văn: câu trả lời của model chưa qua kiểm tra đầy đủ.'
+            : 'Nội dung được dựng từ evidence, giữ nguyên các điều kiện trong nguồn.'}
+        </small>
       )}
       {grounding.sources.length > 0 && (
         <ol className="source-list" aria-label="Nguồn tham chiếu">

@@ -162,11 +162,12 @@ async def _answer_with_rag(db, query: RetrievalInput, request_id, ai):
     )
     if not bundle.evidence:
         status = retrieval_status
-        text = (
-            "Vui lòng cho biết thủ tục hoặc phạm vi địa phương cần tra cứu."
-            if status == "NEED_CLARIFICATION"
-            else "Chưa có đủ dữ liệu đã duyệt để trả lời câu hỏi này."
-        )
+        if status == "NEED_CLARIFICATION" and "field_intents" in missing_fields:
+            text = "Bạn muốn hỏi về hồ sơ, nơi nộp, lệ phí, thời gian hay cách thực hiện?"
+        elif status == "NEED_CLARIFICATION":
+            text = "Vui lòng cho biết thủ tục hoặc phạm vi địa phương cần tra cứu."
+        else:
+            text = "Chưa có đủ dữ liệu đã duyệt để trả lời câu hỏi này."
         grounding = Grounding(
             request_id=request_id,
             evidence_bundle_id=bundle.evidence_bundle_id,
@@ -178,6 +179,10 @@ async def _answer_with_rag(db, query: RetrievalInput, request_id, ai):
         )
         return text, grounding.model_dump(mode="json")
     # Never call legacy G1 generation as a fallback for a missing grounded endpoint.
+    if settings.g4_answer_plan_enabled:
+        from app.rag.planned_grounding import answer_with_plan
+
+        return await answer_with_plan(ai.client, bundle, data, fields=query.field_intents)
     answer = await generate_grounded(ai.client, bundle)
     grounding = validate_answer(answer, bundle)
     return answer.answer, grounding.model_dump(mode="json")

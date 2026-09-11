@@ -1,3 +1,7 @@
+> **G4:** đọc [hướng dẫn backend](docs/g4/README.md) trước khi chạy. Migration và
+> fingerprint phục vụ đã thay đổi; kết quả nghiệm thu nằm trong
+> `docs/giai-doan-4/07-nghiem-thu-giai-doan-4.md` ở thư mục gốc repository.
+
 > **G2 Retrieval/RAG đã được tích hợp và sửa contract trên `g2/integration`.** Bắt đầu ở
 > [docs/g2/README.md](docs/g2/README.md) để migrate lên `0002_g2_rag`, ingest,
 > chạy evaluation và ghép grounded AI. G1 mặc định vẫn bật; RAG là opt-in.

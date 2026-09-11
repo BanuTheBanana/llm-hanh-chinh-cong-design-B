@@ -1,0 +1,14 @@
+# Apply after compose.yaml + compose.g3.local.yaml, optionally compose.g3.docker.yaml.
+# G4 is a separate opt-in project. No G1/G2/G3 container is replaced.
+services:
+  ai-service:
+    environment:
+      LOCAL_LLM_BASE_URL: ${G4_LOCAL_LLM_BASE_URL:-http://host.docker.internal:8080/v1}
+      LOCAL_LLM_MODEL: ${G4_MODEL_NAME:-Qwen3-1.7B}
+  backend:
+    environment:
+      G4_ANSWER_PLAN_ENABLED: "true"
+  web:
+    build:
+      args:
+        VITE_APP_STAGE: G4

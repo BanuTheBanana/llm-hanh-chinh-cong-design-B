@@ -220,21 +220,24 @@ class LocalGroundedProvider(GroundedProvider):
         prefix = "Theo nguồn đã duyệt (chế độ trích xuất an toàn):"
         lines: list[str] = []
         cited_fragment_ids: list[str] = []
-        used_characters = len(prefix)
         for fragment in evidence:
             marker = "\n- "
-            available = MAX_GROUNDED_ANSWER_CHARACTERS - used_characters - len(marker)
-            if available <= 0:
-                break
             text = " ".join(fragment.text.split())
-            truncated = len(text) > available
-            if truncated:
-                text = text[: max(1, available - 1)].rstrip() + "…"
             lines.append(marker + text)
             cited_fragment_ids.append(fragment.fragment_id)
-            used_characters += len(marker) + len(text)
-            if truncated:
-                break
+
+        if len(prefix + "".join(lines)) > MAX_GROUNDED_ANSWER_CHARACTERS:
+            # A truncated fee/time exception can reverse the meaning of a claim.
+            return GroundedGenerationResult(
+                answer="Nội dung nguồn quá dài để trích xuất đầy đủ. Hãy hỏi từng mục cụ thể.",
+                status="INSUFFICIENT_DATA",
+                cited_fragment_ids=(),
+                missing_information=(),
+                provider=self.name,
+                model=self.model_name,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+            )
 
         logger.warning(
             "local_grounded_extractive_fallback evidence_count=%d cited_count=%d",

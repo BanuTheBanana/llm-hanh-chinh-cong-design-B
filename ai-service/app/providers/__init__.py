@@ -1,8 +1,22 @@
-from app.providers.base import AIProvider, GenerationResult
-from app.providers.grounded_base import GroundedGenerationResult, GroundedProvider
-from app.providers.local_grounded import LocalGroundedProvider
-from app.providers.mock import MockProvider
-from app.providers.template_grounded import TemplateGroundedProvider
+"""Lazy exports keep standalone grounding/benchmark imports free of cycles."""
+
+from importlib import import_module
+
+_MODULES = {
+    "AIProvider": "base",
+    "GenerationResult": "base",
+    "GroundedGenerationResult": "grounded_base",
+    "GroundedProvider": "grounded_base",
+    "LocalGroundedProvider": "local_grounded",
+    "MockProvider": "mock",
+    "TemplateGroundedProvider": "template_grounded",
+}
+
+
+def __getattr__(name):
+    if name not in _MODULES:
+        raise AttributeError(name)
+    return getattr(import_module(f"app.providers.{_MODULES[name]}"), name)
 
 __all__ = [
     "AIProvider",

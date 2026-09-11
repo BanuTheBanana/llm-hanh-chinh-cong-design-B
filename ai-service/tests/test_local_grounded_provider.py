@@ -246,9 +246,10 @@ async def test_extractive_fallback_stays_within_answer_budget(provider_factory):
         evidence=[evidence_fragment(text="A" * 8_000)],
     )
 
-    assert result.status == "ANSWER"
+    assert result.status == "INSUFFICIENT_DATA"
     assert len(result.answer) <= 8_000
-    assert result.answer.endswith("…")
+    assert result.cited_fragment_ids == ()
+    assert not result.answer.endswith("…")
 
 
 @pytest.mark.parametrize(

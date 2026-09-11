@@ -2,6 +2,7 @@ import hashlib
 from contextlib import asynccontextmanager
 from uuid import UUID
 
+from pydantic import ValidationError
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +11,9 @@ from app.config import get_settings
 from app.db import engine
 from app.errors import APIError
 from app.models import Conversation, Message, utcnow
+from app.rag.corpus import CorpusError
+from app.rag.g3.runtime import load_active_dataset
+from app.rag.g4.context import ConversationContext, prepare_turn
 from app.rag.grounding import answer_with_rag
 from app.rag.schemas import Filters, RetrievalInput
 from app.schemas import MessageInput, MessagePair
@@ -133,14 +137,40 @@ async def send_message(
         await db.commit()  # No idle database transaction during network I/O.
         try:
             grounding = None
+            next_context = None
             if get_settings().rag_enabled:
+                retrieval_query = RetrievalInput(
+                    query=body.content,
+                    filters=body.retrieval_filters,
+                    top_k=get_settings().rag_top_k,
+                )
+                if get_settings().g3_d2_enabled:
+                    settings = get_settings()
+                    try:
+                        data = load_active_dataset(
+                            str(settings.g3_private_dataset_path),
+                            settings.rag_corpus_version,
+                            settings.g3_expected_rows,
+                            settings.g3_corpus_sha256,
+                        )
+                        previous = (
+                            ConversationContext.model_validate(conversation.rag_context)
+                            if conversation.rag_context
+                            else None
+                        )
+                        retrieval_query, next_context, _ = prepare_turn(
+                            data,
+                            retrieval_query,
+                            previous,
+                            user_message.id,
+                        )
+                    except (CorpusError, ValueError, ValidationError) as exc:
+                        raise APIError(
+                            503, "RAG_CORPUS_UNAVAILABLE", "Corpus RAG chưa sẵn sàng."
+                        ) from exc
                 answer, grounding = await answer_with_rag(
                     db,
-                    RetrievalInput(
-                        query=body.content,
-                        filters=body.retrieval_filters,
-                        top_k=get_settings().rag_top_k,
-                    ),
+                    retrieval_query,
                     request_id,
                     ai,
                 )
@@ -154,6 +184,8 @@ async def send_message(
             conversation.updated_at = utcnow()
             await db.commit()
             raise
+        if next_context is not None:
+            conversation.rag_context = next_context.model_dump(mode="json")
         user_message.status = "completed"
         assistant = Message(
             conversation_id=conversation.id,

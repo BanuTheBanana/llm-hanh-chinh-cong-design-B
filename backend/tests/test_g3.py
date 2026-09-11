@@ -13,7 +13,7 @@ from app.rag.corpus import CorpusError
 from app.rag.g3.cli import main
 from app.rag.g3.retrieval import evaluate, retrieve
 from app.rag.g3.runtime import load_active_dataset, retrieve_active_dataset
-from app.rag.g3.validator import FILES, SECTIONS, digest, load
+from app.rag.g3.validator import FILES, SECTIONS, digest, load, load_serving
 from app.rag.schemas import RetrievalInput
 
 VERSION = "fictional-g3-v1"
@@ -152,7 +152,7 @@ def test_determinism(dataset):
 
 def test_runtime_projects_private_dataset_without_internal_locator(dataset):
     load_active_dataset.cache_clear()
-    expected_hash = load(dataset, VERSION, 2).fingerprint
+    expected_hash = load_serving(dataset, VERSION, 2).fingerprint
     data = load_active_dataset(str(dataset), VERSION, 2, expected_hash)
     bundle, status, missing = retrieve_active_dataset(
         data,

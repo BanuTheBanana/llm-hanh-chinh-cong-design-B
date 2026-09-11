@@ -19,6 +19,14 @@ export type Grounding = {
   model?: string | null
   sources: Citation[]
   missing_information: string[]
+  verification?: {
+    plan_version: 'g4-answer-plan-v1'
+    policy: 'full-claim-exact-v1'
+    candidate_checked: boolean
+    candidate_passed: boolean
+    fallback_used: boolean
+    reasons: string[]
+  } | null
 }
 export type Message = {
   id: string

@@ -192,7 +192,7 @@ describe('G1 web flow', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Đã xóa dữ liệu khỏi giao diện')
   })
 
-  it('renders verified grounding sources and refuses unsafe source schemes', async () => {
+  it.each([false, true])('renders sources and G4 extraction state (fallback=%s)', async (fallback) => {
     getConversationsMock.mockResolvedValue([conversationA])
     const grounding: Grounding = {
       request_id: '00000000-0000-4000-8000-000000000001',
@@ -204,6 +204,14 @@ describe('G1 web flow', () => {
       provider: 'template',
       model: 'template-grounded-v2',
       missing_information: [],
+      verification: {
+        plan_version: 'g4-answer-plan-v1',
+        policy: 'full-claim-exact-v1',
+        candidate_checked: true,
+        candidate_passed: !fallback,
+        fallback_used: fallback,
+        reasons: fallback ? ['FULL_CLAIM_TEXT_NOT_VERIFIED'] : [],
+      },
       sources: [
         {
           fragment_id: 'frag_fees',
@@ -237,6 +245,9 @@ describe('G1 web flow', () => {
       'https://fixture.invalid/synthetic',
     )
     expect(screen.getByText('Nguồn không an toàn').closest('a')).toBeNull()
+    expect(screen.getByText(fallback
+      ? /Trích xuất nguyên văn: câu trả lời của model/
+      : /Nội dung được dựng từ evidence/)).toBeInTheDocument()
   })
 
   it('renders a private reviewed D2 source without inventing a public link', async () => {

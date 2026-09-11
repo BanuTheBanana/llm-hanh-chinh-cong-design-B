@@ -6,6 +6,7 @@ from collections import Counter
 from time import perf_counter
 
 from app.rag.g3.validator import SECTIONS, require, scan
+from app.rag.g4.intent import detect_fields
 from app.rag.retrieval import normalize
 
 INTENTS = {
@@ -33,10 +34,12 @@ ROUTING_STOPWORDS = frozenset(
         "cho",
         "chuan",
         "co",
+        "con",
         "cua",
         "dia",
         "duoc",
         "gi",
+        "giai",
         "han",
         "hanh",
         "hay",
@@ -44,13 +47,20 @@ ROUTING_STOPWORDS = frozenset(
         "ho",
         "lam",
         "le",
+        "ly",
         "may",
+        "mat",
+        "muc",
         "muon",
         "nao",
+        "nay",
         "ngay",
         "nhan",
         "nhieu",
         "nhung",
+        "nguon",
+        "nua",
+        "noi",
         "nop",
         "o",
         "online",
@@ -59,7 +69,10 @@ ROUTING_STOPWORDS = frozenset(
         "phi",
         "phuong",
         "qua",
+        "quy",
+        "quyet",
         "so",
+        "sao",
         "tai",
         "thanh",
         "theo",
@@ -67,16 +80,27 @@ ROUTING_STOPWORDS = frozenset(
         "thu",
         "tiep",
         "tien",
+        "thi",
         "toi",
         "to",
         "tra",
         "trinh",
+        "trong",
         "truc",
+        "truong",
         "tuc",
         "tuyen",
         "vi",
+        "vay",
+        "vua",
         "ve",
         "voi",
+        "xu",
+        "gom",
+        "hop",
+        "dinh",
+        "khong",
+        "khoan",
     }
 ) | frozenset(
     token for phrases in INTENTS.values() for phrase in phrases for token in phrase.split()
@@ -128,11 +152,41 @@ def procedure_names(data, procedure):
     return sorted(names)
 
 
+def fields_for_query(data, query):
+    return detect_fields(
+        query, [name for p in data.procedures.values() for name in procedure_names(data, p)]
+    )
+
+
 def routing_query(query):
     return " ".join(token for token in normalize(query).split() if token not in ROUTING_STOPWORDS)
 
 
-def retrieve(data, query, top_k=5, procedure_id=None, category=None, as_of=None):
+def _unusable_placeholder_fields(procedure, fields):
+    """Fields whose reviewed raw value is only an opaque spreadsheet placeholder."""
+    unusable = set()
+    for field in fields & {"fees", "processing_times"}:
+        values = procedure.get(field, [])
+        raw_values = {
+            str(item.get("raw_text", "")).strip().casefold()
+            for item in values
+            if isinstance(item, dict)
+        }
+        if raw_values & {"0.0", "05"}:
+            unusable.add(field)
+    return unusable
+
+
+def retrieve(
+    data,
+    query,
+    top_k=5,
+    procedure_id=None,
+    category=None,
+    as_of=None,
+    jurisdiction=None,
+    field_intents=None,
+):
     require(isinstance(query, str) and 0 < len(query.strip()) <= 4000, "INVALID_QUERY")
     require(type(top_k) is int and 1 <= top_k <= 8, "INVALID_TOP_K")
     # User input need not already satisfy the producer's NFC/trim invariant.
@@ -140,17 +194,17 @@ def retrieve(data, query, top_k=5, procedure_id=None, category=None, as_of=None)
     normalized_query = unicodedata.normalize("NFC", query.strip())
     scan(normalized_query)
     q = " " + normalize(normalized_query) + " "
-    fields = {
-        field
-        for field, phrases in INTENTS.items()
-        if any(" " + term + " " in q for term in phrases)
-    }
+    fields = (
+        fields_for_query(data, normalized_query) if field_intents is None else set(field_intents)
+    )
+    require(fields <= SECTIONS.keys(), "INVALID_FIELD_INTENTS")
     result = {
         "status": "INSUFFICIENT_DATA",
         "procedure_id": None,
         "evidence": [],
         "missing_fields": [],
         "reason": "RETRIEVAL_MISS",
+        "field_intents": sorted(fields),
     }
     pool = [
         p
@@ -207,7 +261,27 @@ def retrieve(data, query, top_k=5, procedure_id=None, category=None, as_of=None)
     result["procedure_id"] = pid
     if pid not in data.accepted:
         return dict(result, reason=data.rejected[pid])
-    missing = sorted(fields & set(p["missing_fields"]))
+    if jurisdiction:
+        requested_scope = normalize(jurisdiction)
+        available_scope = {
+            normalize(v) for k, v in p["jurisdiction"].items() if v and k != "country_code"
+        }
+        # Unknown scope cannot be asserted; no inference from evidence prose.
+        combined_scope = normalize(
+            " ".join(v for k, v in p["jurisdiction"].items() if v and k != "country_code")
+        )
+        if requested_scope not in available_scope and requested_scope != combined_scope:
+            return dict(result, missing_fields=["jurisdiction"], reason="JURISDICTION_UNVERIFIED")
+    if field_intents is not None and not fields:
+        return dict(
+            result,
+            status="NEED_CLARIFICATION",
+            missing_fields=["field_intents"],
+            reason="FIELD_NOT_SPECIFIED",
+        )
+    missing = sorted(
+        (fields & set(p["missing_fields"])) | _unusable_placeholder_fields(p, fields)
+    )
     if missing:
         return dict(result, missing_fields=missing, reason="DATA_MISSING")
     # No fragment from a declared missing field may enter any evidence bundle.
@@ -244,8 +318,18 @@ def retrieve(data, query, top_k=5, procedure_id=None, category=None, as_of=None)
         usable.append(f)
     scores = bm25(normalized_query, [f["text"] for f in usable])
     ranked = sorted(zip(scores, usable), key=lambda x: (-x[0], x[1]["fragment_id"]))
+    # Reserve one hit per requested field before filling the remaining Top-K slots.
+    # Do not raise K to disguise an intent error.
+    reserved = []
+    for field in sorted(fields):
+        candidate = next(
+            (item for item in ranked if item[1]["section_type"] == SECTIONS[field]), None
+        )
+        if candidate and candidate not in reserved:
+            reserved.append(candidate)
+    selection = (reserved + [item for item in ranked if item not in reserved])[:top_k]
     selected, budget = [], 0
-    for score, f in ranked[:top_k]:
+    for score, f in selection:
         if budget + len(f["text"]) > 32000:
             break
         budget += len(f["text"])

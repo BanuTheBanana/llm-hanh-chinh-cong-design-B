@@ -9,6 +9,19 @@
 
 Tài liệu nghiên cứu và lý do chọn phạm vi nằm tại [định hướng G4](00-nghien-cuu-va-dinh-huong-g4.md).
 
+### Cập nhật 11/09/2026
+
+- Hoan đã có implementation AnswerPlan/guard, test, Docker G4 riêng và benchmark
+  local 0.6B/1.7B/4B. Giữ 1.7B mặc định; xem [bàn giao kỹ thuật](03-hoan-answer-plan-va-tich-hop.md)
+  và [kết quả so sánh](04-ket-qua-so-sanh-qwen.md).
+- G4-01 của Tú đã hoàn tất kỹ thuật và review: 80 DEV, 40 TEST_V2, 36 multi-turn,
+  split 8/2 thủ tục, schema/validator/test đầy đủ; manifest v4 đã khóa bởi Hoan.
+- G4-02/G4-04 của Minh đã được hợp nhất với G4-01 của Tú và G4-03/G4-05 của Hoan.
+- DEV đã chấm đủ 80 scenario, gồm 16 scenario nhiều lượt; toàn bộ gate kỹ thuật DEV
+  đạt. PostgreSQL, Qwen local, API và Chromium Docker đã qua smoke.
+- Release candidate đã sẵn sàng để đóng băng. TEST_V2 vẫn khóa và chỉ được chạy một
+  lần sau commit cuối của code/config.
+
 ## Thứ tự triển khai
 
 ```text

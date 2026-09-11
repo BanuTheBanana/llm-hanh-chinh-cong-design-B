@@ -140,12 +140,14 @@ class Dataset:
         }
 
 
-def load(dataset: Path, version: str, expected_rows: int = 42, production=False):
+def load(
+    dataset: Path, version: str, expected_rows: int = 42, production=False, *, include_gold=True
+):
     require(bool(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}", version)), "INVALID_VERSION")
     require(expected_rows > 0, "INVALID_EXPECTED_ROWS")
     root = dataset.resolve()
     groups, seen = [], set()
-    for filename, kind, key in FILES:
+    for filename, kind, key in FILES if include_gold else FILES[:4]:
         path = root / filename
         require(path.resolve().is_relative_to(root), "FILE_OUTSIDE_DATASET")
         try:
@@ -173,6 +175,8 @@ def load(dataset: Path, version: str, expected_rows: int = 42, production=False)
             groups.append({r[key]: r for r in rows})
         except (OSError, UnicodeError, json.JSONDecodeError):
             raise CorpusError("JSONL_READ_OR_PARSE_ERROR") from None
+    if not include_gold:
+        groups.append({})
     sources, procedures, fragments, conflicts, gold = groups
     require(bool(sources and procedures), "EMPTY_CORPUS")
     row_refs, workbook_hashes = set(), set()
@@ -317,5 +321,13 @@ def load(dataset: Path, version: str, expected_rows: int = 42, production=False)
             rejected[pid] = reason
         else:
             accepted.append(pid)
-    fp = digest(canonical([list(g.values()) for g in groups]).encode("utf-8"))
+    fingerprint_input = [list(g.values()) for g in groups]
+    if not include_gold:
+        fingerprint_input = {"format": "g4-serving-corpus-v1", "groups": fingerprint_input[:4]}
+    fp = digest(canonical(fingerprint_input).encode("utf-8"))
     return Dataset(version, groups, fp, accepted, rejected, len(row_refs))
+
+
+def load_serving(dataset: Path, version: str, expected_rows: int = 10, production=False):
+    """Validate corpus + conflicts only. Never open gold or evaluation files."""
+    return load(dataset, version, expected_rows, production, include_gold=False)

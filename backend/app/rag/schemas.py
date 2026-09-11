@@ -136,6 +136,8 @@ class Filters(Strict):
 
 
 class RetrievalInput(Strict):
+    # Internal override for a pending clarification; not exposed by MessageInput.
+    field_intents: list[ID] | None = None
     query: QueryText
     top_k: int = Field(default=5, ge=1, le=8, strict=True)
     filters: Filters = Field(default_factory=Filters)
@@ -228,6 +230,15 @@ class Citation(Strict):
     metadata: dict
 
 
+class VerificationResult(Strict):
+    plan_version: Literal["g4-answer-plan-v1"] = "g4-answer-plan-v1"
+    policy: Literal["full-claim-exact-v1"] = "full-claim-exact-v1"
+    candidate_checked: bool
+    candidate_passed: bool
+    fallback_used: bool
+    reasons: list[str]
+
+
 class Grounding(Strict):
     request_id: UUID
     evidence_bundle_id: UUID
@@ -239,6 +250,7 @@ class Grounding(Strict):
     model: ID | None = None
     sources: list[Citation]
     missing_information: list[str]
+    verification: VerificationResult | None = None
 
 
 class GoldQuestion(Strict):
