@@ -19,8 +19,9 @@ Tài liệu nghiên cứu và lý do chọn phạm vi nằm tại [định hư�
 - G4-02/G4-04 của Minh đã được hợp nhất với G4-01 của Tú và G4-03/G4-05 của Hoan.
 - DEV đã chấm đủ 80 scenario, gồm 16 scenario nhiều lượt; toàn bộ gate kỹ thuật DEV
   đạt. PostgreSQL, Qwen local, API và Chromium Docker đã qua smoke.
-- Release candidate đã sẵn sàng để đóng băng. TEST_V2 vẫn khóa và chỉ được chạy một
-  lần sau commit cuối của code/config.
+- Release candidate `00b2c03` đã được chấm TEST_V2 đúng một lần. Các gate tổng thể
+  và claim trọng yếu đạt, nhưng multi-turn đạt 85%, thấp hơn ngưỡng 90%; vì vậy G4
+  chưa được nghiệm thu phát hành. TEST_V2 tiếp tục khóa và không dùng để tuning.
 
 ## Thứ tự triển khai
 
