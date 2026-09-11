@@ -68,11 +68,12 @@ def review_and_lock(
         review["status"] = "APPROVED"
         review["reviewer_role"] = reviewer_role
         review["reviewed_at"] = reviewed_at
-        review["decision"] = (
-            "APPROVED_FOR_RAW_TEXT_ONLY"
-            if review["flags"]
-            else "APPROVED_AGAINST_NORMALIZED_SOURCE"
-        )
+        if review["flags"] and row["expected_status"] == "INSUFFICIENT_DATA":
+            review["decision"] = "APPROVED_AS_INSUFFICIENT_DATA"
+        elif review["flags"]:
+            review["decision"] = "APPROVED_FOR_RAW_TEXT_ONLY"
+        else:
+            review["decision"] = "APPROVED_AGAINST_NORMALIZED_SOURCE"
 
     dev_bytes = _encode_jsonl(dev)
     test_bytes = _encode_jsonl(test_v2)

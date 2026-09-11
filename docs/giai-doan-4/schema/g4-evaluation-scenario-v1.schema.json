@@ -110,7 +110,12 @@
         "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
         "decision": {
           "type": ["string", "null"],
-          "enum": [null, "APPROVED_AGAINST_NORMALIZED_SOURCE", "APPROVED_FOR_RAW_TEXT_ONLY"]
+          "enum": [
+            null,
+            "APPROVED_AGAINST_NORMALIZED_SOURCE",
+            "APPROVED_FOR_RAW_TEXT_ONLY",
+            "APPROVED_AS_INSUFFICIENT_DATA"
+          ]
         },
         "flags": {
           "type": "array",

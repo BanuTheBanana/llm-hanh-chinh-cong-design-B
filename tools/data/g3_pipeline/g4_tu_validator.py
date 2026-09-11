@@ -274,8 +274,14 @@ def validate_bundle(
             or review.get("reviewer_role") == review.get("author_role")
         ):
             errors["APPROVED_REVIEW_METADATA_INVALID"] += 1
-        elif flags and review.get("decision") != "APPROVED_FOR_RAW_TEXT_ONLY":
-            errors["AMBIGUOUS_REVIEW_DECISION_INVALID"] += 1
+        elif flags:
+            expected_decision = (
+                "APPROVED_AS_INSUFFICIENT_DATA"
+                if row.get("expected_status") == "INSUFFICIENT_DATA"
+                else "APPROVED_FOR_RAW_TEXT_ONLY"
+            )
+            if review.get("decision") != expected_decision:
+                errors["AMBIGUOUS_REVIEW_DECISION_INVALID"] += 1
         elif not flags and review.get("decision") != "APPROVED_AGAINST_NORMALIZED_SOURCE":
             errors["REVIEW_DECISION_INVALID"] += 1
 
