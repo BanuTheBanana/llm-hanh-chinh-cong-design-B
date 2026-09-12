@@ -57,3 +57,8 @@ Bước tiếp theo là bổ sung dữ liệu đã review cho lỗi follow-up, s
 scope/date và boundary; nối output đã kiểm chứng vào luồng chat; sau đó mới chạy replay
 hội thoại và một TEST kín duy nhất. Số tổng hợp có fingerprint nằm tại
 [`evaluation/baselines/g5-intent-context-pilot-20260912.json`](../../evaluation/baselines/g5-intent-context-pilot-20260912.json).
+
+Ngày 13/09, output đã được nối vào AI Service và chat G5 với verifier/reducer/fallback;
+live smoke một ca D0 qua đúng model+adapter. Việc còn lại là chạy full Docker replay và
+cải thiện chất lượng, không phải chọn lại model. Xem
+[mốc tích hợp runtime](12-tich-hop-intent-context-runtime.md).

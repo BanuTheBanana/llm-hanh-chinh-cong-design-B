@@ -78,3 +78,12 @@ class AIOutput(BaseModel):
     model: str = Field(min_length=1)
     usage: Usage
     latency_ms: float = Field(ge=0)
+
+
+class IntentContextAIOutput(BaseModel):
+    request_id: UUID
+    output: dict
+    provider: str = Field(min_length=1, pattern=r"\S")
+    model: str = Field(min_length=1, pattern=r"\S")
+    usage: Usage
+    latency_ms: float = Field(ge=0)

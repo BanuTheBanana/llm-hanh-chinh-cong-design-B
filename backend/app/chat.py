@@ -1,4 +1,5 @@
 import hashlib
+import logging
 from contextlib import asynccontextmanager
 from uuid import UUID
 
@@ -13,12 +14,21 @@ from app.errors import APIError
 from app.models import Conversation, Message, utcnow
 from app.rag.corpus import CorpusError
 from app.rag.g3.runtime import load_active_dataset
-from app.rag.g4.context import ConversationContext, prepare_turn
+from app.rag.g4.context import prepare_turn
+from app.rag.g5.intent_context import (
+    load_context,
+    merge_legacy_context,
+    model_state,
+    prepare_model_turn,
+    procedure_candidates,
+    to_legacy_context,
+)
 from app.rag.grounding import answer_with_rag
 from app.rag.schemas import Filters, RetrievalInput
 from app.schemas import MessageInput, MessagePair
 
 AI_CONTEXT_MAX_MESSAGES = 100
+logger = logging.getLogger("backend.chat")
 
 
 async def owned_conversation(db: AsyncSession, conversation_id: UUID, user_id: UUID):
@@ -138,6 +148,7 @@ async def send_message(
         try:
             grounding = None
             next_context = None
+            policy_answer = None
             if get_settings().rag_enabled:
                 retrieval_query = RetrievalInput(
                     query=body.content,
@@ -153,47 +164,87 @@ async def send_message(
                             settings.g3_expected_rows,
                             settings.g3_corpus_sha256,
                         )
-                        previous = (
-                            ConversationContext.model_validate(conversation.rag_context)
-                            if conversation.rag_context
-                            else None
+                        previous_model = load_context(
+                            conversation.rag_context,
+                            corpus_version=data.version,
                         )
-                        retrieval_query, next_context, query_context = prepare_turn(
-                            data,
-                            retrieval_query,
-                            previous,
-                            user_message.id,
-                        )
-                        # Dense routing is a bounded fallback only. Exact/BM25 and
-                        # conversation context remain deterministic and cheaper.
-                        if (
-                            query_context.procedure_id is None
-                            and settings.g5_hybrid_enabled
-                            and ai.hybrid_router is not None
-                        ):
-                            candidate = await ai.hybrid_router.route(data, body.content)
-                            if candidate is not None:
-                                retrieval_query, next_context, _ = prepare_turn(
-                                    data,
-                                    RetrievalInput(
-                                        query=body.content,
-                                        filters=body.retrieval_filters,
-                                        top_k=settings.rag_top_k,
-                                    ),
-                                    previous,
-                                    user_message.id,
-                                    procedure_hint=candidate.procedure_id,
+                        use_legacy = not settings.g5_intent_context_enabled
+                        if settings.g5_intent_context_enabled:
+                            candidates = procedure_candidates(data)
+                            try:
+                                intent_output = await ai.analyze_intent_context(
+                                    request_id=request_id,
+                                    current_message_id=user_message.id,
+                                    current_user_message=body.content,
+                                    state_before=model_state(previous_model),
+                                    procedure_candidates=candidates,
+                                    data_classification="D2_COMPANY_REAL",
                                 )
+                                retrieval_query, next_context, policy_answer = prepare_model_turn(
+                                    data,
+                                    retrieval_query,
+                                    previous_model,
+                                    intent_output,
+                                    message_id=str(user_message.id),
+                                )
+                            except (APIError, ValueError, ValidationError) as exc:
+                                if not settings.g5_intent_context_fallback_enabled:
+                                    raise
+                                logger.warning(
+                                    "intent_context_fallback request_id=%s error=%s",
+                                    request_id,
+                                    type(exc).__name__,
+                                )
+                                use_legacy = True
+                        if use_legacy:
+                            previous = to_legacy_context(previous_model)
+                            retrieval_query, legacy_context, query_context = prepare_turn(
+                                data,
+                                retrieval_query,
+                                previous,
+                                user_message.id,
+                            )
+                            # Dense routing is a bounded fallback for the legacy path.
+                            if (
+                                query_context.procedure_id is None
+                                and settings.g5_hybrid_enabled
+                                and ai.hybrid_router is not None
+                            ):
+                                candidate = await ai.hybrid_router.route(data, body.content)
+                                if candidate is not None:
+                                    retrieval_query, legacy_context, _ = prepare_turn(
+                                        data,
+                                        RetrievalInput(
+                                            query=body.content,
+                                            filters=body.retrieval_filters,
+                                            top_k=settings.rag_top_k,
+                                        ),
+                                        previous,
+                                        user_message.id,
+                                        procedure_hint=candidate.procedure_id,
+                                    )
+                            if settings.g5_intent_context_enabled:
+                                next_context = merge_legacy_context(
+                                    previous_model,
+                                    legacy_context,
+                                    message_id=str(user_message.id),
+                                    explicit_as_of=body.retrieval_filters.as_of,
+                                )
+                            else:
+                                next_context = legacy_context
                     except (CorpusError, ValueError, ValidationError) as exc:
                         raise APIError(
                             503, "RAG_CORPUS_UNAVAILABLE", "Corpus RAG chưa sẵn sàng."
                         ) from exc
-                answer, grounding = await answer_with_rag(
-                    db,
-                    retrieval_query,
-                    request_id,
-                    ai,
-                )
+                if policy_answer is not None:
+                    answer = policy_answer
+                else:
+                    answer, grounding = await answer_with_rag(
+                        db,
+                        retrieval_query,
+                        request_id,
+                        ai,
+                    )
             else:
                 answer = await ai.generate(
                     request_id,

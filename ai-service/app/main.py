@@ -12,6 +12,7 @@ from app.config import get_settings
 from app.dependencies import (
     close_grounded_provider_cache,
     get_grounded_provider,
+    get_intent_context_provider,
     get_provider,
     initialize_grounded_provider_cache,
 )
@@ -24,6 +25,7 @@ from app.providers.base import (
     ProviderTimeoutError,
 )
 from app.providers.grounded_base import GroundedProvider
+from app.providers.intent_context_base import IntentContextProvider
 from app.schemas import (
     ErrorDetail,
     ErrorResponse,
@@ -33,6 +35,9 @@ from app.schemas import (
     GroundedGenerateResponse,
     GroundedHealthResponse,
     HealthResponse,
+    IntentContextHealthResponse,
+    IntentContextRequest,
+    IntentContextResponse,
     Usage,
 )
 
@@ -289,6 +294,59 @@ def create_app() -> FastAPI:
             provider=provider.name,
             prompt_version=PROMPT_VERSION,
             external_calls_enabled=provider.external_calls_enabled,
+            allowed_data_classifications=sorted(provider.allowed_data_classifications),
+        )
+
+    @application.post(
+        "/internal/v3/intent-context",
+        response_model=IntentContextResponse,
+        responses={
+            422: {"model": ErrorResponse},
+            502: {"model": ErrorResponse},
+            503: {"model": ErrorResponse},
+            504: {"model": ErrorResponse},
+        },
+        tags=["intent-context"],
+    )
+    async def intent_context(
+        payload: IntentContextRequest,
+        provider: IntentContextProvider = Depends(get_intent_context_provider),
+    ) -> IntentContextResponse:
+        started_at = perf_counter()
+        result = await provider.analyze(payload)
+        latency_ms = round((perf_counter() - started_at) * 1000)
+        logger.info(
+            "intent_context_success request_id=%s provider=%s model=%s latency_ms=%d",
+            payload.request_id,
+            result.provider,
+            result.model,
+            latency_ms,
+        )
+        return IntentContextResponse(
+            request_id=payload.request_id,
+            output=result.output,
+            provider=result.provider,
+            model=result.model,
+            usage=Usage(
+                input_tokens=result.input_tokens,
+                output_tokens=result.output_tokens,
+            ),
+            latency_ms=latency_ms,
+        )
+
+    @application.get(
+        "/internal/v3/intent-context/health",
+        response_model=IntentContextHealthResponse,
+        responses={503: {"model": ErrorResponse}},
+        tags=["intent-context"],
+    )
+    async def intent_context_health(
+        provider: IntentContextProvider = Depends(get_intent_context_provider),
+    ) -> IntentContextHealthResponse:
+        return IntentContextHealthResponse(
+            provider=provider.name,
+            model=provider.model_name,
+            external_calls_enabled=False,
             allowed_data_classifications=sorted(provider.allowed_data_classifications),
         )
 

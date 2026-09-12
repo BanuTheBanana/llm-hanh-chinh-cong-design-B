@@ -148,3 +148,20 @@ def test_diagnostic_sqlstates(state, code):
 
 def test_diagnostic_network():
     assert diagnose_exception(ConnectionRefusedError())[0] == "DB_NETWORK_ERROR"
+
+
+def test_g5_intent_context_requires_answer_plan():
+    with pytest.raises(ValueError, match="intent/context"):
+        Settings(_env_file=None, g5_intent_context_enabled=True)
+
+    settings = Settings(
+        _env_file=None,
+        rag_enabled=True,
+        rag_corpus_version="fixture-v1",
+        g3_d2_enabled=True,
+        g3_private_dataset_path="private",
+        g3_corpus_sha256="a" * 64,
+        g4_answer_plan_enabled=True,
+        g5_intent_context_enabled=True,
+    )
+    assert settings.g5_intent_context_enabled is True

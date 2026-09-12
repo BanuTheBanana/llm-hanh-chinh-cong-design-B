@@ -19,6 +19,16 @@ Identifier = Annotated[
 ]
 GroundedStatus = Literal["ANSWER", "NEED_CLARIFICATION", "INSUFFICIENT_DATA"]
 GroundedDataClassification = Literal["D0_SYSTEM_SMOKE", "D1_PUBLIC_DEMO", "D2_COMPANY_REAL"]
+FieldIntent = Literal[
+    "receiving_authority",
+    "required_documents",
+    "fees",
+    "processing_times",
+    "submission_methods",
+    "steps",
+    "legal_bases",
+    "applicant_scope",
+]
 
 
 class ChatMessage(BaseModel):
@@ -217,4 +227,141 @@ class GroundedHealthResponse(BaseModel):
     provider: str
     prompt_version: Identifier
     external_calls_enabled: bool
+    allowed_data_classifications: list[GroundedDataClassification]
+
+
+class IntentPatchEvidence(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    message_id: Identifier
+    quote: Annotated[str, StringConstraints(min_length=1, max_length=300, pattern=r"\S")]
+
+
+class IntentStringPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    op: Literal["KEEP", "SET", "CLEAR"]
+    value: Annotated[str, StringConstraints(max_length=200)] | None
+    evidence: list[IntentPatchEvidence] = Field(max_length=4)
+
+    @model_validator(mode="after")
+    def validate_operation(self) -> "IntentStringPatch":
+        if self.op == "SET" and (not self.value or not self.value.strip() or not self.evidence):
+            raise ValueError("SET requires a non-empty value and evidence")
+        if self.op == "CLEAR" and (self.value is not None or not self.evidence):
+            raise ValueError("CLEAR requires null and evidence")
+        if self.op == "KEEP" and (self.value is not None or self.evidence):
+            raise ValueError("KEEP requires null and no evidence")
+        return self
+
+
+class IntentFieldPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    op: Literal["KEEP", "SET", "CLEAR"]
+    value: list[FieldIntent] | None = Field(min_length=1, max_length=8)
+    evidence: list[IntentPatchEvidence] = Field(max_length=4)
+
+    @model_validator(mode="after")
+    def validate_operation(self) -> "IntentFieldPatch":
+        if self.op == "SET" and (not self.value or not self.evidence):
+            raise ValueError("SET requires a non-empty value and evidence")
+        if self.value and len(self.value) != len(set(self.value)):
+            raise ValueError("field intents must be unique")
+        if self.op == "CLEAR" and (self.value is not None or not self.evidence):
+            raise ValueError("CLEAR requires null and evidence")
+        if self.op == "KEEP" and (self.value is not None or self.evidence):
+            raise ValueError("KEEP requires null and no evidence")
+        return self
+
+
+class IntentContextPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    procedure_id: IntentStringPatch
+    field_intents: IntentFieldPatch
+    jurisdiction: IntentStringPatch
+    as_of: IntentStringPatch
+
+
+class IntentContextModelOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["g5-intent-context-v2"]
+    dialogue_act: Literal[
+        "ASK_INFORMATION",
+        "PROVIDE_CLARIFICATION",
+        "CORRECT_CONTEXT",
+        "RESET_CONTEXT",
+        "GREET",
+        "OUT_OF_SCOPE",
+    ]
+    topic_action: Literal["KEEP", "SWITCH", "RESET", "UNRESOLVED"]
+    patch: IntentContextPatch
+
+    @model_validator(mode="after")
+    def validate_as_of(self) -> "IntentContextModelOutput":
+        item = self.patch.as_of
+        if item.op == "SET":
+            try:
+                date.fromisoformat(item.value or "")
+            except ValueError as exc:
+                raise ValueError("as_of SET must use YYYY-MM-DD") from exc
+        return self
+
+
+class IntentContextStateInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    procedure_id: Identifier | None = None
+    field_intents: list[FieldIntent] = Field(default_factory=list, max_length=8)
+    jurisdiction: Annotated[str, StringConstraints(min_length=1, max_length=500)] | None = None
+    as_of: date | None = None
+    pending_clarification: (
+        Literal["procedure_id", "field_intents", "jurisdiction", "as_of"] | None
+    ) = None
+
+
+class ProcedureCandidate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: Identifier
+    name: Annotated[str, StringConstraints(min_length=1, max_length=500, pattern=r"\S")]
+
+
+class IntentContextRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    request_id: UUID
+    current_message_id: Identifier
+    current_user_message: Annotated[str, StringConstraints(min_length=1, max_length=4_000)]
+    state_before: IntentContextStateInput
+    procedure_candidates: list[ProcedureCandidate] = Field(min_length=1, max_length=64)
+    data_classification: GroundedDataClassification
+    max_output_tokens: int = Field(default=384, ge=64, le=512, strict=True)
+
+    @model_validator(mode="after")
+    def validate_candidate_ids(self) -> "IntentContextRequest":
+        ids = [candidate.id for candidate in self.procedure_candidates]
+        if len(ids) != len(set(ids)):
+            raise ValueError("procedure candidate IDs must be unique")
+        return self
+
+
+class IntentContextResponse(BaseModel):
+    request_id: UUID
+    output: IntentContextModelOutput
+    provider: str
+    model: str
+    usage: Usage
+    latency_ms: int = Field(ge=0)
+
+
+class IntentContextHealthResponse(BaseModel):
+    status: Literal["ok"] = "ok"
+    service: Literal["ai-service"] = "ai-service"
+    endpoint: Literal["intent-context-v2"] = "intent-context-v2"
+    provider: str
+    model: str
+    external_calls_enabled: Literal[False] = False
     allowed_data_classifications: list[GroundedDataClassification]

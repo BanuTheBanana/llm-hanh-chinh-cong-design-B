@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     g5_source_mcp_enabled: bool = False
     g5_source_mcp_url: str = "http://localhost:8091/mcp"
     g5_source_mcp_timeout_seconds: float = Field(default=5, gt=0, le=30)
+    g5_intent_context_enabled: bool = False
+    g5_intent_context_fallback_enabled: bool = True
     # Root Compose provides the origin; AIClient owns the internal route path.
     ai_service_url: str = "http://localhost:8001"
     ai_request_timeout_seconds: float = Field(default=10, gt=0, le=120)
@@ -66,6 +68,8 @@ class Settings(BaseSettings):
             raise ValueError("G5 hybrid routing requires the G4 grounded pipeline.")
         if self.g5_source_mcp_enabled and not self.g4_answer_plan_enabled:
             raise ValueError("G5 MCP source updates require the G4 grounded pipeline.")
+        if self.g5_intent_context_enabled and not self.g4_answer_plan_enabled:
+            raise ValueError("G5 intent/context requires the G4 grounded pipeline.")
         if not self.allowed_web_origins:
             raise ValueError("At least one Web origin is required.")
         if self.rag_enabled and not self.rag_corpus_version.strip():

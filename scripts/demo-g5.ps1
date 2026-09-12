@@ -3,10 +3,14 @@ param(
     [string]$DatasetPath = '',
     [string]$GenerationModelPath = '',
     [string]$EmbeddingModelPath = '',
+    [string]$IntentModelPath = '',
+    [string]$IntentAdapterPath = '',
     [ValidateSet('Qwen3-1.7B', 'Qwen3-4B-Instruct-2507')]
     [string]$GenerationModelName = 'Qwen3-1.7B',
     [ValidatePattern('^$|^[A-Fa-f0-9]{64}$')][string]$GenerationModelSha256 = '',
     [ValidatePattern('^$|^[A-Fa-f0-9]{64}$')][string]$EmbeddingModelSha256 = '',
+    [ValidatePattern('^$|^[A-Fa-f0-9]{64}$')][string]$IntentModelSha256 = '',
+    [ValidatePattern('^$|^[A-Fa-f0-9]{64}$')][string]$IntentAdapterSha256 = '',
     [string]$ReviewToken = ''
 )
 
@@ -26,7 +30,19 @@ if (-not $GenerationModelPath) {
 if (-not $EmbeddingModelPath) {
     $EmbeddingModelPath = Join-Path $taskRepo '../LLM/models/Qwen3-Embedding-0.6B-Q8_0.gguf'
 }
-foreach ($taskPath in @($DatasetPath, $GenerationModelPath, $EmbeddingModelPath)) {
+if (-not $IntentModelPath) {
+    $IntentModelPath = Join-Path $taskRepo '../LLM/models/qwen3-4b-instruct-2507-q8_0.gguf'
+}
+if (-not $IntentAdapterPath) {
+    $IntentAdapterPath = Join-Path $taskRepo 'training/output/qwen3-4b-intent-pilot-r16/adapter-f16.gguf'
+}
+foreach ($taskPath in @(
+    $DatasetPath,
+    $GenerationModelPath,
+    $EmbeddingModelPath,
+    $IntentModelPath,
+    $IntentAdapterPath
+)) {
     if (-not (Test-Path -LiteralPath $taskPath)) {
         throw "Missing local artifact: $taskPath"
     }
@@ -34,7 +50,12 @@ foreach ($taskPath in @($DatasetPath, $GenerationModelPath, $EmbeddingModelPath)
 if (-not (Test-Path -LiteralPath $DatasetPath -PathType Container)) {
     throw 'DatasetPath must be a directory.'
 }
-foreach ($taskModelPath in @($GenerationModelPath, $EmbeddingModelPath)) {
+foreach ($taskModelPath in @(
+    $GenerationModelPath,
+    $EmbeddingModelPath,
+    $IntentModelPath,
+    $IntentAdapterPath
+)) {
     if (-not (Test-Path -LiteralPath $taskModelPath -PathType Leaf)) {
         throw "Model path must be a file: $taskModelPath"
     }
@@ -44,7 +65,9 @@ foreach ($taskModelPath in @($GenerationModelPath, $EmbeddingModelPath)) {
 }
 foreach ($taskArtifact in @(
     @($GenerationModelPath, $GenerationModelSha256),
-    @($EmbeddingModelPath, $EmbeddingModelSha256)
+    @($EmbeddingModelPath, $EmbeddingModelSha256),
+    @($IntentModelPath, $IntentModelSha256),
+    @($IntentAdapterPath, $IntentAdapterSha256)
 )) {
     if ($taskArtifact[1]) {
         $taskActualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $taskArtifact[0]).Hash
@@ -60,6 +83,8 @@ $taskVariables = @{
     G4_MODEL_HOST_PATH = (Resolve-Path -LiteralPath $GenerationModelPath).Path
     G4_MODEL_NAME = $GenerationModelName
     G5_EMBEDDING_MODEL_HOST_PATH = (Resolve-Path -LiteralPath $EmbeddingModelPath).Path
+    G5_INTENT_MODEL_HOST_PATH = (Resolve-Path -LiteralPath $IntentModelPath).Path
+    G5_INTENT_ADAPTER_HOST_PATH = (Resolve-Path -LiteralPath $IntentAdapterPath).Path
     G5_SOURCE_REVIEW_TOKEN = $ReviewToken
     WEB_PORT = '3005'
     BACKEND_PORT = '8005'
@@ -67,6 +92,7 @@ $taskVariables = @{
     LLAMA_SERVER_PORT = '8085'
     EMBEDDING_SERVER_PORT = '8095'
     SOURCE_SERVICE_PORT = '8096'
+    INTENT_SERVER_PORT = '8087'
     POSTGRES_PORT = '55435'
     POSTGRES_DB = 'g5_demo'
     DATABASE_URL = ''

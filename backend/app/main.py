@@ -353,9 +353,25 @@ async def rag_health(
             )
         ):
             raise ValueError("invalid grounded readiness")
+        intent = None
+        if current.g5_intent_context_enabled:
+            response = await ai.client.get(
+                current.ai_service_url.rstrip("/") + "/internal/v3/intent-context/health",
+                timeout=current.ai_request_timeout_seconds,
+            )
+            response.raise_for_status()
+            intent = response.json()
+            if (
+                not isinstance(intent, dict)
+                or intent.get("status") != "ok"
+                or intent.get("endpoint") != "intent-context-v2"
+                or intent.get("external_calls_enabled") is not False
+                or "D2_COMPANY_REAL" not in intent.get("allowed_data_classifications", [])
+            ):
+                raise ValueError("invalid intent/context readiness")
     except (CorpusError, httpx.HTTPError, ValueError) as exc:
         raise APIError(503, "RAG_UNAVAILABLE", "RAG hoặc grounded AI chưa sẵn sàng.") from exc
-    return {
+    readiness = {
         "status": "ok",
         "corpus_version": corpus_version,
         "data_classification": data_classification,
@@ -366,6 +382,12 @@ async def rag_health(
         "prompt_version": grounded.get("prompt_version"),
         "external_calls_enabled": grounded.get("external_calls_enabled"),
     }
+    if intent is not None:
+        readiness.update(
+            intent_context_enabled=True,
+            intent_context_model=intent.get("model"),
+        )
+    return readiness
 
 
 app.include_router(router)

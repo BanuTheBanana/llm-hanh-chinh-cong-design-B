@@ -126,6 +126,7 @@ jobs:
           --config backend/pyproject.toml
           scripts/smoke-g5.py scripts/load-g5.py scripts/evaluate-g5-hybrid.py
           scripts/evaluate-g5-opened-regression.py scripts/g5-source-update.py
+          scripts/smoke-g5-intent-context.py
           scripts/evaluate-g5-intent-context-models.py
           scripts/rescore-g5-intent-context-results.py training
       - run: uv run --frozen python -m pytest

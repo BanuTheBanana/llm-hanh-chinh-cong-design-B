@@ -102,6 +102,51 @@ async def test_rag_readiness_checks_corpus_and_grounded_ai(client, database, cor
     }
 
 
+async def test_g5_rag_readiness_checks_intent_context(client, database, corpus, monkeypatch):
+    monkeypatch.setattr(get_settings(), "rag_enabled", True)
+    monkeypatch.setattr(get_settings(), "rag_allow_fixtures", True)
+    monkeypatch.setattr(get_settings(), "rag_corpus_version", corpus.version)
+    monkeypatch.setattr(get_settings(), "g5_intent_context_enabled", True)
+    async with database() as db:
+        await ingest(db, corpus)
+        await db.commit()
+
+    def handler(request):
+        assert request.method == "GET"
+        if request.url.path == "/internal/v2/health":
+            return httpx.Response(
+                200,
+                json={
+                    "status": "ok",
+                    "service": "ai-service",
+                    "endpoint": "grounded-v2",
+                    "provider": "local",
+                    "prompt_version": "g2-grounded-v2",
+                    "external_calls_enabled": False,
+                },
+            )
+        assert request.url.path == "/internal/v3/intent-context/health"
+        return httpx.Response(
+            200,
+            json={
+                "status": "ok",
+                "service": "ai-service",
+                "endpoint": "intent-context-v2",
+                "provider": "local-intent-context",
+                "model": "Qwen3-4B-Intent-r16",
+                "external_calls_enabled": False,
+                "allowed_data_classifications": ["D0_SYSTEM_SMOKE", "D2_COMPANY_REAL"],
+            },
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http:
+        app.dependency_overrides[get_ai] = lambda: AIClient(http)
+        result = await client.get("/health/rag")
+    assert result.status_code == 200
+    assert result.json()["intent_context_enabled"] is True
+    assert result.json()["intent_context_model"] == "Qwen3-4B-Intent-r16"
+
+
 async def test_rag_rejects_query_over_grounded_contract_limit(
     client, database, corpus, monkeypatch
 ):

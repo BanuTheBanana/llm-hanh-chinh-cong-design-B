@@ -1,4 +1,5 @@
 import asyncio
+import json
 from uuid import UUID
 
 import httpx
@@ -7,7 +8,8 @@ from pydantic import ValidationError
 
 from app.config import get_settings
 from app.errors import APIError
-from app.schemas import AIOutput
+from app.rag.g5.intent_context import IntentContextOutput, validate_model_output
+from app.schemas import AIOutput, IntentContextAIOutput
 
 
 class AIClient:
@@ -48,6 +50,52 @@ class AIClient:
         except (httpx.HTTPError, ValidationError, ValueError) as exc:
             raise APIError(
                 502, "AI_SERVICE_ERROR", "Không thể nhận phản hồi từ AI. Vui lòng thử lại."
+            ) from exc
+
+    async def analyze_intent_context(
+        self,
+        *,
+        request_id: UUID,
+        current_message_id: UUID,
+        current_user_message: str,
+        state_before: dict,
+        procedure_candidates: list[dict[str, str]],
+        data_classification: str,
+    ) -> IntentContextOutput:
+        settings = get_settings()
+        try:
+            async with asyncio.timeout(settings.ai_request_timeout_seconds):
+                response = await self.client.post(
+                    settings.ai_service_url.rstrip("/") + "/internal/v3/intent-context",
+                    json={
+                        "request_id": str(request_id),
+                        "current_message_id": str(current_message_id),
+                        "current_user_message": current_user_message,
+                        "state_before": state_before,
+                        "procedure_candidates": procedure_candidates,
+                        "data_classification": data_classification,
+                        "max_output_tokens": 384,
+                    },
+                    timeout=settings.ai_request_timeout_seconds,
+                )
+                response.raise_for_status()
+            result = IntentContextAIOutput.model_validate(response.json())
+            if result.request_id != request_id:
+                raise ValueError("intent response request mismatch")
+            return validate_model_output(
+                json.dumps(result.output, ensure_ascii=False),
+                current_message_id=str(current_message_id),
+                current_user_message=current_user_message,
+                candidate_ids={candidate["id"] for candidate in procedure_candidates},
+                state_before=state_before,
+            )
+        except (httpx.TimeoutException, TimeoutError) as exc:
+            raise APIError(
+                504, "INTENT_CONTEXT_TIMEOUT", "Bộ hiểu hội thoại đang phản hồi chậm."
+            ) from exc
+        except (httpx.HTTPError, ValidationError, ValueError, KeyError) as exc:
+            raise APIError(
+                502, "INTENT_CONTEXT_ERROR", "Không thể kiểm chứng kết quả hiểu hội thoại."
             ) from exc
 
 

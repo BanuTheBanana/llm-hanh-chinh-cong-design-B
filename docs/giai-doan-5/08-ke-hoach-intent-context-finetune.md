@@ -188,13 +188,14 @@ hoặc đưa thẳng mọi phản hồi vào lần training sau.
 - Đã rà code intent/context, pilot G4, SFT/QLoRA G5, audit full corpus và máy đích.
 - Đã chọn hướng nghiên cứu, ghi kế hoạch và protocol thực nghiệm.
 - Đã tạo JSON Schema, fixture hư cấu 120 TRAIN/60 DEV, script QLoRA và benchmark GGUF.
-- Đã thêm parser/verifier/reducer Backend độc lập: kiểm catalog/evidence, tự xóa context
-  phụ thuộc khi switch/reset và chống áp dụng hai lần. Chưa nối model mới vào route chat,
-  nên không ảnh hưởng demo G3 đang dùng.
+- Đã thêm parser/verifier/reducer Backend: kiểm catalog/evidence, tự xóa context phụ thuộc
+  khi switch/reset và chống áp dụng hai lần. Ngày 13/09 đã nối route AI Service và chat G5,
+  kèm fallback G4; thay đổi không áp dụng cho demo G3.
 - Đã chạy baseline ba model, pilot QLoRA hai model và xác nhận winner bằng seed thứ hai.
   Chọn **Qwen3-4B-Instruct-2507** cho nhánh phát triển; Qwen3.5-2B là fallback nhẹ.
 - Kết quả tốt nhất hiện tại trên DEV hư cấu: schema/ngữ nghĩa 100%, dialogue act 91,67%,
   topic 93,33%, joint state 75,00%, full state 63,33%, P95 2,52 giây và tăng 4.843 MiB VRAM.
 - Đây là **model-selection pilot**, không phải TEST cuối: joint state chưa đạt 90%, chưa
-  replay hội thoại và chưa dùng nhãn công ty đã review. Xem
+  replay toàn bộ DEV hội thoại và chưa dùng nhãn công ty đã review. Một smoke Docker ba
+  lượt trực tiếp → follow-up → reset đã đạt. Xem
   [kết quả chi tiết](11-ket-qua-chon-model-intent-context.md).

@@ -31,6 +31,16 @@ class Settings(BaseSettings):
     local_llm_seed: int = 42
     local_llm_allowed_hosts: str = "localhost,127.0.0.1,::1,local-model,host.docker.internal"
     local_llm_allow_d2_company_data: bool = False
+    intent_context_provider: str = "disabled"
+    intent_llm_base_url: str = "http://localhost:8087/v1"
+    intent_llm_model: str = "Qwen3-4B-Intent-r16"
+    intent_llm_timeout_seconds: float = Field(default=30.0, gt=0, le=300)
+    intent_llm_context: int = Field(default=4096, ge=512, le=32768)
+    intent_llm_max_prompt_characters: int = Field(default=12000, ge=1000, le=64000)
+    intent_llm_max_output_tokens: int = Field(default=384, ge=64, le=512)
+    intent_llm_seed: int = 42
+    intent_llm_allowed_hosts: str = "localhost,127.0.0.1,::1,intent-model,host.docker.internal"
+    intent_llm_allow_d2_company_data: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",

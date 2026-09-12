@@ -95,8 +95,8 @@ Quy tắc state manager:
 7. State lưu theo conversation và được cập nhật một lần mỗi message; kiểm concurrency
    bằng state revision và transaction, tách khỏi gold state dùng đánh giá.
 
-Phiên bản schema ban đầu đã có parser/verifier/reducer Backend và test độc lập; route chat
-G5 hiện tại chưa gọi model intent/context mới.
+Phiên bản schema đã có parser/verifier/reducer Backend và route AI Service/chat G5.
+Runtime giữ fallback rule có log; kết quả nghiệm thu model phải tắt hoặc báo riêng fallback.
 Không nhận hỗ trợ multi-procedure đồng thời khi state chỉ giữ một thủ tục: hỏi người dùng
 chọn thủ tục hoặc lần lượt xử lý, đưa các ca này vào đánh giá.
 

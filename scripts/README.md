@@ -85,7 +85,9 @@ tổng hợp.
 ## Công cụ G5
 
 - `demo-g5.ps1`: start/stop/status stack G5 riêng; kiểm tra kiểu đường dẫn và tùy chọn
-  xác minh SHA-256 của hai model GGUF.
+  hash cho generation, embedding, intent model và intent adapter trước khi gọi Compose.
+- `smoke-g5-intent-context.py`: gửi một câu D0 hư cấu qua provider intent local và kiểm
+  procedure/field/evidence của output có đúng contract.
 - `evaluate-g5-hybrid.py`: so Exact/BM25 với dense fallback trên DEV; TEST đã mở chỉ
   được chạy khi gắn cờ regression rõ ràng.
 - `smoke-g5.py`: kiểm tra live vòng đời nguồn `PENDING → APPROVED → PUBLISHED → ROLLBACK`

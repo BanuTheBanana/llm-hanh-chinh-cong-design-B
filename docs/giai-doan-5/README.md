@@ -30,3 +30,4 @@ chứng nhận độ đúng pháp lý, chưa phục vụ toàn bộ corpus và c
 6. [Protocol model và intent/context](09-protocol-model-intent-context.md)
 7. [Cơ sở nghiên cứu](10-co-so-nghien-cuu-intent-context.md)
 8. [Kết quả chọn model intent/context](11-ket-qua-chon-model-intent-context.md)
+9. [Tích hợp intent/context vào runtime](12-tich-hop-intent-context-runtime.md)
