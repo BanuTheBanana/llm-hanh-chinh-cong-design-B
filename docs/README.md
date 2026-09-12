@@ -2,6 +2,8 @@
 
 ## Tài liệu trung tâm
 
+Ưu tiên thực hiện: [fine-tune và hoàn thiện intent/context theo yêu cầu mentor](giai-doan-5/08-ke-hoach-intent-context-finetune.md).
+
 Lộ trình sau nền tảng cơ bản: [Chiến lược dài hạn và chặng G5](lo-trinh-phat-trien-he-thong.md).
 Tài liệu này định hướng các chặng lớn; biên bản từng giai đoạn vẫn lưu kết quả thực tế.
 

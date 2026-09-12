@@ -1,5 +1,10 @@
 # Nghiệm thu Giai đoạn 5
 
+> Phạm vi mới của mentor ngày 12/09: cần model đã fine-tune cho intent/context.
+> [Kế hoạch thực hiện](08-ke-hoach-intent-context-finetune.md) đang triển khai; đã chọn
+> checkpoint qua pilot nhưng chưa đạt gate intent/context. Biên bản dưới đây chỉ nghiệm
+> thu mốc demo10 trước yêu cầu mới, không nghiệm thu năng lực bổ sung.
+
 Ngày nghiệm thu kỹ thuật: **12/09/2026**.
 
 ## Kết luận
@@ -34,9 +39,10 @@ chưa có holdout độc lập mới để xác nhận ngưỡng tổng quát h�
 - Chưa có đánh giá nghiệp vụ độc lập cuối chặng trên câu hỏi hoàn toàn chưa thấy.
 - Adapter QLoRA chỉ là artifact thí nghiệm private, không phải model phát hành.
 
-## Quyết định chuyển giai đoạn
+## Quyết định sau yêu cầu mới
 
-Có thể chuyển sang G6 – sản phẩm thử nghiệm nội bộ – mà không tạo TEST mới sau mỗi lỗi.
-Trước khi mở rộng người dùng hoặc corpus, cần reviewer độc lập giữ một holdout mới, duyệt
-thêm nguồn và chốt RBAC/giám sát/backup. Các file công ty, bundle SFT, output model và báo
-cáo chi tiết tiếp tục nằm ngoài Git.
+Chưa đóng G5 mở rộng và chưa chuyển sang G6. Tiếp tục với checkpoint
+Qwen3-4B-Instruct-2507 đã chọn ở pilot, hoàn thiện nhãn intent/context, nối state manager,
+replay hội thoại rồi mới chạy một TEST kín. Trước khi mở rộng người dùng hoặc corpus,
+cần duyệt thêm nguồn và chốt RBAC/giám sát/backup. File công ty, bundle SFT, output model
+và báo cáo chi tiết tiếp tục nằm ngoài Git.

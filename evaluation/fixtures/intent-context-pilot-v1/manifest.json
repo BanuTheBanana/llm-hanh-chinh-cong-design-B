@@ -1,0 +1,20 @@
+{
+  "schema_version": "g5-intent-context-pilot-manifest-v1",
+  "classification": "D0_SYSTEM_SMOKE",
+  "purpose": "Public fictional baseline/pilot only; never a final legal-quality test.",
+  "case_count": 60,
+  "groups": {
+    "direct": 16,
+    "followup": 12,
+    "correction_switch": 8,
+    "reset": 6,
+    "scope_date": 8,
+    "boundary": 10
+  },
+  "source_file": "cases.jsonl",
+  "content_sha256": "4808d068f8b033de529e1ea5ada50b296501db497e7c095962ab9e55e48e4533",
+  "final_test": false,
+  "contains_company_data": false,
+  "review_status": "LOCKED_FOR_BASELINE_PILOT",
+  "seed": 42
+}

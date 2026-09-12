@@ -1,1 +1,1 @@
-"""G5 retrieval, model-selection and source-update integration."""
+"""G5 retrieval, model selection, source updates and intent/context integration."""

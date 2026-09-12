@@ -1,0 +1,34 @@
+{
+  "schema_version": "g5-intent-context-v2",
+  "dialogue_act": "ASK_INFORMATION",
+  "topic_action": "KEEP",
+  "patch": {
+    "procedure_id": {
+      "op": "KEEP",
+      "value": null,
+      "evidence": []
+    },
+    "field_intents": {
+      "op": "SET",
+      "value": [
+        "fees"
+      ],
+      "evidence": [
+        {
+          "message_id": "fixture-user-2",
+          "quote": "Còn lệ phí?"
+        }
+      ]
+    },
+    "jurisdiction": {
+      "op": "KEEP",
+      "value": null,
+      "evidence": []
+    },
+    "as_of": {
+      "op": "KEEP",
+      "value": null,
+      "evidence": []
+    }
+  }
+}

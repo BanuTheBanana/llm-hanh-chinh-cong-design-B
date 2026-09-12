@@ -1,0 +1,21 @@
+{
+  "schema_version": "g5-intent-context-train-pilot-manifest-v1",
+  "classification": "D0_SYSTEM_SMOKE",
+  "purpose": "Public fictional SFT pilot; distinct utterances from intent-context-pilot-v1 DEV.",
+  "case_count": 120,
+  "groups": {
+    "direct": 48,
+    "multi": 12,
+    "followup": 24,
+    "correction_switch": 12,
+    "reset": 6,
+    "scope_date": 10,
+    "boundary": 8
+  },
+  "source_file": "cases.jsonl",
+  "content_sha256": "00127ee7e7399443ee37a3f27a2614074975601b913a0b71902b37103e6fe984",
+  "split": "TRAIN",
+  "contains_company_data": false,
+  "review_status": "APPROVED_FOR_PILOT_TRAIN",
+  "seed": 42
+}

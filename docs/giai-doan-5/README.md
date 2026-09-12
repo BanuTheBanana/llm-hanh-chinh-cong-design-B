@@ -1,5 +1,9 @@
 # Giai đoạn 5 – chuyên biệt hóa và cập nhật nguồn
 
+> Ưu tiên mới theo mentor (12/09/2026): [kế hoạch fine-tune, intent và context trong
+> 5 ngày làm việc](08-ke-hoach-intent-context-finetune.md). Yêu cầu model đã fine-tune
+> thực sự xử lý intent/context chưa được nghiệm thu; kết quả demo10 dưới đây là mốc trước đó.
+
 G5 nâng hệ thống cơ bản thành một bản **limited release nội bộ** trên đúng phạm vi dữ liệu
 đã được duyệt. Hệ thống vẫn ưu tiên độ tin cậy: dùng nguồn làm căn cứ, từ chối khi thiếu
 nguồn và không đưa dữ liệu công ty lên Git.
@@ -22,3 +26,7 @@ chứng nhận độ đúng pháp lý, chưa phục vụ toàn bộ corpus và c
 2. [Kết quả thực nghiệm và quyết định model](02-ket-qua-thuc-nghiem.md)
 3. [Runbook Docker và demo](03-runbook-demo.md)
 4. [Biên bản nghiệm thu G5](07-nghiem-thu-giai-doan-5.md)
+5. [Kế hoạch theo yêu cầu mentor](08-ke-hoach-intent-context-finetune.md)
+6. [Protocol model và intent/context](09-protocol-model-intent-context.md)
+7. [Cơ sở nghiên cứu](10-co-so-nghien-cuu-intent-context.md)
+8. [Kết quả chọn model intent/context](11-ket-qua-chon-model-intent-context.md)

@@ -1,5 +1,10 @@
 # Lộ trình dài hạn – từ nền tảng cơ bản đến trợ lý hành chính chuyên biệt
 
+> Điều chỉnh 12/09/2026 theo mentor: ưu tiên [mốc 5 ngày làm việc cho model đã fine-tune,
+> intent và context](giai-doan-5/08-ke-hoach-intent-context-finetune.md), feedback làm sau.
+> Kế hoạch này thay thứ tự và thời lượng gần hạn ở phần G5 dưới đây. Demo10 G5 đã chạy,
+> nhưng yêu cầu mới chưa hoàn thành. Các chặng dài hạn và số liệu lịch sử vẫn được giữ.
+
 Ngày lập: 11/09/2026. Bản kế hoạch để Hoan và nhóm review, áp dụng cho công việc sau G4.
 Các thời lượng, quy mô và chỉ tiêu dưới đây là mục tiêu đề xuất, không phải kết quả đã đạt.
 

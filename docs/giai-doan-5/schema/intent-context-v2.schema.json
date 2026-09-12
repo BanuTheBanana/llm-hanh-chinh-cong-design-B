@@ -1,0 +1,405 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "G5 intent/context model output v2 (planned contract)",
+  "description": "Structural contract only. Runtime must verify catalog membership, evidence against allowed user messages, pending clarification, ownership, topic-reset semantics and state revision before applying changes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dialogue_act",
+    "topic_action",
+    "patch"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "g5-intent-context-v2"
+    },
+    "dialogue_act": {
+      "enum": [
+        "ASK_INFORMATION",
+        "PROVIDE_CLARIFICATION",
+        "CORRECT_CONTEXT",
+        "RESET_CONTEXT",
+        "GREET",
+        "OUT_OF_SCOPE"
+      ]
+    },
+    "topic_action": {
+      "enum": [
+        "KEEP",
+        "SWITCH",
+        "RESET",
+        "UNRESOLVED"
+      ]
+    },
+    "patch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "procedure_id",
+        "field_intents",
+        "jurisdiction",
+        "as_of"
+      ],
+      "properties": {
+        "procedure_id": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "KEEP"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 0
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "CLEAR"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "SET"
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1
+                }
+              }
+            }
+          ]
+        },
+        "field_intents": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "KEEP"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 0
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "CLEAR"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "SET"
+                },
+                "value": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "receiving_authority",
+                      "required_documents",
+                      "fees",
+                      "processing_times",
+                      "submission_methods",
+                      "steps",
+                      "legal_bases",
+                      "applicant_scope"
+                    ]
+                  }
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1
+                }
+              }
+            }
+          ]
+        },
+        "jurisdiction": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "KEEP"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 0
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "CLEAR"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "SET"
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "pattern": "\\S"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1
+                }
+              }
+            }
+          ]
+        },
+        "as_of": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "KEEP"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 0
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "CLEAR"
+                },
+                "value": {
+                  "type": "null"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op",
+                "value",
+                "evidence"
+              ],
+              "properties": {
+                "op": {
+                  "const": "SET"
+                },
+                "value": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/evidence"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "message_id",
+        "quote"
+      ],
+      "properties": {
+        "message_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "pattern": "\\S"
+        }
+      }
+    }
+  }
+}

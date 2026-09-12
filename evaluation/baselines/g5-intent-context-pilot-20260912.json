@@ -1,0 +1,112 @@
+{
+  "schema_version": "g5-intent-context-pilot-result-v1",
+  "measured_at": "2026-09-12",
+  "scope": "D0 fictional pilot; model selection only, not final TEST or legal-answer evaluation",
+  "hardware": "NVIDIA GeForce RTX 5060 Ti 16 GB",
+  "runtime": "llama.cpp 0.4.0-dev build 10853 commit 9dcf84e5a",
+  "train": {
+    "examples": 120,
+    "sha256": "00127ee7e7399443ee37a3f27a2614074975601b913a0b71902b37103e6fe984"
+  },
+  "dev": {
+    "examples": 60,
+    "sha256": "4808d068f8b033de529e1ea5ada50b296501db497e7c095962ab9e55e48e4533"
+  },
+  "metric_note": "joint_patch is exact JSON-patch matching; joint_state applies deterministic Backend switch/reset rules; full_state also requires dialogue_act and topic_action.",
+  "runs": [
+    {
+      "candidate": "Qwen3-1.7B Q8_0 base",
+      "seed": 42,
+      "schema_valid": 1.0,
+      "semantic_valid": 0.983333,
+      "dialogue_act_accuracy": 0.7,
+      "topic_action_accuracy": 0.45,
+      "joint_patch_accuracy": 0.016667,
+      "joint_state_accuracy": 0.066667,
+      "full_state_case_accuracy": 0.033333,
+      "p95_ms": 2436.266,
+      "gpu_memory_delta_mib": 2266,
+      "model_sha256": "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a"
+    },
+    {
+      "candidate": "Qwen3-4B-Instruct-2507 Q8_0 base",
+      "seed": 42,
+      "schema_valid": 1.0,
+      "semantic_valid": 0.833333,
+      "dialogue_act_accuracy": 0.683333,
+      "topic_action_accuracy": 0.75,
+      "joint_patch_accuracy": 0.383333,
+      "joint_state_accuracy": 0.566667,
+      "full_state_case_accuracy": 0.466667,
+      "p95_ms": 4547.698,
+      "gpu_memory_delta_mib": 4751,
+      "model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1"
+    },
+    {
+      "candidate": "Qwen3.5-2B Q8_0 base",
+      "seed": 42,
+      "schema_valid": 0.983333,
+      "semantic_valid": 0.95,
+      "dialogue_act_accuracy": 0.7,
+      "topic_action_accuracy": 0.466667,
+      "joint_patch_accuracy": 0.033333,
+      "joint_state_accuracy": 0.083333,
+      "full_state_case_accuracy": 0.083333,
+      "p95_ms": 3357.496,
+      "gpu_memory_delta_mib": 2053,
+      "model_sha256": "042ff4f34740d5dcb2499080d1b53dabc7c48cdb67c6126d6ee1312dffe3f5e8"
+    },
+    {
+      "candidate": "Qwen3-4B-Instruct-2507 Q8_0 + intent LoRA r16",
+      "seed": 42,
+      "schema_valid": 1.0,
+      "semantic_valid": 1.0,
+      "dialogue_act_accuracy": 0.916667,
+      "topic_action_accuracy": 0.933333,
+      "joint_patch_accuracy": 0.566667,
+      "joint_state_accuracy": 0.75,
+      "full_state_case_accuracy": 0.633333,
+      "p95_ms": 2517.006,
+      "gpu_memory_delta_mib": 4843,
+      "model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+      "adapter_sha256": "f081fee903c9c7c6daabd53baa0bbce6d9680fdad43b2e45a0261aeacdff4fa2"
+    },
+    {
+      "candidate": "Qwen3.5-2B Q8_0 + intent LoRA r16",
+      "seed": 42,
+      "schema_valid": 1.0,
+      "semantic_valid": 1.0,
+      "dialogue_act_accuracy": 0.766667,
+      "topic_action_accuracy": 0.916667,
+      "joint_patch_accuracy": 0.533333,
+      "joint_state_accuracy": 0.616667,
+      "full_state_case_accuracy": 0.416667,
+      "p95_ms": 1615.889,
+      "gpu_memory_delta_mib": 2332,
+      "model_sha256": "042ff4f34740d5dcb2499080d1b53dabc7c48cdb67c6126d6ee1312dffe3f5e8",
+      "adapter_sha256": "4c4d2a283cd44b237355b3134422a1efd6613c472099fcb961955ca75a0aa069"
+    },
+    {
+      "candidate": "Qwen3-4B-Instruct-2507 Q8_0 + intent LoRA r16",
+      "seed": 7,
+      "schema_valid": 1.0,
+      "semantic_valid": 1.0,
+      "dialogue_act_accuracy": 0.9,
+      "topic_action_accuracy": 0.85,
+      "joint_patch_accuracy": 0.566667,
+      "joint_state_accuracy": 0.716667,
+      "full_state_case_accuracy": 0.583333,
+      "p95_ms": 2605.375,
+      "gpu_memory_delta_mib": 4908,
+      "model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+      "adapter_sha256": "845d24804250c61f914269ea27e65f4bd6b220236daf93fc4ec5ccd6c574f86d"
+    }
+  ],
+  "decision": {
+    "selected_checkpoint_family": "Qwen/Qwen3-4B-Instruct-2507",
+    "selected_pilot_adapter_seed": 42,
+    "fallback_candidate": "Qwen/Qwen3.5-2B",
+    "acceptance_gate_passed": false,
+    "reason": "The 4B candidate has the highest quality on the locked DEV pilot across base, fine-tuned and confirmation-seed runs. It remains within the local memory and latency budget, but is below the final 0.90 joint-state gate."
+  }
+}
