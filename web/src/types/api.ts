@@ -27,6 +27,14 @@ export type Grounding = {
     fallback_used: boolean
     reasons: string[]
   } | null
+  checklist?: {
+    field: string
+    label: string
+    value: string
+    evidence_ids: string[]
+  }[] | null
+  knowledge_version?: string | null
+  source_checked_at?: string | null
 }
 export type Message = {
   id: string

@@ -180,9 +180,28 @@ async def _answer_with_rag(db, query: RetrievalInput, request_id, ai):
         return text, grounding.model_dump(mode="json")
     # Never call legacy G1 generation as a fallback for a missing grounded endpoint.
     if settings.g4_answer_plan_enabled:
+        from app.rag.g5.source_mcp import apply_source_updates
         from app.rag.planned_grounding import answer_with_plan
 
-        return await answer_with_plan(ai.client, bundle, data, fields=query.field_intents)
+        field_evidence = None
+        if settings.g5_source_mcp_enabled and ai.source_update_client is not None:
+            procedure_ids = {item.procedure_id for item in bundle.evidence}
+            if len(procedure_ids) == 1:
+                procedure = data.procedures[next(iter(procedure_ids))]
+                field_evidence = procedure.get("field_evidence", {})
+                bundle, field_evidence = await apply_source_updates(
+                    bundle,
+                    fields=query.field_intents or [],
+                    field_evidence=field_evidence,
+                    client=ai.source_update_client,
+                )
+        return await answer_with_plan(
+            ai.client,
+            bundle,
+            data,
+            fields=query.field_intents,
+            field_evidence=field_evidence,
+        )
     answer = await generate_grounded(ai.client, bundle)
     grounding = validate_answer(answer, bundle)
     return answer.answer, grounding.model_dump(mode="json")

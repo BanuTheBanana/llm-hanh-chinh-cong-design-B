@@ -1,0 +1,5 @@
+# Install after a CUDA-enabled PyTorch build compatible with the target GPU.
+accelerate==1.15.0
+bitsandbytes==0.50.2
+peft==0.20.0
+transformers==5.8.1

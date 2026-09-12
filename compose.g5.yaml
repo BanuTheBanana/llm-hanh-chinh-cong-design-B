@@ -1,0 +1,92 @@
+# Apply after compose.yaml + G3/G4 overlays. G5 adds a local embedding model and
+# a reviewed MCP source registry; company corpus/model files remain host-mounted.
+services:
+  embedding-server:
+    image: ghcr.io/ggml-org/llama.cpp@sha256:93e3b8da7ce2d7c501e826e3c87b6fde980fac18a8058d38e24529a5b3b83b94
+    gpus: all
+    command:
+      - --model
+      - /models/embedding.gguf
+      - --alias
+      - Qwen3-Embedding-0.6B
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8090"
+      - --embedding
+      - --pooling
+      - last
+      - --n-gpu-layers
+      - "99"
+      - --ctx-size
+      - "4096"
+      - --ubatch-size
+      - "2048"
+      - --no-webui
+    volumes:
+      - type: bind
+        source: ${G5_EMBEDDING_MODEL_HOST_PATH:?Set G5_EMBEDDING_MODEL_HOST_PATH}
+        target: /models/embedding.gguf
+        read_only: true
+    ports:
+      - "127.0.0.1:${EMBEDDING_SERVER_PORT:-8095}:8090"
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://localhost:8090/health]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+    init: true
+    networks: [app-network]
+
+  source-service:
+    build:
+      context: ./source-service
+      dockerfile: Dockerfile
+    environment:
+      G5_SOURCE_DATA_DIR: /var/lib/g5-source
+      G5_CORPUS_PATH: /run/g5-corpus
+      G5_REVIEW_TOKEN: ${G5_SOURCE_REVIEW_TOKEN:?Set a local G5 reviewer token}
+    volumes:
+      - g5_source_data:/var/lib/g5-source
+      - type: bind
+        source: ${G3_PRIVATE_DATASET_HOST_PATH:?Set the reviewed private corpus path}
+        target: /run/g5-corpus
+        read_only: true
+    ports:
+      - "127.0.0.1:${SOURCE_SERVICE_PORT:-8096}:8091"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8091/health', timeout=2)
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    init: true
+    networks: [app-network]
+
+  backend:
+    environment:
+      G5_HYBRID_ENABLED: "true"
+      G5_EMBEDDING_SERVICE_URL: http://embedding-server:8090/v1
+      G5_EMBEDDING_MODEL: Qwen3-Embedding-0.6B
+      G5_EMBEDDING_TIMEOUT_SECONDS: "8"
+      G5_SOURCE_MCP_ENABLED: "true"
+      G5_SOURCE_MCP_URL: http://source-service:8091/mcp
+      G5_SOURCE_MCP_TIMEOUT_SECONDS: "8"
+    depends_on:
+      embedding-server:
+        condition: service_healthy
+      source-service:
+        condition: service_healthy
+
+  web:
+    build:
+      args:
+        VITE_APP_STAGE: G5
+
+volumes:
+  g5_source_data:

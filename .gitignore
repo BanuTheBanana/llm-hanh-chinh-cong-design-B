@@ -29,6 +29,8 @@ data/company_private/
 dataset/
 uploads/
 models/
+training/.venv/
+training/output/
 logs/
 
 # Generated evaluation reports; keep only the directory placeholder in Git.

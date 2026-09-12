@@ -81,3 +81,18 @@ Git, qua validator dữ liệu và được leader duyệt trước. Lệnh yêu
 hash corpus, cờ xác nhận và đường dẫn output/marker thuộc `evaluation/reports/` đang
 được Git-ignore. Mỗi cặp marker/output chỉ được tạo một lần và kết quả chỉ chứa số
 tổng hợp.
+
+## Công cụ G5
+
+- `demo-g5.ps1`: start/stop/status stack G5 riêng; kiểm tra kiểu đường dẫn và tùy chọn
+  xác minh SHA-256 của hai model GGUF.
+- `evaluate-g5-hybrid.py`: so Exact/BM25 với dense fallback trên DEV; TEST đã mở chỉ
+  được chạy khi gắn cờ regression rõ ràng.
+- `smoke-g5.py`: kiểm tra live vòng đời nguồn `PENDING → APPROVED → PUBLISHED → ROLLBACK`
+  và câu trả lời Backend dùng đúng snapshot đã duyệt.
+- `g5-source-update.py`: CLI quản trị registry MCP; token chỉ đọc từ biến môi trường.
+- `load-g5.py`: bài tải nhỏ có giới hạn trên DEV, ghi output vào thư mục bị ignore.
+- `evaluate-g5-opened-regression.py`: chấm TEST_V3 đã mở như regression, không gọi là
+  holdout hoặc kết quả nghiệm thu độc lập.
+
+Runbook đầy đủ: [docs/giai-doan-5/03-runbook-demo.md](../docs/giai-doan-5/03-runbook-demo.md).

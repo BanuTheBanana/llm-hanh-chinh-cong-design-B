@@ -11,8 +11,10 @@ from app.schemas import AIOutput
 
 
 class AIClient:
-    def __init__(self, client: httpx.AsyncClient):
+    def __init__(self, client: httpx.AsyncClient, *, hybrid_router=None, source_update_client=None):
         self.client = client
+        self.hybrid_router = hybrid_router
+        self.source_update_client = source_update_client
 
     async def generate(self, request_id: UUID, messages: list[dict]) -> str:
         settings = get_settings()

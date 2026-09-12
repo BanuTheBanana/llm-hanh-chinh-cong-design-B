@@ -33,6 +33,13 @@ class Settings(BaseSettings):
     g3_corpus_sha256: str = ""
     g3_allow_production: bool = False
     g4_answer_plan_enabled: bool = False
+    g5_hybrid_enabled: bool = False
+    g5_embedding_service_url: str = "http://localhost:8090/v1"
+    g5_embedding_model: str = "Qwen3-Embedding-0.6B"
+    g5_embedding_timeout_seconds: float = Field(default=5, gt=0, le=30)
+    g5_source_mcp_enabled: bool = False
+    g5_source_mcp_url: str = "http://localhost:8091/mcp"
+    g5_source_mcp_timeout_seconds: float = Field(default=5, gt=0, le=30)
     # Root Compose provides the origin; AIClient owns the internal route path.
     ai_service_url: str = "http://localhost:8001"
     ai_request_timeout_seconds: float = Field(default=10, gt=0, le=120)
@@ -55,6 +62,10 @@ class Settings(BaseSettings):
     def validate_rag_safety(self):
         if self.g4_answer_plan_enabled and not self.g3_d2_enabled:
             raise ValueError("G4 AnswerPlan currently requires the approved G3 D2 corpus.")
+        if self.g5_hybrid_enabled and not self.g4_answer_plan_enabled:
+            raise ValueError("G5 hybrid routing requires the G4 grounded pipeline.")
+        if self.g5_source_mcp_enabled and not self.g4_answer_plan_enabled:
+            raise ValueError("G5 MCP source updates require the G4 grounded pipeline.")
         if not self.allowed_web_origins:
             raise ValueError("At least one Web origin is required.")
         if self.rag_enabled and not self.rag_corpus_version.strip():

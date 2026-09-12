@@ -158,12 +158,32 @@ async def send_message(
                             if conversation.rag_context
                             else None
                         )
-                        retrieval_query, next_context, _ = prepare_turn(
+                        retrieval_query, next_context, query_context = prepare_turn(
                             data,
                             retrieval_query,
                             previous,
                             user_message.id,
                         )
+                        # Dense routing is a bounded fallback only. Exact/BM25 and
+                        # conversation context remain deterministic and cheaper.
+                        if (
+                            query_context.procedure_id is None
+                            and settings.g5_hybrid_enabled
+                            and ai.hybrid_router is not None
+                        ):
+                            candidate = await ai.hybrid_router.route(data, body.content)
+                            if candidate is not None:
+                                retrieval_query, next_context, _ = prepare_turn(
+                                    data,
+                                    RetrievalInput(
+                                        query=body.content,
+                                        filters=body.retrieval_filters,
+                                        top_k=settings.rag_top_k,
+                                    ),
+                                    previous,
+                                    user_message.id,
+                                    procedure_hint=candidate.procedure_id,
+                                )
                     except (CorpusError, ValueError, ValidationError) as exc:
                         raise APIError(
                             503, "RAG_CORPUS_UNAVAILABLE", "Corpus RAG chưa sẵn sàng."

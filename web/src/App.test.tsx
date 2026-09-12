@@ -212,6 +212,16 @@ describe('G1 web flow', () => {
         fallback_used: fallback,
         reasons: fallback ? ['FULL_CLAIM_TEXT_NOT_VERIFIED'] : [],
       },
+      checklist: [
+        {
+          field: 'fees',
+          label: 'Lệ phí',
+          value: 'Không thu phí.',
+          evidence_ids: ['frag_fees'],
+        },
+      ],
+      knowledge_version: 'g5-source-v000001',
+      source_checked_at: '2026-09-12T01:00:00Z',
       sources: [
         {
           fragment_id: 'frag_fees',
@@ -245,6 +255,9 @@ describe('G1 web flow', () => {
       'https://fixture.invalid/synthetic',
     )
     expect(screen.getByText('Nguồn không an toàn').closest('a')).toBeNull()
+    expect(screen.getByText('g5-source-v000001')).toBeInTheDocument()
+    expect(screen.getByText('Lệ phí').tagName).toBe('DT')
+    expect(screen.getByText('Không thu phí.').tagName).toBe('DD')
     expect(screen.getByText(fallback
       ? /Trích xuất nguyên văn: câu trả lời của model/
       : /Nội dung được dựng từ evidence/)).toBeInTheDocument()

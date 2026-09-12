@@ -19,6 +19,8 @@ hcc-g4-coverage = "g3_pipeline.coverage_tu_g4:main"
 hcc-build-g4-evaluation = "g3_pipeline.g4_tu_scenarios:main"
 hcc-validate-g4-evaluation = "g3_pipeline.g4_tu_validator:main"
 hcc-lock-g4-evaluation = "g3_pipeline.g4_tu_review:main"
+hcc-audit-g5-scope = "g5_pipeline.scope:main"
+hcc-build-g5-sft = "g5_pipeline.sft:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -35,4 +37,4 @@ requires = ["setuptools>=75"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["g3_pipeline*"]
+include = ["g3_pipeline*", "g5_pipeline*"]

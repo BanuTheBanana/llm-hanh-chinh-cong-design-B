@@ -4,24 +4,27 @@ import logging
 
 from app.errors import APIError
 from app.rag.answer_plan import (
+    LABELS,
     build_answer_plan,
     plan_citations,
     render_plan,
     verify_candidate,
 )
-from app.rag.schemas import Citation, Grounding, VerificationResult
+from app.rag.schemas import ChecklistItem, Citation, Grounding, VerificationResult
 
 logger = logging.getLogger("g1.requests")
 
 
-async def answer_with_plan(client, bundle, data, *, fields=None):
+async def answer_with_plan(client, bundle, data, *, fields=None, field_evidence=None):
     # Local import avoids the orchestration import cycle.
     from app.rag.grounding import generate_grounded, validate_answer
 
     pids = {item.procedure_id for item in bundle.evidence}
     procedure = data.procedures.get(next(iter(pids)), {}) if len(pids) == 1 else {}
     plan = build_answer_plan(
-        bundle, fields=fields, field_evidence=procedure.get("field_evidence", {})
+        bundle,
+        fields=fields,
+        field_evidence=field_evidence or procedure.get("field_evidence", {}),
     )
     checked, reasons, provider, model = False, [], "answer-plan", "deterministic-v1"
     if plan.status == "ANSWER":
@@ -47,6 +50,16 @@ async def answer_with_plan(client, bundle, data, *, fields=None):
         reasons=reasons,
     )
     available = {item.fragment_id: item for item in bundle.evidence}
+    source_versions = {
+        item.metadata.get("source_version")
+        for item in bundle.evidence
+        if item.metadata.get("source_version")
+    }
+    checked_times = [
+        item.metadata.get("source_checked_at")
+        for item in bundle.evidence
+        if item.metadata.get("source_checked_at")
+    ]
     grounding = Grounding(
         request_id=bundle.request_id,
         evidence_bundle_id=bundle.evidence_bundle_id,
@@ -68,6 +81,19 @@ async def answer_with_plan(client, bundle, data, *, fields=None):
         ],
         missing_information=plan.missing_fields,
         verification=verification,
+        checklist=[
+            ChecklistItem(
+                field=claim.field,
+                label=LABELS[claim.field],
+                value=claim.value,
+                evidence_ids=claim.evidence_ids,
+            )
+            for claim in plan.claims
+        ],
+        knowledge_version=(
+            next(iter(source_versions)) if len(source_versions) == 1 else bundle.corpus_version
+        ),
+        source_checked_at=(max(checked_times) if checked_times else None),
     )
     logger.info(
         "request_id=%s stage=claim_verification status=%s checked=%s passed=%s "

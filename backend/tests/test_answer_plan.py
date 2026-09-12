@@ -204,6 +204,7 @@ async def test_orchestration_verifies_renders_and_records_reason(mode):
     assert text == render_plan(plan_for(b))
     assert grounding.status == "ANSWER"
     assert grounding.sources[0].fragment_id == "f1"
+    assert grounding.knowledge_version == b.corpus_version
     assert grounding.verification.fallback_used == (mode != "good")
     assert grounding.verification.candidate_passed == (mode == "good")
 

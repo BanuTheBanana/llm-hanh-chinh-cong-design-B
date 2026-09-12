@@ -25,7 +25,9 @@ const ACTIVE_CONVERSATION_KEY = 'g1-active-conversation-id'
 const UNAUTHORIZED_MESSAGE = 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.'
 const APP_STAGE = import.meta.env.VITE_APP_STAGE?.trim().toUpperCase() || 'G1'
 const STAGE_LABEL =
-  APP_STAGE === 'G4'
+  APP_STAGE === 'G5'
+    ? 'G5 / QWEN + HYBRID + MCP'
+    : APP_STAGE === 'G4'
     ? 'G4 / KIỂM CHỨNG EVIDENCE'
     : APP_STAGE === 'G3'
       ? 'G3 / LOCAL QWEN'
@@ -562,6 +564,24 @@ function GroundingPanel({ grounding }: { grounding: Grounding }) {
             ? 'Trích xuất nguyên văn: câu trả lời của model chưa qua kiểm tra đầy đủ.'
             : 'Nội dung được dựng từ evidence, giữ nguyên các điều kiện trong nguồn.'}
         </small>
+      )}
+      {grounding.knowledge_version && (
+        <small className="grounding-version">
+          Phiên bản cập nhật: <code>{grounding.knowledge_version}</code>
+          {grounding.source_checked_at
+            ? ` · duyệt ${new Intl.DateTimeFormat('vi-VN').format(new Date(grounding.source_checked_at))}`
+            : ''}
+        </small>
+      )}
+      {grounding.checklist && grounding.checklist.length > 0 && (
+        <dl className="answer-checklist" aria-label="Nội dung đã kiểm chứng">
+          {grounding.checklist.map((item) => (
+            <div key={`${item.field}:${item.evidence_ids.join(':')}`}>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
       )}
       {grounding.sources.length > 0 && (
         <ol className="source-list" aria-label="Nguồn tham chiếu">

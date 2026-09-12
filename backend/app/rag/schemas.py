@@ -239,6 +239,13 @@ class VerificationResult(Strict):
     reasons: list[str]
 
 
+class ChecklistItem(Strict):
+    field: ID
+    label: Title
+    value: GroundedText
+    evidence_ids: list[ID] = Field(min_length=1, max_length=8)
+
+
 class Grounding(Strict):
     request_id: UUID
     evidence_bundle_id: UUID
@@ -251,6 +258,9 @@ class Grounding(Strict):
     sources: list[Citation]
     missing_information: list[str]
     verification: VerificationResult | None = None
+    checklist: list[ChecklistItem] | None = None
+    knowledge_version: ID | None = None
+    source_checked_at: AwareDatetime | None = None
 
 
 class GoldQuestion(Strict):

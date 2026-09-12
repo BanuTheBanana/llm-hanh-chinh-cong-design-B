@@ -24,6 +24,8 @@ from app.errors import APIError
 from app.models import Conversation, Message, SessionRecord, User, utcnow
 from app.rag.corpus import CorpusError
 from app.rag.g3.runtime import load_active_dataset
+from app.rag.g5.hybrid import HybridProcedureRouter
+from app.rag.g5.source_mcp import MCPSourceUpdateClient
 from app.rag.store import load_corpus
 from app.schemas import (
     ConversationInput,
@@ -43,7 +45,25 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with httpx.AsyncClient() as client:
-        app.state.ai = AIClient(client)
+        hybrid_router = None
+        if settings.g5_hybrid_enabled:
+            hybrid_router = HybridProcedureRouter(
+                base_url=settings.g5_embedding_service_url,
+                model_name=settings.g5_embedding_model,
+                timeout_seconds=settings.g5_embedding_timeout_seconds,
+                client=client,
+            )
+        source_update_client = None
+        if settings.g5_source_mcp_enabled:
+            source_update_client = MCPSourceUpdateClient(
+                url=settings.g5_source_mcp_url,
+                timeout_seconds=settings.g5_source_mcp_timeout_seconds,
+            )
+        app.state.ai = AIClient(
+            client,
+            hybrid_router=hybrid_router,
+            source_update_client=source_update_client,
+        )
         yield
     await engine.dispose()
 
@@ -79,9 +99,7 @@ async def trace_request(request: Request, call_next):
             if origin is not None
             else fetch_site == "cross-site"
         )
-        if request.method in {"POST", "PUT", "PATCH", "DELETE"} and (
-            forbidden_origin
-        ):
+        if request.method in {"POST", "PUT", "PATCH", "DELETE"} and (forbidden_origin):
             response = error_response(request, 403, "FORBIDDEN_ORIGIN", "Origin không hợp lệ.")
         else:
             response = await call_next(request)

@@ -33,7 +33,8 @@ FOLLOWUP_WORDS = frozenset(
     "nhan du hoan tat xong dau den can toi co quan don vi xin hoi biet giup minh em anh "
     "va hoac chuan bi giay to nop gui cach lieu khong duoc la nhu the nao "
     "quy phuong thuc mang buu dien chinh buoc cac ban cho muon ro cu chi tiet xac them "
-    "thong tin ve vui long noi phai muc se".split()
+    "thong tin ve vui long noi phai muc se dung nen neu cau chieu cuoi de dieu do giu loi "
+    "nguyen amount_vnd bo dan hien hoa ma nguoi diem tinh".split()
 )
 
 
@@ -56,7 +57,7 @@ def _explicit_scope(data, text):
     return match.group(1).strip() if match else None
 
 
-def prepare_turn(data, query, previous, message_id: UUID):
+def prepare_turn(data, query, previous, message_id: UUID, *, procedure_hint: str | None = None):
     """Resolve an isolated turn without reading assistant text or evaluation labels."""
     if previous is None or previous.corpus_version != data.version:
         state = ConversationContext(corpus_version=data.version)
@@ -72,9 +73,13 @@ def prepare_turn(data, query, previous, message_id: UUID):
     if requested_scope:
         identity_query = identity_query.replace(normalize(requested_scope), " ")
     scoped_tokens = set(routing_query(identity_query).split()) - FOLLOWUP_WORDS
-    short_followup = bool(detected) and not scoped_tokens and not explicit
+    short_followup = bool(state.active_procedure_id) and not scoped_tokens and not explicit
     fields = sorted(detected)
-    if not fields and state.pending_clarification in {"procedure_id", "jurisdiction"}:
+    if (
+        not fields
+        and state.field_intents
+        and (short_followup or state.pending_clarification in {"procedure_id", "jurisdiction"})
+    ):
         fields = state.field_intents
     pid = query.filters.procedure_id
     inherited = False
@@ -93,6 +98,10 @@ def prepare_turn(data, query, previous, message_id: UUID):
     ):
         pid = state.active_procedure_id
         inherited = True
+    elif pid is None and procedure_hint is not None and not explicit:
+        if procedure_hint not in data.procedures:
+            raise ValueError("UNKNOWN_PROCEDURE_HINT")
+        pid = procedure_hint
     # Persist an explicitly supplied place, including an unsupported place; retrieval abstains.
     scope = requested_scope or state.confirmed_jurisdiction
     prepared = RetrievalInput(

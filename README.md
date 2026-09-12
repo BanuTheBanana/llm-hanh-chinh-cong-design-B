@@ -51,6 +51,18 @@ generation sai contract có retry và fallback trích xuất evidence kèm citat
 QLoRA chưa có căn cứ nên chưa thực hiện. Đây chưa phải chứng nhận đúng nghiệp vụ
 hoặc production release; raw/derived company data không được commit lên GitHub.
 
+**Giai đoạn 4 đã tích hợp nhưng không đạt gate đánh giá độc lập tại thời điểm chấm:**
+hệ thống có intent theo field, AnswerPlan/verifier và context đa lượt; DEV đạt đầy đủ
+nhưng TEST_V2 chỉ đạt 85% multi-turn và TEST_V3 mới bộc lộ lỗi câu nối tiếp dài. Sau khi
+mở để phân tích, các bộ TEST này chỉ còn giá trị regression, không còn là holdout.
+
+**Giai đoạn 5 đã hoàn thành phạm vi kỹ thuật limited release trên demo10:** sửa hội thoại
+nối tiếp, thêm Qwen3 Embedding làm fallback, thử QLoRA có kiểm soát, thêm MCP quản lý
+nguồn có review/version/rollback và hiển thị checklist trên Web. Adapter QLoRA không được
+phát hành vì citation giảm và độ trễ tăng; model phục vụ vẫn là Qwen3-1.7B Q8_0 gốc.
+Corpus đầy đủ vẫn BLOCKED và TEST_V3 đã mở chỉ được tính là regression, không phải holdout.
+Xem [biên bản nghiệm thu G5](docs/giai-doan-5/07-nghiem-thu-giai-doan-5.md).
+
 ## Chạy nhanh
 
 Yêu cầu Docker Engine/Desktop và Docker Compose v2:
@@ -90,21 +102,35 @@ docker compose -f compose.yaml -f compose.g3.local.yaml `
 Mở `http://localhost:3000`. Chỉ dùng release D2 đã duyệt cho demo; không sao chép
 nội dung workbook vào log/chat ngoài. Readiness ở `http://localhost:8000/health/rag`.
 
+Chạy G5 tại cổng riêng `3005` bằng script có kiểm tra corpus/model; xem lệnh đầy đủ và
+hash artifact trong [runbook G5](docs/giai-doan-5/03-runbook-demo.md):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
+  -Action Start `
+  -DatasetPath 'D:\duong-dan-rieng\company-demo10' `
+  -GenerationModelPath 'D:\duong-dan-rieng\Qwen3-1.7B-Q8_0.gguf' `
+  -EmbeddingModelPath 'D:\duong-dan-rieng\Qwen3-Embedding-0.6B-Q8_0.gguf' `
+  -ReviewToken '<token-local-it-nhat-12-ky-tu>'
+```
+
 ## Tài liệu trung tâm
 
-1. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
-2. [Chiến lược và phân công Giai đoạn 3](docs/giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md)
-3. [Audit dataset công ty](docs/giai-doan-3/01-audit-dataset-cong-ty.md)
-4. [Data contract G3 giữa Tú và Minh](docs/giai-doan-3/02-contract-data-g3.md)
-5. [Runbook Qwen3-1.7B local](docs/giai-doan-3/04-runbook-qwen-local.md)
-6. [Contract D2 Giai đoạn 3](docs/contracts-g3.md)
-7. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
-8. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
-9. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
-10. [Grounded API contract G2](docs/contracts-g2.md)
-11. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
-12. [API contract G1](docs/contracts-g1.md)
-13. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
+1. [Nghiệm thu Giai đoạn 5](docs/giai-doan-5/07-nghiem-thu-giai-doan-5.md)
+2. [Lộ trình phát triển dài hạn](docs/lo-trinh-phat-trien-he-thong.md)
+3. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
+4. [Chiến lược và phân công Giai đoạn 3](docs/giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md)
+5. [Audit dataset công ty](docs/giai-doan-3/01-audit-dataset-cong-ty.md)
+6. [Data contract G3 giữa Tú và Minh](docs/giai-doan-3/02-contract-data-g3.md)
+7. [Runbook Qwen3-1.7B local](docs/giai-doan-3/04-runbook-qwen-local.md)
+8. [Contract D2 Giai đoạn 3](docs/contracts-g3.md)
+9. [Phân công Giai đoạn 2](docs/giai-doan-2/02-phan-cong-giai-doan-2.md)
+10. [Biên bản nghiệm thu Giai đoạn 2](docs/giai-doan-2/NGHIEM-THU-G2.md)
+11. [Chỉ mục Giai đoạn 2](docs/giai-doan-2/README.md)
+12. [Grounded API contract G2](docs/contracts-g2.md)
+13. [Phân công và nghiệm thu Giai đoạn 1](docs/01-phan-cong-giai-doan-1.md)
+14. [API contract G1](docs/contracts-g1.md)
+15. [Chỉ mục lưu trữ Giai đoạn 1](docs/giai-doan-1/README.md)
 
 ## Cấu trúc repository
 
@@ -113,6 +139,8 @@ nội dung workbook vào log/chat ngoài. Readiness ở `http://localhost:8000/h
 ├── web/                 # React/TypeScript, Vitest, Playwright, Nginx
 ├── backend/             # FastAPI, PostgreSQL, SQLAlchemy, Alembic
 ├── ai-service/          # FastAPI, provider interface, MockProvider
+├── source-service/      # MCP registry cho nguồn đã review và version hóa
+├── training/            # Pipeline QLoRA/evaluation; artifact private không vào Git
 ├── data/demo_synthetic/ # Corpus D0 hoàn chỉnh để dev/test, không có giá trị pháp lý
 ├── data/demo_public/    # Spike D1 công khai; chưa publish khi review còn PENDING
 ├── evaluation/          # Fixture và report evaluation G2 offline
@@ -129,6 +157,7 @@ nội dung workbook vào log/chat ngoài. Readiness ở `http://localhost:8000/h
 ├── compose.yaml         # Full G1 stack và health dependencies
 ├── compose.g2.yaml      # Overlay D0: ingest fixture + bật grounded RAG
 ├── compose.g3.local.yaml # Overlay D2 private: Qwen local + mount read-only
+├── compose.g5.yaml      # Overlay G5: embedding local + Source MCP
 └── .env.example         # Cấu hình demo, không có secret thật
 ```
 
@@ -139,6 +168,8 @@ nội dung workbook vào log/chat ngoài. Readiness ở `http://localhost:8000/h
 | Bản chính đã hoàn tất G1 | `main`, tag `g1-v1.0.0` |
 | Bản G2 synthetic đã nghiệm thu | `g2/integration`, phát hành bằng tag `g2-v1.0.0` |
 | Nền tảng G3 đã hoàn tất, chờ merge | `g3/integration` |
+| G4 đã tích hợp, giữ kết quả gate lịch sử | `g4/integration` |
+| G5 limited-release candidate | `g5/integration` |
 | AI/evaluation G2 của Hoan | `g2/ai-eval-hoan` |
 | Nhánh dữ liệu Tú đã nhập | `data/frontend-tu` |
 | Nhánh RAG Minh đã nhập | `Minh-RAG_test` |

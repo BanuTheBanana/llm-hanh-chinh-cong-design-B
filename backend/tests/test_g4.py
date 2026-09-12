@@ -171,6 +171,23 @@ def test_explicit_unknown_does_not_inherit(g4_data):
     assert state.active_procedure_id is None
 
 
+def test_instruction_only_followup_keeps_procedure_and_field(g4_data):
+    first = uuid4()
+    _, state, _ = prepare_turn(
+        g4_data, RetrievalInput(query="Mẫu Alpha cần giấy tờ gì?"), None, first
+    )
+    query, state, context = prepare_turn(
+        g4_data,
+        RetrievalInput(query="Nếu có điều kiện thì giữ nguyên điều kiện đó ở câu trả lời cuối."),
+        state,
+        uuid4(),
+    )
+    assert query.filters.procedure_id == "fictional-alpha"
+    assert query.field_intents == ["required_documents"]
+    assert context.source_message_ids["active_procedure_id"] == first
+    assert state.pending_clarification is None
+
+
 def test_pending_field_survives_procedure_clarification(g4_data):
     _, state, _ = prepare_turn(g4_data, RetrievalInput(query="Lệ phí bao nhiêu?"), None, uuid4())
     q, state, _ = prepare_turn(g4_data, RetrievalInput(query="Mẫu Alpha"), state, uuid4())

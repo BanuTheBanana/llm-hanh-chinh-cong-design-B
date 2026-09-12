@@ -60,6 +60,27 @@ uv run --project tools/data hcc-lock-g4-evaluation `
 Sau khi `LOCKED`, không dùng kết quả TEST_V2 để chỉnh prompt, retrieval hoặc
 model. Minh chỉ nhận DEV, schema và tool; TEST_V2/gold do Hoan giữ.
 
+## Dữ liệu huấn luyện G5
+
+G5 chỉ audit corpus đã duyệt và tạo SFT từ `scenario_dev.jsonl`; tên file TEST bị từ
+chối trước khi đọc. TRAIN/VALIDATION được tách theo thủ tục để tránh rò rỉ cùng nghiệp vụ.
+Output chi tiết chỉ được ghi vào `evaluation/reports/` hoặc `training/output/`, đều bị
+Git-ignore.
+
+```powershell
+uv run --project tools/data hcc-audit-g5-scope `
+  --dataset 'D:\duong-dan-rieng\company-demo10' `
+  --output evaluation/reports/g5/scope-local.json
+
+uv run --project tools/data hcc-build-g5-sft build `
+  --dataset 'D:\duong-dan-rieng\company-demo10' `
+  --dev 'D:\duong-dan-rieng\scenario_dev.jsonl' `
+  --output evaluation/reports/g5/sft-local
+
+uv run --project tools/data hcc-build-g5-sft validate `
+  --bundle evaluation/reports/g5/sft-local
+```
+
 Khi kiểm tra dữ liệu D0, phải truyền rõ:
 
 ```text
