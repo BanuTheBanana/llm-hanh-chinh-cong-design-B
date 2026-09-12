@@ -42,9 +42,7 @@ def main():
                     "before_single_turn": benchmark(
                         data, rows, baseline.retrieve, old_fields, include_multiturn=False
                     ),
-                    "after_single_turn": benchmark(
-                        data, rows, include_multiturn=False
-                    ),
+                    "after_single_turn": benchmark(data, rows, include_multiturn=False),
                     "after_all_scenarios": benchmark(data, rows),
                 },
                 ensure_ascii=False,

@@ -18,6 +18,7 @@ def __getattr__(name):
         raise AttributeError(name)
     return getattr(import_module(f"app.providers.{_MODULES[name]}"), name)
 
+
 __all__ = [
     "AIProvider",
     "GenerationResult",

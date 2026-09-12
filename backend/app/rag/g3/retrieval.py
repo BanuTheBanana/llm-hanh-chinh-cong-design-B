@@ -279,9 +279,7 @@ def retrieve(
             missing_fields=["field_intents"],
             reason="FIELD_NOT_SPECIFIED",
         )
-    missing = sorted(
-        (fields & set(p["missing_fields"])) | _unusable_placeholder_fields(p, fields)
-    )
+    missing = sorted((fields & set(p["missing_fields"])) | _unusable_placeholder_fields(p, fields))
     if missing:
         return dict(result, missing_fields=missing, reason="DATA_MISSING")
     # No fragment from a declared missing field may enter any evidence bundle.
