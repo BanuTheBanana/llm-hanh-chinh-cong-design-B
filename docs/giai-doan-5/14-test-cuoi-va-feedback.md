@@ -14,6 +14,12 @@ Số aggregate và fingerprint nằm ở
 [`evaluation/baselines/g5-intent-context-final-result-20260913.json`](../../evaluation/baselines/g5-intent-context-final-result-20260913.json).
 Nội dung câu hỏi, gold label và raw output tiếp tục nằm ngoài Git.
 
+Sau khi TEST trở thành regression đã mở, policy v2 được xây dựng bằng các bất biến tổng quát:
+nhắc lại cùng procedure không phải switch, câu sửa/chuyển có ưu tiên cao hơn nhãn chào nhầm,
+và giá trị scope đầu tiên không phải correction. Policy v2 giữ DEV ở 95% full-state; trên
+regression đã mở đạt 98,33% theo lượt và 19/20 hội thoại. Số này chỉ dùng kiểm tra lỗi cũ,
+không thay đổi kết luận FAIL và không thay cho holdout độc lập tiếp theo.
+
 ## 2. Feedback người dùng
 
 Mỗi câu trả lời hoàn tất ở Web G5 có hai đánh giá độc lập:

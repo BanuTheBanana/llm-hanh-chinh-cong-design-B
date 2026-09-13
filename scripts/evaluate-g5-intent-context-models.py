@@ -555,8 +555,15 @@ def main() -> int:
         help="Apply the same deterministic intent/context policy as the AI service.",
     )
     parser.add_argument("--final-test", action="store_true")
+    parser.add_argument(
+        "--opened-regression",
+        action="store_true",
+        help="Re-score an already opened final fixture; never use this as final acceptance.",
+    )
     parser.add_argument("--candidate-commit")
     args = parser.parse_args()
+    if args.final_test and args.opened_regression:
+        raise SystemExit("FINAL_TEST_AND_OPENED_REGRESSION_ARE_EXCLUSIVE")
     output_dir = args.output_dir.resolve()
     if not output_dir.is_relative_to(ALLOWED_OUTPUT_ROOT):
         raise SystemExit("PRIVATE_EVALUATION_OUTPUT_REQUIRED")
@@ -628,6 +635,18 @@ def main() -> int:
             + "\n",
             encoding="utf-8",
         )
+    elif args.opened_regression:
+        opened_manifest_ok = (
+            manifest.get("final_test") is True
+            and manifest.get("review_status") == "LOCKED"
+            and manifest.get("answer_visibility") == "PRIVATE_GOLD_ONLY"
+            and manifest.get("content_sha256") == sha256(cases_path)
+            and validate_final_conversations(cases)
+            and all(case.get("split") == "FINAL_TEST" for case in cases)
+        )
+        if not opened_manifest_ok or args.limit or not args.apply_policy:
+            raise SystemExit("LOCKED_OPENED_REGRESSION_MANIFEST_REQUIRED")
+        output_dir.mkdir(parents=True, exist_ok=True)
     elif manifest.get("final_test") is not False:
         raise SystemExit("PILOT_FIXTURE_MANIFEST_INVALID")
     else:
@@ -716,7 +735,11 @@ def main() -> int:
         "scope": (
             "Locked private G5 intent/context final test; not legal-answer evaluation"
             if args.final_test
-            else "D0 fictional pilot; not final TEST and not legal-answer evaluation"
+            else (
+                "Opened G5 intent/context regression; not final acceptance or legal-answer evaluation"
+                if args.opened_regression
+                else "D0 fictional pilot; not final TEST and not legal-answer evaluation"
+            )
         ),
         "fixture_sha256": sha256(cases_path),
         "schema_sha256": sha256(args.schema),

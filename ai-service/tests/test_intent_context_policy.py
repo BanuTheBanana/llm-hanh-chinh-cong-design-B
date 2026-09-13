@@ -31,7 +31,7 @@ def payload(message, **state):
 
 
 def test_policy_version_is_explicit():
-    assert POLICY_VERSION == "g5-intent-context-policy-v1"
+    assert POLICY_VERSION == "g5-intent-context-policy-v2"
 
 
 def test_explicit_switch_is_a_correction():
@@ -93,3 +93,70 @@ def test_reset_cannot_repopulate_state():
     assert normalized["topic_action"] == "RESET"
     assert all(item["op"] == "KEEP" for item in normalized["patch"].values())
     assert actions == ["RESET_ACT_CLEARS_STATE_MACHINE"]
+
+
+def test_explicit_switch_wins_over_incorrect_greeting_label():
+    candidate = output(act="GREET", topic="SWITCH")
+    candidate["patch"]["procedure_id"] = {
+        "op": "SET",
+        "value": "p_birth",
+        "evidence": [{"message_id": "current-user", "quote": "chuyển sang khai sinh"}],
+    }
+    normalized, actions = apply_intent_context_policy(
+        candidate,
+        payload("Không hỏi kết hôn nữa, chuyển sang khai sinh nhé.", procedure_id="p_marriage"),
+    )
+    assert normalized["dialogue_act"] == "CORRECT_CONTEXT"
+    assert normalized["topic_action"] == "SWITCH"
+    assert normalized["patch"]["procedure_id"]["value"] == "p_birth"
+    assert actions == ["EXPLICIT_TOPIC_CORRECTION"]
+
+
+def test_repeated_procedure_is_not_a_topic_switch():
+    candidate = output(topic="SWITCH")
+    candidate["patch"]["procedure_id"] = {
+        "op": "SET",
+        "value": "p_birth",
+        "evidence": [{"message_id": "current-user", "quote": "thủ tục khai sinh đó"}],
+    }
+    candidate["patch"]["field_intents"] = {
+        "op": "SET",
+        "value": ["fees"],
+        "evidence": [{"message_id": "current-user", "quote": "lệ phí"}],
+    }
+    normalized, actions = apply_intent_context_policy(
+        candidate, payload("Thủ tục khai sinh đó có lệ phí không?", procedure_id="p_birth")
+    )
+    assert normalized["topic_action"] == "KEEP"
+    assert normalized["patch"]["procedure_id"]["op"] == "KEEP"
+    assert normalized["patch"]["field_intents"]["value"] == ["fees"]
+    assert actions == ["REPEATED_PROCEDURE_KEEPS_TOPIC"]
+
+
+def test_explicit_field_correction_is_not_plain_information_request():
+    candidate = output()
+    candidate["patch"]["field_intents"] = {
+        "op": "SET",
+        "value": ["receiving_authority"],
+        "evidence": [{"message_id": "current-user", "quote": "nơi tiếp nhận"}],
+    }
+    normalized, actions = apply_intent_context_policy(
+        candidate,
+        payload("Tôi nói nơi tiếp nhận, không hỏi cách nộp.", procedure_id="p_birth"),
+    )
+    assert normalized["dialogue_act"] == "CORRECT_CONTEXT"
+    assert actions == ["EXPLICIT_TOPIC_CORRECTION"]
+
+
+def test_first_scope_value_is_information_not_correction():
+    candidate = output(act="CORRECT_CONTEXT")
+    candidate["patch"]["jurisdiction"] = {
+        "op": "SET",
+        "value": "Đà Nẵng",
+        "evidence": [{"message_id": "current-user", "quote": "Đà Nẵng"}],
+    }
+    normalized, actions = apply_intent_context_policy(
+        candidate, payload("Nếu làm tại Đà Nẵng thì sao?", procedure_id="p_birth")
+    )
+    assert normalized["dialogue_act"] == "ASK_INFORMATION"
+    assert actions == ["NEW_VALUE_IS_NOT_A_CORRECTION"]

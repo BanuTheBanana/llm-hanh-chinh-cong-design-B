@@ -1,0 +1,27 @@
+{
+  "schema_version": "g5-intent-context-policy-v2-result-v1",
+  "evaluated_at": "2026-09-13",
+  "candidate": "Qwen3-4B-hard-v2-r16 + policy-v2",
+  "model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+  "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
+  "prompt_sha256": "d6c196d1cca836a8f3e2f1448c76a50ba1ea965981d546e752982d4657841225",
+  "policy_version": "g5-intent-context-policy-v2",
+  "dev": {
+    "fixture_sha256": "4808d068f8b033de529e1ea5ada50b296501db497e7c095962ab9e55e48e4533",
+    "case_count": 60,
+    "full_state_case": 0.95,
+    "joint_state": 0.983333,
+    "field_macro_f1": 0.988636
+  },
+  "opened_regression": {
+    "fixture_sha256": "884cd86a58ce4215e8a1beacdcf648d0144cc66f37f7f75a66639833e6717925",
+    "case_count": 60,
+    "conversation_count": 20,
+    "full_state_case": 0.983333,
+    "joint_state": 0.983333,
+    "field_macro_f1": 0.995,
+    "conversation_success": 0.95,
+    "classification": "OPENED_REGRESSION_NOT_FINAL_ACCEPTANCE"
+  },
+  "decision": "LOCK_POLICY_V2_AS_NEXT_CANDIDATE; REQUIRE_ONE_NEW_INDEPENDENT_HOLDOUT"
+}

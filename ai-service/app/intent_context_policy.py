@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import unicodedata
 
-POLICY_VERSION = "g5-intent-context-policy-v1"
+POLICY_VERSION = "g5-intent-context-policy-v2"
 CONTEXT_SLOTS = ("procedure_id", "field_intents", "jurisdiction", "as_of")
 _CORRECTION_MARKERS = (
     "doi sang",
@@ -50,6 +50,7 @@ def apply_intent_context_policy(output: dict, payload: dict) -> tuple[dict, list
     state = payload["state_before"]
     message = _plain_text(payload["current_user_message"])
     dialogue_act = normalized["dialogue_act"]
+    explicit_correction = any(marker in message for marker in _CORRECTION_MARKERS)
 
     has_context = any(
         state.get(slot) not in (None, [], "")
@@ -62,6 +63,26 @@ def apply_intent_context_policy(output: dict, payload: dict) -> tuple[dict, list
         normalized["topic_action"] = "KEEP"
         for slot in CONTEXT_SLOTS:
             patch[slot] = _keep_patch()
+        dialogue_act = normalized["dialogue_act"]
+
+    procedure = patch["procedure_id"]
+    if (
+        normalized["topic_action"] == "SWITCH"
+        and procedure["op"] == "SET"
+        and procedure["value"] == state.get("procedure_id")
+    ):
+        normalized["topic_action"] = "KEEP"
+        patch["procedure_id"] = _keep_patch()
+        actions.append("REPEATED_PROCEDURE_KEEPS_TOPIC")
+
+    if (
+        explicit_correction
+        and normalized["topic_action"] in {"KEEP", "SWITCH"}
+        and any(patch[slot]["op"] != "KEEP" for slot in CONTEXT_SLOTS)
+    ):
+        if normalized["dialogue_act"] != "CORRECT_CONTEXT":
+            actions.append("EXPLICIT_TOPIC_CORRECTION")
+        normalized["dialogue_act"] = "CORRECT_CONTEXT"
         dialogue_act = normalized["dialogue_act"]
 
     if dialogue_act in {"GREET", "OUT_OF_SCOPE"}:
@@ -93,12 +114,19 @@ def apply_intent_context_policy(output: dict, payload: dict) -> tuple[dict, list
         normalized["dialogue_act"] = "PROVIDE_CLARIFICATION"
         actions.append("PENDING_SLOT_WAS_PROVIDED")
 
-    if normalized["topic_action"] == "SWITCH" and any(
-        marker in message for marker in _CORRECTION_MARKERS
+    if (
+        normalized["dialogue_act"] == "CORRECT_CONTEXT"
+        and not explicit_correction
+        and normalized["topic_action"] == "KEEP"
     ):
-        if normalized["dialogue_act"] != "CORRECT_CONTEXT":
-            normalized["dialogue_act"] = "CORRECT_CONTEXT"
-            actions.append("EXPLICIT_TOPIC_CORRECTION")
+        changed_slots = [
+            slot for slot in CONTEXT_SLOTS if patch[slot]["op"] in {"SET", "CLEAR"}
+        ]
+        if changed_slots and all(
+            state.get(slot) in (None, [], "") for slot in changed_slots
+        ):
+            normalized["dialogue_act"] = "ASK_INFORMATION"
+            actions.append("NEW_VALUE_IS_NOT_A_CORRECTION")
 
     if normalized["dialogue_act"] in {"ASK_INFORMATION", "PROVIDE_CLARIFICATION"}:
         for slot in ("jurisdiction", "as_of"):
