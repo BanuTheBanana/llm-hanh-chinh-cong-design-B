@@ -56,12 +56,12 @@ hệ thống có intent theo field, AnswerPlan/verifier và context đa lượt;
 nhưng TEST_V2 chỉ đạt 85% multi-turn và TEST_V3 mới bộc lộ lỗi câu nối tiếp dài. Sau khi
 mở để phân tích, các bộ TEST này chỉ còn giá trị regression, không còn là holdout.
 
-**Giai đoạn 5 đã hoàn thành phạm vi kỹ thuật limited release trên demo10:** sửa hội thoại
-nối tiếp, thêm Qwen3 Embedding làm fallback, thử QLoRA có kiểm soát, thêm MCP quản lý
-nguồn có review/version/rollback và hiển thị checklist trên Web. Adapter QLoRA không được
-phát hành vì citation giảm và độ trễ tăng; model phục vụ vẫn là Qwen3-1.7B Q8_0 gốc.
-Corpus đầy đủ vẫn BLOCKED và TEST_V3 đã mở chỉ được tính là regression, không phải holdout.
-Xem [biên bản nghiệm thu G5](docs/giai-doan-5/07-nghiem-thu-giai-doan-5.md).
+**Giai đoạn 5 đã hoàn tất phạm vi triển khai kỹ thuật nội bộ trên demo10:** model trả lời vẫn là
+Qwen3-1.7B Q8_0; Qwen3 Embedding làm fallback; intent/context dùng Qwen3-4B Q8_0 với adapter
+QLoRA r16 và policy có log. Hệ thống còn có MCP quản lý nguồn review/version/rollback, context
+nhiều lượt và feedback hai trục. Tuy nhiên FINAL V3 độc lập cuối chỉ đạt 81,67% full-state và
+65% hội thoại trọn chuỗi, nên **không đạt acceptance intent/context** và không phải release.
+Corpus đầy đủ vẫn BLOCKED. Xem [biên bản nghiệm thu G5](docs/giai-doan-5/07-nghiem-thu-giai-doan-5.md).
 
 ## Chạy nhanh
 

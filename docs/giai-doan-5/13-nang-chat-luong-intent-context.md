@@ -57,6 +57,10 @@ thấp nhất 80%. Các số regression chỉ chứng minh lỗi cũ không tái
 Candidate tại commit `e59d214` được đóng băng cho một holdout độc lập cuối và không tiếp tục
 tinh chỉnh theo V1/V2.
 
+Holdout độc lập cuối V3 sau đó chỉ đạt 81,67% full-state, 93,12% field macro-F1 và 65% hội thoại
+đúng trọn chuỗi. Policy v3 vì vậy được giữ cho runtime phát triển nội bộ nhưng không đạt nhãn
+accepted. Theo protocol, V3 không được chạy lại hoặc dùng để tiếp tục chỉnh G5.
+
 ## Xác minh Docker và PostgreSQL
 
 Docker Desktop đã được xác minh là có sẵn và daemon đã được khởi động lại; không cần cài mới.

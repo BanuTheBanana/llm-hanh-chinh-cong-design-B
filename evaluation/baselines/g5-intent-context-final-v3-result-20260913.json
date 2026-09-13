@@ -1,0 +1,42 @@
+{
+  "schema_version": "g5-intent-context-final-result-v3",
+  "evaluated_at": "2026-09-13",
+  "scope": "Terminal independent private D0 intent/context holdout V3; not legal-answer evaluation",
+  "candidate_commit": "e59d214b992cb5ab260c0be8d13a2cfc4b35fc97",
+  "evaluation_commit": "b6b778e4860190f833f4cd25d424b49850964497",
+  "test_sha256": "7d06d13dc752a083c80ce227b2a21fbab4dff1444172989736045be1bfeb9469",
+  "case_count": 60,
+  "conversation_count": 20,
+  "single_attempt": true,
+  "excluded_prior_holdout_count": 2,
+  "candidate": "Qwen3-4B-hard-v2-policy-v3",
+  "model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+  "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
+  "prompt_sha256": "d6c196d1cca836a8f3e2f1448c76a50ba1ea965981d546e752982d4657841225",
+  "policy_version": "g5-intent-context-policy-v3",
+  "metrics": {
+    "schema_valid": 1.0,
+    "semantic_valid": 1.0,
+    "dialogue_act": 0.933333,
+    "topic_action": 0.966667,
+    "joint_patch": 0.866667,
+    "joint_state": 0.866667,
+    "full_state_case": 0.816667,
+    "field_state_exact": 0.9,
+    "field_macro_f1": 0.931242,
+    "conversation_success": 0.65,
+    "p95_ms": 2937.575,
+    "gpu_memory_delta_mib": 4844
+  },
+  "per_group_full_state_case": {
+    "boundary": 1.0,
+    "clarification": 0.333333,
+    "correction_switch": 0.9,
+    "direct": 1.0,
+    "followup": 0.583333,
+    "reset": 1.0,
+    "scope_date": 0.5
+  },
+  "gate": "FAIL",
+  "decision": "TERMINAL_G5_FINAL_FAIL; RETAIN_INTERNAL_RUNTIME; NO_RERUN_OR_ACCEPTED_RELEASE_CLAIM"
+}

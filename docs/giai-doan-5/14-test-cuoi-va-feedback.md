@@ -34,6 +34,14 @@ Candidate v3 vì vậy đủ điều kiện bước vào **một holdout độc 
 accepted cho đến khi holdout đó chạy xong. Chi tiết aggregate không chứa câu hỏi private nằm ở
 [`evaluation/baselines/g5-intent-context-policy-v3-20260913.json`](../../evaluation/baselines/g5-intent-context-policy-v3-20260913.json).
 
+Holdout V3 độc lập cuối đã chạy đúng một lần trên 20 hội thoại, 60 lượt và loại trừ TRAIN, DEV,
+V1 cùng V2. Schema/semantic đạt 100%, dialogue act 93,33%, topic action 96,67%, nhưng full-state
+chỉ đạt 81,67%, field macro-F1 93,12% và 13/20 hội thoại đúng trọn chuỗi (65%). Ba nhóm dưới gate
+là clarification 33,33%, scope/date 50% và follow-up 58,33%. Gate cuối là **FAIL**. V3 đã được mở,
+không chạy lại và không dùng để tinh chỉnh G5. Aggregate công khai tại
+[`evaluation/baselines/g5-intent-context-final-v3-result-20260913.json`](../../evaluation/baselines/g5-intent-context-final-v3-result-20260913.json);
+câu hỏi, gold và raw output vẫn ở ngoài Git.
+
 ## 2. Feedback người dùng
 
 Mỗi câu trả lời hoàn tất ở Web G5 có hai đánh giá độc lập:

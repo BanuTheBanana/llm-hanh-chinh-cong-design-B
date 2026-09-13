@@ -24,6 +24,13 @@ FAIL**. V2 đạt schema/semantic 100%, full-state 73,33%, field macro-F1 74,88%
 correction/switch 55,56%. Kết quả này cho thấy candidate chưa tổng quát hóa đủ với cách diễn
 đạt tự nhiên. V2 cũng đã mở và tuyệt đối không được chạy lại để đổi kết luận.
 
+Sau vòng sửa bất biến tổng quát, policy v3 đạt 100% full-state trên DEV và vượt gate trên hai
+regression đã mở. Candidate được đóng băng rồi chạy **FINAL TEST V3 độc lập cuối đúng một lần**.
+V3 đạt schema/semantic 100%, dialogue act 93,33%, topic action 96,67%, full-state 81,67%,
+field macro-F1 93,12% và 13/20 hội thoại đúng trọn chuỗi (65%). Clarification đạt 33,33%,
+scope/date 50% và follow-up 58,33%, đều dưới ngưỡng nhóm 70%. Do đó kết luận cuối G5 vẫn là
+**FAIL acceptance intent/context**. V3 không được chạy lại hoặc dùng để điều chỉnh candidate G5.
+
 ## Phần kỹ thuật đã đạt
 
 - Qwen3-4B + adapter QLoRA r16 phục vụ intent/context bằng llama.cpp local.
@@ -44,7 +51,8 @@ correction/switch 55,56%. Kết quả này cho thấy candidate chưa tổng qu�
 
 ## Quyết định
 
-Giữ candidate hiện tại làm **G5 internal development runtime**, không gắn nhãn accepted release.
-Vòng cải thiện tiếp theo dùng V1/V2 đã mở để phân loại lỗi, nhưng chỉ tối ưu trên TRAIN/DEV mở
-rộng. Chỉ sau khi khóa một candidate mới đủ mạnh mới tạo một holdout độc lập cuối; không tạo
-TEST sau từng lỗi.
+Đóng G5 ở trạng thái **hoàn tất triển khai kỹ thuật nhưng không đạt nghiệm thu chất lượng
+intent/context**. Giữ candidate hiện tại làm internal development runtime, không gắn nhãn
+accepted release. Không tạo thêm holdout hoặc tinh chỉnh tiếp trong G5. Sai số V1–V3 chỉ được
+chuyển thành backlog nghiên cứu cho giai đoạn sau; một chu kỳ mới phải có TRAIN/DEV, candidate
+và protocol đánh giá mới được duyệt độc lập trước khi tạo TEST.

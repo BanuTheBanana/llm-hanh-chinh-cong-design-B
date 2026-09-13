@@ -26,5 +26,16 @@
     "same_locked_thresholds_as_v1_v2": true,
     "semantic_jurisdiction_normalization_locked": true
   },
-  "final_test_used": false
+  "final_test_used": true,
+  "final_test_result": {
+    "attempted_at": "2026-09-13T13:57:55.588541+00:00",
+    "evaluation_commit": "b6b778e4860190f833f4cd25d424b49850964497",
+    "test_sha256": "7d06d13dc752a083c80ce227b2a21fbab4dff1444172989736045be1bfeb9469",
+    "gate": "FAIL",
+    "full_state_case": 0.816667,
+    "field_macro_f1": 0.931242,
+    "conversation_success": 0.65,
+    "minimum_group": 0.333333
+  },
+  "decision": "TERMINAL_G5_FINAL_FAIL; DO_NOT_RERUN_V3"
 }
