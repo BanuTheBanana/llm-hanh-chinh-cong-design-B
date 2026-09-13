@@ -13,17 +13,15 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
 
-
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "evaluation/fixtures/g6-intent-context-dev-v1"
 sys.path.insert(0, str(ROOT))
 
-from training.intent_context import (  # noqa: E402
+from training.intent_context import (
     CONTEXT_SLOTS,
     apply_output_to_state,
     build_target,
 )
-
 
 CANDIDATES = [
     {"id": "p_birth", "name": "Đăng ký khai sinh"},
