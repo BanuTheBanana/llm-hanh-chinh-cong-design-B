@@ -1,0 +1,38 @@
+{
+  "schema_version": "g5-intent-context-policy-v3-result-v1",
+  "evaluated_at": "2026-09-13",
+  "scope": "D0 DEV and opened regressions only; not final acceptance or legal-answer evaluation",
+  "candidate_commit": "e59d214b992cb5ab260c0be8d13a2cfc4b35fc97",
+  "candidate": "Qwen3-4B-hard-v2-r16 + policy-v3",
+  "base_model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1c0",
+  "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
+  "prompt_sha256": "d6c196d1cca836a8f3e2f1448c76a50ba1ea965981d546e752982d4657841225",
+  "policy_version": "g5-intent-context-policy-v3",
+  "semantic_state_note": "Jurisdiction administrative classifiers are normalized for state comparison; exact patch remains a diagnostic.",
+  "results": {
+    "dev": {
+      "fixture_sha256": "4808d068f8b033de529e1ea5ada50b296501db497e7c095962ab9e55e48e4533",
+      "full_state_case": 1.0,
+      "field_macro_f1": 1.0,
+      "minimum_group": 1.0,
+      "p95_ms": 3114.629
+    },
+    "opened_regression_v1": {
+      "fixture_sha256": "884cd86a58ce4215e8a1beacdcf648d0144cc66f37f7f75a66639833e6717925",
+      "full_state_case": 1.0,
+      "field_macro_f1": 1.0,
+      "conversation_success": 1.0,
+      "minimum_group": 1.0,
+      "classification": "OPENED_REGRESSION_NOT_FINAL_ACCEPTANCE"
+    },
+    "opened_regression_v2": {
+      "fixture_sha256": "4571fdfafc735517526d40bef84339e5dd972701a8c2ab7bc42277b813c34082",
+      "full_state_case": 0.966667,
+      "field_macro_f1": 0.991667,
+      "conversation_success": 0.9,
+      "minimum_group": 0.8,
+      "classification": "OPENED_REGRESSION_NOT_FINAL_ACCEPTANCE"
+    }
+  },
+  "decision": "LOCK_POLICY_V3_CANDIDATE; NO_MORE_TUNING_ON_OPENED_REGRESSIONS; REQUIRE_ONE_INDEPENDENT_TERMINAL_HOLDOUT"
+}

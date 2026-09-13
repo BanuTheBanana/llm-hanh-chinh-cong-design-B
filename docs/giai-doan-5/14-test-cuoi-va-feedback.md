@@ -28,6 +28,12 @@ và câu chưa đủ thông tin. Aggregate công khai nằm ở
 [`evaluation/baselines/g5-intent-context-final-v2-result-20260913.json`](../../evaluation/baselines/g5-intent-context-final-v2-result-20260913.json);
 raw output và gold label vẫn nằm ngoài Git.
 
+Sau khi phân loại lỗi của cả hai TEST đã mở, policy v3 được kiểm tra lại trên DEV, V1 và V2.
+Ba tập đều vượt ngưỡng đã khóa; riêng V2 regression đạt 96,67% full-state và 90% hội thoại.
+Candidate v3 vì vậy đủ điều kiện bước vào **một holdout độc lập cuối**, nhưng chưa được gọi là
+accepted cho đến khi holdout đó chạy xong. Chi tiết aggregate không chứa câu hỏi private nằm ở
+[`evaluation/baselines/g5-intent-context-policy-v3-20260913.json`](../../evaluation/baselines/g5-intent-context-policy-v3-20260913.json).
+
 ## 2. Feedback người dùng
 
 Mỗi câu trả lời hoàn tất ở Web G5 có hai đánh giá độc lập:

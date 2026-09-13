@@ -44,6 +44,19 @@ mount read-only, không commit trọng số lên Git. Fingerprint và số liệ
 TEST kín chưa được mở. Bước tiếp theo là khóa candidate, chạy integration/smoke, sau đó mới nghiệm
 thu TEST một lần. Kết quả intent/context không được diễn giải thành độ chính xác pháp lý của câu trả lời.
 
+## Vòng ổn định policy v3
+
+Hai FINAL TEST trước đều giữ nguyên kết luận FAIL và đã chuyển thành regression mở. Policy v3
+không thay trọng số Qwen/LoRA mà bổ sung các bất biến nhẹ, có log: chỉ reset khi câu hiện tại có
+yêu cầu reset rõ; ưu tiên procedure mới sau phần phủ định; đối chiếu procedure với catalog; chuẩn
+hóa field có tín hiệu chắc; loại phỏng đoán field hàng loạt; và xử lý pending clarification.
+
+Trên đúng phiên bản đã khóa, DEV đạt 100% full-state. Regression V1 đạt 100% theo lượt và
+20/20 hội thoại; regression V2 đạt 96,67% theo lượt, 18/20 hội thoại, macro-F1 99,17% và nhóm
+thấp nhất 80%. Các số regression chỉ chứng minh lỗi cũ không tái diễn, không phải FINAL PASS.
+Candidate tại commit `e59d214` được đóng băng cho một holdout độc lập cuối và không tiếp tục
+tinh chỉnh theo V1/V2.
+
 ## Xác minh Docker và PostgreSQL
 
 Docker Desktop đã được xác minh là có sẵn và daemon đã được khởi động lại; không cần cài mới.
