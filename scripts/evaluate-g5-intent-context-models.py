@@ -228,7 +228,9 @@ def normalize_text(value: str) -> str:
     return re.sub(r"[^\w]+", " ", normalized, flags=re.UNICODE).strip()
 
 
-def validate_no_final_test_leakage(cases: list[dict], manifest: dict) -> bool:
+def validate_no_final_test_leakage(
+    cases: list[dict], manifest: dict, additional_fixtures: tuple[Path, ...] = ()
+) -> bool:
     audit = manifest.get("leakage_audit") or {}
     threshold = audit.get("near_duplicate_threshold")
     if threshold != 0.9:
@@ -236,7 +238,7 @@ def validate_no_final_test_leakage(cases: list[dict], manifest: dict) -> bool:
 
     reference_messages: list[str] = []
     reference_hashes: dict[str, str] = {}
-    for fixture in FINAL_REFERENCE_FIXTURES:
+    for fixture in (*FINAL_REFERENCE_FIXTURES, *additional_fixtures):
         reference_manifest = read_json(fixture / "manifest.json")
         source = fixture / reference_manifest["source_file"]
         if sha256(source) != reference_manifest["content_sha256"]:
@@ -560,6 +562,13 @@ def main() -> int:
         action="store_true",
         help="Re-score an already opened final fixture; never use this as final acceptance.",
     )
+    parser.add_argument(
+        "--prior-fixture",
+        action="append",
+        type=Path,
+        default=[],
+        help="Prior opened holdout to exclude from a new final test; may be repeated.",
+    )
     parser.add_argument("--candidate-commit")
     args = parser.parse_args()
     if args.final_test and args.opened_regression:
@@ -594,7 +603,12 @@ def main() -> int:
             and manifest.get("case_count") == 60
             and manifest.get("conversation_count") == 20
             and validate_final_conversations(cases)
-            and validate_no_final_test_leakage(cases, manifest)
+            and manifest.get("prior_holdout_count", 0) == len(args.prior_fixture)
+            and validate_no_final_test_leakage(
+                cases,
+                manifest,
+                tuple(path.resolve() for path in args.prior_fixture),
+            )
             and all(case.get("split") == "FINAL_TEST" for case in cases)
         )
         if (
@@ -650,6 +664,8 @@ def main() -> int:
     elif manifest.get("final_test") is not False:
         raise SystemExit("PILOT_FIXTURE_MANIFEST_INVALID")
     else:
+        if args.prior_fixture:
+            raise SystemExit("PRIOR_FIXTURE_ONLY_ALLOWED_FOR_FINAL_TEST")
         output_dir.mkdir(parents=True, exist_ok=True)
     if args.limit:
         cases = cases[: args.limit]

@@ -1,0 +1,27 @@
+{
+  "schema_version": "g5-intent-context-final-candidate-lock-v2",
+  "locked_at": "2026-09-13",
+  "candidate_commit": "86474bc247391bdbe87ebc61ef2e0ff50f6dda85",
+  "candidate": {
+    "name": "Qwen3-4B-Intent-hard-v2-r16-policy-v2",
+    "base_model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+    "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
+    "prompt_sha256": "d6c196d1cca836a8f3e2f1448c76a50ba1ea965981d546e752982d4657841225",
+    "policy_version": "g5-intent-context-policy-v2"
+  },
+  "selection_evidence": {
+    "dev_full_state_case": 0.95,
+    "dev_joint_state": 0.983333,
+    "opened_regression_conversation_success": 0.95,
+    "opened_regression_is_not_final_acceptance": true
+  },
+  "final_test_protocol": {
+    "conversations": 20,
+    "turns_per_conversation": 3,
+    "case_count": 60,
+    "single_attempt": true,
+    "exclude_prior_holdout": true,
+    "same_locked_thresholds_as_v1": true
+  },
+  "final_test_used": false
+}
