@@ -43,3 +43,15 @@ mount read-only, không commit trọng số lên Git. Fingerprint và số liệ
 
 TEST kín chưa được mở. Bước tiếp theo là khóa candidate, chạy integration/smoke, sau đó mới nghiệm
 thu TEST một lần. Kết quả intent/context không được diễn giải thành độ chính xác pháp lý của câu trả lời.
+
+## Xác minh Docker và PostgreSQL
+
+Docker Desktop đã được xác minh là có sẵn và daemon đã được khởi động lại; không cần cài mới.
+PostgreSQL 16 được chạy bằng container riêng thay vì cài trực tiếp lên Windows. Toàn bộ Backend suite
+đạt **244 passed, 1 skipped** trên database test tách biệt.
+
+Stack G5 sau khi build lại có đủ 8 service healthy: Web, Backend, PostgreSQL, AI Service, generation
+model, embedding model, intent model và source service. Web trả HTTP 200; Backend, RAG và endpoint
+intent đều báo `ok`, đúng model `Qwen3-4B-Intent-hard-v2-r16`. Smoke trực tiếp qua intent container
+trả đúng `p_birth`, field `fees` và evidence nguyên văn. Web G5 đang phục vụ tại
+`http://localhost:3005`.

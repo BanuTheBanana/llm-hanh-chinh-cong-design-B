@@ -40,7 +40,7 @@ khi nhận stack G5 là sẵn sàng. Tham số cụ thể nằm trong
 
 ## Bằng chứng hiện tại
 
-- Unit/API: AI Service 75/75 test đạt; toàn bộ Backend 244 test đạt và 1 test được bỏ qua
+- Unit/API: toàn bộ AI Service test đạt; toàn bộ Backend 244 test đạt và 1 test được bỏ qua
   theo thiết kế. Test transaction PostgreSQL riêng xác minh direct, follow-up, switch và reset.
 - Live provider smoke bằng Qwen3-4B Q8_0 + adapter seed 42 trả đúng procedure `p_birth`,
   field `fees`, JSON và evidence UUID.
