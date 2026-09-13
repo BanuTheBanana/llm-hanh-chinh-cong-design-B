@@ -38,7 +38,7 @@ def payload(message, **state):
 
 
 def test_policy_version_is_explicit():
-    assert POLICY_VERSION == "g5-intent-context-policy-v3"
+    assert POLICY_VERSION == "g6-intent-context-policy-v4"
 
 
 def test_explicit_switch_is_a_correction():
@@ -116,7 +116,7 @@ def test_explicit_switch_wins_over_incorrect_greeting_label():
     assert normalized["dialogue_act"] == "CORRECT_CONTEXT"
     assert normalized["topic_action"] == "SWITCH"
     assert normalized["patch"]["procedure_id"]["value"] == "p_birth"
-    assert actions == ["EXPLICIT_TOPIC_CORRECTION"]
+    assert actions == ["SEMANTIC_SIGNAL_OVERRIDES_POLICY_INTENT"]
 
 
 def test_repeated_procedure_is_not_a_topic_switch():
@@ -353,3 +353,107 @@ def test_temporal_regulation_phrase_only_sets_date():
         ),
     )
     assert normalized["patch"]["field_intents"]["op"] == "KEEP"
+
+
+def test_unsolicited_clarification_is_plain_information():
+    candidate = output(act="PROVIDE_CLARIFICATION")
+    candidate["patch"]["jurisdiction"] = {
+        "op": "SET",
+        "value": "Ba Đình, Hà Nội",
+        "evidence": [{"message_id": "current-user", "quote": "Ba Đình, Hà Nội"}],
+    }
+    normalized, actions = apply_intent_context_policy(
+        candidate,
+        payload(
+            "Tôi thực hiện tại Ba Đình, Hà Nội.",
+            procedure_id="p_marriage",
+            field_intents=["submission_methods"],
+        ),
+    )
+    assert normalized["dialogue_act"] == "ASK_INFORMATION"
+    assert "UNSOLICITED_CLARIFICATION_DOWNGRADED" in actions
+
+
+def test_procedure_signal_overrides_false_greeting_during_clarification():
+    normalized, actions = apply_intent_context_policy(
+        output(act="GREET", topic="UNRESOLVED"),
+        payload(
+            "Việc cần làm chính xác là đăng ký kết hôn.",
+            pending_clarification="procedure_id",
+        ),
+    )
+    assert normalized["dialogue_act"] == "PROVIDE_CLARIFICATION"
+    assert normalized["topic_action"] == "SWITCH"
+    assert normalized["patch"]["procedure_id"]["value"] == "p_marriage"
+    assert "SEMANTIC_SIGNAL_OVERRIDES_POLICY_INTENT" in actions
+    assert "PENDING_SLOT_WAS_PROVIDED" in actions
+
+
+def test_incidental_workflow_and_regulation_words_do_not_add_fields():
+    cases = [
+        (
+            "Ngoài quy trình, hồ sơ phải kèm theo tài liệu nào?",
+            ["required_documents"],
+        ),
+        (
+            "Vậy trình tự xử lý hồ sơ gồm các bước ra sao?",
+            ["steps"],
+        ),
+        (
+            "Khoản lệ phí dành cho họ được quy định thế nào?",
+            ["fees"],
+        ),
+        (
+            "Tôi cần đối chiếu quy định có hiệu lực vào ngày 21 tháng 6 năm 2026.",
+            [],
+        ),
+    ]
+    for message, fields in cases:
+        candidate = output()
+        candidate["patch"]["field_intents"] = {
+            "op": "SET",
+            "value": ["legal_bases", "required_documents", "steps", *fields],
+            "evidence": [{"message_id": "current-user", "quote": message}],
+        }
+        normalized, _ = apply_intent_context_policy(candidate, payload(message))
+        if fields:
+            assert normalized["patch"]["field_intents"]["value"] == fields
+        else:
+            assert normalized["patch"]["field_intents"]["op"] == "KEEP"
+
+
+def test_unsupported_clear_cannot_delete_remembered_scope():
+    candidate = output()
+    candidate["patch"]["jurisdiction"] = {
+        "op": "CLEAR",
+        "value": None,
+        "evidence": [{"message_id": "current-user", "quote": "Ở địa bàn mới"}],
+    }
+    normalized, actions = apply_intent_context_policy(
+        candidate,
+        payload(
+            "Ở địa bàn mới, hồ sơ khai sinh gồm những tài liệu nào?",
+            procedure_id="p_birth",
+            jurisdiction="Tam Kỳ, Quảng Nam",
+        ),
+    )
+    assert normalized["patch"]["jurisdiction"]["op"] == "KEEP"
+    assert "UNSUPPORTED_CLEAR_JURISDICTION_REMOVED" in actions
+
+
+def test_explicit_jurisdiction_edit_is_a_correction():
+    candidate = output(act="CORRECT_CONTEXT")
+    candidate["patch"]["jurisdiction"] = {
+        "op": "SET",
+        "value": "thành phố Huế",
+        "evidence": [{"message_id": "current-user", "quote": "thành phố Huế"}],
+    }
+    normalized, actions = apply_intent_context_policy(
+        candidate,
+        payload(
+            "Sửa địa bàn thực hiện thành thành phố Huế.",
+            procedure_id="p_change",
+        ),
+    )
+    assert normalized["dialogue_act"] == "CORRECT_CONTEXT"
+    assert "NEW_VALUE_IS_NOT_A_CORRECTION" not in actions

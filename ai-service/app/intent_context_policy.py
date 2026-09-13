@@ -6,7 +6,7 @@ import copy
 import re
 import unicodedata
 
-POLICY_VERSION = "g5-intent-context-policy-v3"
+POLICY_VERSION = "g6-intent-context-policy-v4"
 CONTEXT_SLOTS = ("procedure_id", "field_intents", "jurisdiction", "as_of")
 _CORRECTION_PATTERNS = (
     r"\bdoi (?:qua|sang)\b",
@@ -16,6 +16,7 @@ _CORRECTION_PATTERNS = (
     r"\bsua (?:lai |dia ban )?(?:tu|thanh|sang)\b",
     r"\bthay chu de\b",
     r"\bthay bang\b",
+    r"\bsua\b[^,.!?;]{0,40}\bdia ban\b",
 )
 _RESET_PATTERNS = (
     r"\bbat dau lai\b",
@@ -122,7 +123,13 @@ _FIELD_CUES = {
         "gui den co quan bang",
     ),
     "steps": ("quy trinh", "trinh tu", "cac buoc", "thu tu cac buoc"),
-    "legal_bases": ("can cu", "co so phap ly", "van ban", "quy dinh"),
+    "legal_bases": (
+        "can cu",
+        "co so phap ly",
+        "van ban",
+        "quy dinh nao",
+        "nhung quy dinh",
+    ),
     "applicant_scope": (
         "doi tuong",
         "danh cho ai",
@@ -188,12 +195,18 @@ def _positive_clause(message: str) -> str:
         positive_message,
     )
     positive_message = re.sub(
+        r"\bngoai (?:quy trinh|trinh tu|cac buoc)\b",
+        " ",
+        positive_message,
+    )
+    positive_message = re.sub(
         r"\bsau khi (?:da )?(?:du|nop du) (?:giay to|ho so)\b",
         " ",
         positive_message,
     )
     positive_message = re.sub(
-        r"\b(?:tra cuu theo|doi chieu) quy dinh(?: co hieu luc)?(?: tai)? ngay\b",
+        r"\b(?:tra cuu theo|doi chieu)(?: noi dung nay| thong tin)?"
+        r"(?: quy dinh)?(?: co hieu luc)?(?: vao| tai)? ngay\b",
         " ",
         positive_message,
     )
@@ -203,11 +216,41 @@ def _positive_clause(message: str) -> str:
 
 def _detect_fields(message: str) -> list[str]:
     positive_message = _positive_clause(message)
-    return [
+    detected = [
         field
         for field, cues in _FIELD_CUES.items()
         if any(cue in positive_message for cue in cues)
     ]
+    if "steps" in detected and "required_documents" in detected:
+        strong_document_cues = (
+            "giay to",
+            "tai lieu",
+            "thanh phan",
+            "kem theo",
+            "mang theo",
+            "mang gi",
+        )
+        if not any(cue in positive_message for cue in strong_document_cues):
+            detected.remove("required_documents")
+    return detected
+
+
+_CLEAR_CUES = {
+    "procedure_id": ("bo thu tuc", "xoa thu tuc", "khong giu thu tuc"),
+    "field_intents": ("bo noi dung dang hoi", "xoa noi dung dang hoi"),
+    "jurisdiction": (
+        "bo dia ban",
+        "xoa dia ban",
+        "bo dia phuong",
+        "xoa dia phuong",
+        "khong gioi han dia ban",
+    ),
+    "as_of": ("bo moc ngay", "xoa moc ngay", "bo thoi diem", "xoa thoi diem"),
+}
+
+
+def _clear_is_supported(slot: str, message: str) -> bool:
+    return any(cue in message for cue in _CLEAR_CUES[slot])
 
 
 def _detect_procedure(payload: dict, message: str) -> str | None:
@@ -297,6 +340,11 @@ def apply_intent_context_policy(output: dict, payload: dict) -> tuple[dict, list
         dialogue_act = normalized["dialogue_act"]
         actions.append("UNSUPPORTED_RESET_DOWNGRADED")
 
+    for slot in CONTEXT_SLOTS:
+        if patch[slot].get("op") == "CLEAR" and not _clear_is_supported(slot, message):
+            patch[slot] = _keep_patch()
+            actions.append(f"UNSUPPORTED_CLEAR_{slot.upper()}_REMOVED")
+
     if detected_procedure is not None:
         candidate_ids = {
             item.get("id") for item in payload.get("procedure_candidates") or []
@@ -339,6 +387,14 @@ def apply_intent_context_policy(output: dict, payload: dict) -> tuple[dict, list
     ):
         patch["field_intents"] = _keep_patch()
         actions.append("UNSUPPORTED_FIELD_GUESS_REMOVED")
+
+    semantic_signal = detected_procedure is not None or bool(detected_fields)
+    if dialogue_act in {"GREET", "OUT_OF_SCOPE"} and semantic_signal:
+        normalized["dialogue_act"] = (
+            "CORRECT_CONTEXT" if explicit_correction else "ASK_INFORMATION"
+        )
+        dialogue_act = normalized["dialogue_act"]
+        actions.append("SEMANTIC_SIGNAL_OVERRIDES_POLICY_INTENT")
 
     if (
         not state.get("procedure_id")
@@ -393,6 +449,12 @@ def apply_intent_context_policy(output: dict, payload: dict) -> tuple[dict, list
     ):
         normalized["dialogue_act"] = "PROVIDE_CLARIFICATION"
         actions.append("PENDING_SLOT_WAS_PROVIDED")
+
+    if normalized["dialogue_act"] == "PROVIDE_CLARIFICATION" and pending is None:
+        normalized["dialogue_act"] = (
+            "CORRECT_CONTEXT" if explicit_correction else "ASK_INFORMATION"
+        )
+        actions.append("UNSOLICITED_CLARIFICATION_DOWNGRADED")
 
     if (
         normalized["dialogue_act"] == "CORRECT_CONTEXT"
