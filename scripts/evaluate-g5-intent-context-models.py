@@ -31,12 +31,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "ai-service"))
 
-from app.intent_context_policy import (  # noqa: E402
+from app.intent_context_policy import (
     POLICY_VERSION,
     apply_intent_context_policy,
 )
 
-from training.intent_context import (  # noqa: E402
+from training.intent_context import (
     CONTEXT_SLOTS,
     SYSTEM_PROMPT,
     SYSTEM_PROMPT_VERSION,
@@ -180,6 +180,30 @@ def empty_runtime_state(state: dict) -> dict:
         "jurisdiction": state.get("jurisdiction"),
         "as_of": state.get("as_of"),
     }
+
+
+def canonical_jurisdiction(value: object) -> str | None:
+    """Normalize administrative classifiers for semantic state comparison only."""
+
+    if not isinstance(value, str) or not value.strip():
+        return None
+    plain = unicodedata.normalize("NFD", value.casefold())
+    plain = "".join(char for char in plain if unicodedata.category(char) != "Mn")
+    plain = plain.replace("đ", "d")
+    tokens = "".join(char if char.isalnum() else " " for char in plain).split()
+    administrative = {"tinh", "thanh", "pho", "quan", "huyen", "thi", "xa", "phuong"}
+    return " ".join(token for token in tokens if token not in administrative)
+
+
+def state_equal(predicted: dict, expected: dict) -> bool:
+    return (
+        predicted.get("procedure_id") == expected.get("procedure_id")
+        and sorted(predicted.get("field_intents") or [])
+        == sorted(expected.get("field_intents") or [])
+        and canonical_jurisdiction(predicted.get("jurisdiction"))
+        == canonical_jurisdiction(expected.get("jurisdiction"))
+        and predicted.get("as_of") == expected.get("as_of")
+    )
 
 
 def macro_f1(counts: dict[str, Counter]) -> float:
@@ -401,8 +425,10 @@ def evaluate_candidate(
                     predicted, policy_actions = apply_intent_context_policy(
                         predicted,
                         {
+                            "message_id": "current-user",
                             "current_user_message": case["current_user_message"],
                             "state_before": evaluation_case["state_before"],
+                            "procedure_candidates": case["procedure_candidates"],
                         },
                     )
                 score_counts["schema_valid"] += 1
@@ -433,7 +459,7 @@ def evaluate_candidate(
             predicted_state = apply_output_to_state(
                 evaluation_case["state_before"], predicted
             )
-            state_ok = predicted_state == expected_state
+            state_ok = state_equal(predicted_state, expected_state)
             field_state_ok = update_field_scores(
                 field_counts, expected_state, predicted_state
             )

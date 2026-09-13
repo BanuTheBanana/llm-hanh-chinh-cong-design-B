@@ -4,7 +4,6 @@ import importlib.util
 from collections import Counter
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[3]
 SCRIPT = ROOT / "scripts/evaluate-g5-intent-context-models.py"
 SPEC = importlib.util.spec_from_file_location("g5_final_evaluator", SCRIPT)
@@ -54,3 +53,14 @@ def test_final_conversations_require_twenty_ordered_three_turn_chains():
     assert MODULE.validate_final_conversations(cases) is True
     cases[-1]["turn_index"] = 2
     assert MODULE.validate_final_conversations(cases) is False
+
+
+def test_semantic_state_comparison_normalizes_jurisdiction_classifiers():
+    expected = {
+        "procedure_id": "p_birth",
+        "field_intents": ["fees"],
+        "jurisdiction": "thành phố Biên Hòa, Đồng Nai",
+        "as_of": None,
+    }
+    predicted = {**expected, "jurisdiction": "Biên Hòa, Đồng Nai"}
+    assert MODULE.state_equal(predicted, expected)

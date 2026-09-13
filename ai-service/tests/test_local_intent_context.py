@@ -121,7 +121,7 @@ async def test_unknown_procedure_is_retried_once_then_rejected(provider_factory)
     assert calls == 2
 
 
-async def test_conflicting_reset_semantics_are_retried_then_rejected(provider_factory):
+async def test_false_reset_label_is_recovered_from_current_message(provider_factory):
     body = request_body()
     invalid = model_output(body)
     invalid["dialogue_act"] = "RESET_CONTEXT"
@@ -133,9 +133,12 @@ async def test_conflicting_reset_semantics_are_retried_then_rejected(provider_fa
         return httpx.Response(200, json=completion(invalid))
 
     result = await provider_factory(handler).analyze(IntentContextRequest.model_validate(body))
-    assert result.output.dialogue_act == "RESET_CONTEXT"
-    assert result.output.topic_action == "RESET"
-    assert result.policy_actions == ("RESET_ACT_CLEARS_STATE_MACHINE",)
+    assert result.output.dialogue_act == "ASK_INFORMATION"
+    assert result.output.topic_action == "SWITCH"
+    assert result.policy_actions == (
+        "UNSUPPORTED_RESET_DOWNGRADED",
+        "CATALOG_PROCEDURE_RECOVERED",
+    )
     assert calls == 1
 
 

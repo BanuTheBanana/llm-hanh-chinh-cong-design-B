@@ -5,13 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from training.intent_context import (  # noqa: E402
+from training.intent_context import (
     CONTEXT_SLOTS,
     apply_output_to_state,
 )
@@ -35,6 +36,28 @@ def patch_equal(slot: str, predicted: dict, expected: dict) -> bool:
     )
 
 
+def canonical_jurisdiction(value: object) -> str | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    plain = unicodedata.normalize("NFD", value.casefold())
+    plain = "".join(char for char in plain if unicodedata.category(char) != "Mn")
+    plain = plain.replace("đ", "d")
+    tokens = "".join(char if char.isalnum() else " " for char in plain).split()
+    administrative = {"tinh", "thanh", "pho", "quan", "huyen", "thi", "xa", "phuong"}
+    return " ".join(token for token in tokens if token not in administrative)
+
+
+def state_equal(predicted: dict, expected: dict) -> bool:
+    return (
+        predicted.get("procedure_id") == expected.get("procedure_id")
+        and sorted(predicted.get("field_intents") or [])
+        == sorted(expected.get("field_intents") or [])
+        and canonical_jurisdiction(predicted.get("jurisdiction"))
+        == canonical_jurisdiction(expected.get("jurisdiction"))
+        and predicted.get("as_of") == expected.get("as_of")
+    )
+
+
 def rescore(result: dict, cases: list[dict]) -> dict:
     case_by_id = {case["case_id"]: case for case in cases}
     counts = Counter()
@@ -54,8 +77,9 @@ def rescore(result: dict, cases: list[dict]) -> dict:
             patch_equal(slot, predicted["patch"][slot], expected["patch"][slot])
             for slot in CONTEXT_SLOTS
         )
-        state_ok = apply_output_to_state(case["state_before"], predicted) == apply_output_to_state(
-            case["state_before"], expected
+        state_ok = state_equal(
+            apply_output_to_state(case["state_before"], predicted),
+            apply_output_to_state(case["state_before"], expected),
         )
         full_state_ok = act_ok and topic_ok and state_ok
         counts["joint_patch"] += patch_ok
