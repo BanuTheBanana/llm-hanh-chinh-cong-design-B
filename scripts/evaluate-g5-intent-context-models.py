@@ -7,15 +7,20 @@ This is a candidate-selection pilot, not the final held-out legal-quality evalua
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import math
+import re
 import shutil
 import statistics
 import subprocess
 import sys
 import time
+import unicodedata
 from collections import Counter
+from datetime import datetime, timezone
+from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -37,11 +42,38 @@ from training.intent_context import (  # noqa: E402
     SYSTEM_PROMPT_VERSION,
     apply_output_to_state,
     build_messages,
+    build_target,
 )
 
 DEFAULT_FIXTURE = ROOT / "evaluation/fixtures/intent-context-pilot-v1"
 DEFAULT_SCHEMA = ROOT / "docs/giai-doan-5/schema/intent-context-v2.schema.json"
 ALLOWED_OUTPUT_ROOT = (ROOT / "evaluation/reports").resolve()
+FIELD_INTENTS = (
+    "receiving_authority",
+    "required_documents",
+    "fees",
+    "processing_times",
+    "submission_methods",
+    "steps",
+    "legal_bases",
+    "applicant_scope",
+)
+RUNTIME_CANDIDATE_PATHS = (
+    "ai-service/app/config.py",
+    "ai-service/app/intent_context_policy.py",
+    "ai-service/app/prompts/intent-context-v2.txt",
+    "ai-service/app/providers/intent_context_base.py",
+    "ai-service/app/providers/local_intent_context.py",
+    "ai-service/app/schemas.py",
+    "backend/app/ai.py",
+    "backend/app/chat.py",
+    "backend/app/rag/g5/intent_context.py",
+    "compose.g5.yaml",
+)
+FINAL_REFERENCE_FIXTURES = (
+    ROOT / "evaluation/fixtures/intent-context-train-hard-v2",
+    ROOT / "evaluation/fixtures/intent-context-pilot-v1",
+)
 
 
 def read_json(path: Path) -> dict:
@@ -54,6 +86,32 @@ def sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def verify_locked_candidate(candidate_commit: str) -> str:
+    head = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+    ).strip()
+    subprocess.run(
+        ["git", "rev-parse", "--verify", f"{candidate_commit}^{{commit}}"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    dirty = subprocess.check_output(
+        ["git", "status", "--porcelain"], cwd=ROOT, text=True
+    )
+    if dirty:
+        raise SystemExit("FINAL_TEST_REQUIRES_CLEAN_WORKTREE")
+    unchanged = subprocess.run(
+        ["git", "diff", "--quiet", candidate_commit, head, "--", *RUNTIME_CANDIDATE_PATHS],
+        cwd=ROOT,
+        check=False,
+    )
+    if unchanged.returncode != 0:
+        raise SystemExit("CANDIDATE_RUNTIME_CHANGED_AFTER_LOCK")
+    return head
 
 
 def percentile(values: list[float], fraction: float) -> float | None:
@@ -115,6 +173,137 @@ def patch_equal(slot: str, predicted: dict, expected: dict) -> bool:
     return normalize_patch(slot, predicted) == normalize_patch(slot, expected)
 
 
+def empty_runtime_state(state: dict) -> dict:
+    return {
+        "procedure_id": state.get("procedure_id"),
+        "field_intents": sorted(state.get("field_intents") or []),
+        "jurisdiction": state.get("jurisdiction"),
+        "as_of": state.get("as_of"),
+    }
+
+
+def macro_f1(counts: dict[str, Counter]) -> float:
+    scores = []
+    for label in FIELD_INTENTS:
+        item = counts[label]
+        precision = item["tp"] / (item["tp"] + item["fp"]) if item["tp"] + item["fp"] else 1
+        recall = item["tp"] / (item["tp"] + item["fn"]) if item["tp"] + item["fn"] else 1
+        scores.append(2 * precision * recall / (precision + recall) if precision + recall else 0)
+    return round(statistics.fmean(scores), 6)
+
+
+def update_field_scores(
+    counts: dict[str, Counter], expected_state: dict, predicted_state: dict
+) -> bool:
+    expected_fields = set(expected_state["field_intents"])
+    predicted_fields = set(predicted_state["field_intents"])
+    for label in FIELD_INTENTS:
+        if label in expected_fields and label in predicted_fields:
+            counts[label]["tp"] += 1
+        elif label in predicted_fields:
+            counts[label]["fp"] += 1
+        elif label in expected_fields:
+            counts[label]["fn"] += 1
+    return predicted_fields == expected_fields
+
+
+def parse_candidate(value: str) -> tuple[str, Path, Path | None]:
+    if "=" not in value:
+        raise SystemExit("CANDIDATE_FORMAT_NAME_EQUALS_PATH")
+    name, raw_path = value.split("=", 1)
+    model_part, separator, lora_part = raw_path.partition("::")
+    if not name or not model_part or (separator and not lora_part):
+        raise SystemExit("CANDIDATE_FORMAT_NAME_EQUALS_PATH")
+    model_path = Path(model_part).resolve()
+    lora_path = Path(lora_part).resolve() if separator else None
+    if not model_path.is_file():
+        raise SystemExit(f"MODEL_NOT_FOUND:{name}")
+    if lora_path is not None and not lora_path.is_file():
+        raise SystemExit(f"LORA_NOT_FOUND:{name}")
+    return name, model_path, lora_path
+
+
+def normalize_text(value: str) -> str:
+    normalized = unicodedata.normalize("NFC", value).casefold()
+    return re.sub(r"[^\w]+", " ", normalized, flags=re.UNICODE).strip()
+
+
+def validate_no_final_test_leakage(cases: list[dict], manifest: dict) -> bool:
+    audit = manifest.get("leakage_audit") or {}
+    threshold = audit.get("near_duplicate_threshold")
+    if threshold != 0.9:
+        return False
+
+    reference_messages: list[str] = []
+    reference_hashes: dict[str, str] = {}
+    for fixture in FINAL_REFERENCE_FIXTURES:
+        reference_manifest = read_json(fixture / "manifest.json")
+        source = fixture / reference_manifest["source_file"]
+        if sha256(source) != reference_manifest["content_sha256"]:
+            return False
+        reference_hashes[fixture.name] = sha256(source)
+        reference_messages.extend(
+            normalize_text(json.loads(line)["current_user_message"])
+            for line in source.read_text(encoding="utf-8").splitlines()
+        )
+
+    if audit.get("reference_hashes") != reference_hashes:
+        return False
+    final_messages = [normalize_text(case["current_user_message"]) for case in cases]
+    if len(set(final_messages)) != len(final_messages):
+        return False
+    exact_overlap = sum(message in set(reference_messages) for message in final_messages)
+    near_overlap = sum(
+        max(SequenceMatcher(None, message, reference).ratio() for reference in reference_messages)
+        >= threshold
+        for message in final_messages
+    )
+    return (
+        exact_overlap == 0
+        and near_overlap == 0
+        and audit.get("exact_overlap_count") == 0
+        and audit.get("near_duplicate_count") == 0
+    )
+
+
+def validate_final_conversations(cases: list[dict]) -> bool:
+    conversations: dict[str, list[int]] = {}
+    replay_states: dict[str, dict] = {}
+    case_ids: set[str] = set()
+    for case in cases:
+        case_id = case.get("case_id")
+        conversation_id = case.get("conversation_id")
+        turn_index = case.get("turn_index")
+        if (
+            not isinstance(case_id, str)
+            or case_id in case_ids
+            or not isinstance(conversation_id, str)
+            or type(turn_index) is not int
+        ):
+            return False
+        if turn_index != len(conversations.get(conversation_id, [])) + 1:
+            return False
+        expected_before = replay_states.get(
+            conversation_id,
+            {
+                "procedure_id": None,
+                "field_intents": [],
+                "jurisdiction": None,
+                "as_of": None,
+            },
+        )
+        if empty_runtime_state(case.get("state_before") or {}) != expected_before:
+            return False
+        case_ids.add(case_id)
+        conversations.setdefault(conversation_id, []).append(turn_index)
+        replay_states[conversation_id] = apply_output_to_state(
+            case["state_before"], case["expected"]
+        )
+    return len(conversations) == 20 and all(
+        sorted(turns) == [1, 2, 3] for turns in conversations.values()
+    )
+
+
 def semantic_errors(case: dict, predicted: dict) -> list[str]:
     errors = []
     allowed_ids = {item["id"] for item in case["procedure_candidates"]}
@@ -149,12 +338,30 @@ def evaluate_candidate(
     input_tokens = []
     output_tokens = []
     slots = CONTEXT_SLOTS
+    replay_states: dict[str, dict] = {}
+    conversation_passes: dict[str, bool] = {}
+    field_counts = {label: Counter() for label in FIELD_INTENTS}
 
     for case in cases:
+        evaluation_case = copy.deepcopy(case)
+        conversation_id = case.get("conversation_id")
+        if conversation_id:
+            turn_index = case.get("turn_index")
+            if type(turn_index) is not int or turn_index < 1:
+                raise ValueError("INVALID_CONVERSATION_TURN")
+            if turn_index == 1:
+                replay_states[conversation_id] = empty_runtime_state(case["state_before"])
+                conversation_passes[conversation_id] = True
+            elif conversation_id not in replay_states:
+                raise ValueError("CONVERSATION_TURN_ORDER_INVALID")
+            evaluation_case["state_before"] = {
+                **replay_states[conversation_id],
+                "pending_clarification": case["state_before"].get("pending_clarification"),
+            }
         group_counts[case["group"]] += 1
         request_body = {
             "model": model_name,
-            "messages": build_messages(case),
+            "messages": build_messages(evaluation_case),
             "temperature": 0,
             "top_k": 1,
             "seed": 42,
@@ -188,7 +395,7 @@ def evaluate_candidate(
                         predicted,
                         {
                             "current_user_message": case["current_user_message"],
-                            "state_before": case["state_before"],
+                            "state_before": evaluation_case["state_before"],
                         },
                     )
                 score_counts["schema_valid"] += 1
@@ -205,6 +412,7 @@ def evaluate_candidate(
             error_codes.append(type(exc).__name__.upper())
 
         expected = case["expected"]
+        expected_state = apply_output_to_state(case["state_before"], expected)
         semantic_ok = predicted is not None and not error_codes
         if semantic_ok:
             score_counts["semantic_valid"] += 1
@@ -215,9 +423,14 @@ def evaluate_candidate(
                 for slot in slots
             }
             exact_patch_ok = all(patch_results.values())
-            expected_state = apply_output_to_state(case["state_before"], expected)
-            predicted_state = apply_output_to_state(case["state_before"], predicted)
+            predicted_state = apply_output_to_state(
+                evaluation_case["state_before"], predicted
+            )
             state_ok = predicted_state == expected_state
+            field_state_ok = update_field_scores(
+                field_counts, expected_state, predicted_state
+            )
+            score_counts["field_state_exact"] += int(field_state_ok)
             exact_full_ok = act_ok and topic_ok and exact_patch_ok
             full_ok = act_ok and topic_ok and state_ok
             score_counts["dialogue_act"] += int(act_ok)
@@ -232,6 +445,11 @@ def evaluate_candidate(
                 group_passes[case["group"]] += 1
         else:
             full_ok = False
+            predicted_state = empty_runtime_state(evaluation_case["state_before"])
+            update_field_scores(field_counts, expected_state, predicted_state)
+        if conversation_id:
+            replay_states[conversation_id] = predicted_state
+            conversation_passes[conversation_id] &= full_ok
         failures.update(error_codes)
         raw_rows.append(
             {
@@ -243,6 +461,8 @@ def evaluate_candidate(
                 "predicted": predicted,
                 "raw_predicted": raw_predicted if policy_actions else None,
                 "policy_actions": policy_actions,
+                "state_input": evaluation_case["state_before"] if conversation_id else None,
+                "predicted_state": predicted_state,
                 "raw_content": content if predicted is None else None,
             }
         )
@@ -263,8 +483,16 @@ def evaluate_candidate(
             "slot_field_intents",
             "slot_jurisdiction",
             "slot_as_of",
+            "field_state_exact",
         )
     }
+    metrics["field_macro_f1"] = macro_f1(field_counts)
+    conversation_count = len(conversation_passes)
+    conversation_success = (
+        round(sum(conversation_passes.values()) / conversation_count, 6)
+        if conversation_count
+        else None
+    )
     return {
         "candidate": model_name,
         "case_count": count,
@@ -287,6 +515,8 @@ def evaluate_candidate(
             "prompt_mean": round(statistics.fmean(input_tokens), 3) if input_tokens else None,
             "completion_mean": round(statistics.fmean(output_tokens), 3) if output_tokens else None,
         },
+        "conversation_count": conversation_count,
+        "conversation_success": conversation_success,
         "raw_rows": raw_rows,
     }
 
@@ -319,38 +549,92 @@ def main() -> int:
         action="store_true",
         help="Apply the same deterministic intent/context policy as the AI service.",
     )
+    parser.add_argument("--final-test", action="store_true")
+    parser.add_argument("--candidate-commit")
     args = parser.parse_args()
     output_dir = args.output_dir.resolve()
     if not output_dir.is_relative_to(ALLOWED_OUTPUT_ROOT):
         raise SystemExit("PRIVATE_EVALUATION_OUTPUT_REQUIRED")
     if not args.llama_server:
         raise SystemExit("LLAMA_SERVER_NOT_FOUND")
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     manifest = read_json(args.fixture / "manifest.json")
     cases_path = args.fixture / manifest["source_file"]
     cases = [json.loads(line) for line in cases_path.read_text(encoding="utf-8").splitlines()]
-    if len(cases) != manifest["case_count"] or manifest.get("final_test") is not False:
-        raise SystemExit("PILOT_FIXTURE_MANIFEST_INVALID")
-    if args.limit:
-        cases = cases[: args.limit]
+    if len(cases) != manifest["case_count"]:
+        raise SystemExit("FIXTURE_MANIFEST_COUNT_INVALID")
     schema = read_json(args.schema)
     Draft202012Validator.check_schema(schema)
+    expected_validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    try:
+        for case in cases:
+            expected_validator.validate(build_target(case))
+    except Exception as exc:
+        raise SystemExit("FIXTURE_GOLD_CONTRACT_INVALID") from exc
+    if args.final_test:
+        if not args.candidate_commit:
+            raise SystemExit("FINAL_TEST_CANDIDATE_COMMIT_REQUIRED")
+        final_manifest_ok = (
+            manifest.get("final_test") is True
+            and manifest.get("review_status") == "LOCKED"
+            and manifest.get("answer_visibility") == "PRIVATE_GOLD_ONLY"
+            and manifest.get("candidate_commit") == args.candidate_commit
+            and manifest.get("content_sha256") == sha256(cases_path)
+            and manifest.get("case_count") == 60
+            and manifest.get("conversation_count") == 20
+            and validate_final_conversations(cases)
+            and validate_no_final_test_leakage(cases, manifest)
+            and all(case.get("split") == "FINAL_TEST" for case in cases)
+        )
+        if (
+            not final_manifest_ok
+            or args.limit
+            or len(args.candidate) != 1
+            or not args.apply_policy
+        ):
+            raise SystemExit("LOCKED_FINAL_TEST_MANIFEST_REQUIRED")
+
+        _, final_model_path, final_lora_path = parse_candidate(args.candidate[0])
+        if final_lora_path is None:
+            raise SystemExit("FINAL_TEST_LORA_REQUIRED")
+        if (
+            manifest.get("model_sha256") != sha256(final_model_path)
+            or manifest.get("adapter_sha256") != sha256(final_lora_path)
+            or manifest.get("prompt_sha256")
+            != hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest()
+            or manifest.get("policy_version") != POLICY_VERSION
+        ):
+            raise SystemExit("FINAL_TEST_CANDIDATE_FINGERPRINT_MISMATCH")
+
+        evaluation_commit = verify_locked_candidate(args.candidate_commit)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        marker_path = output_dir / "FINAL_TEST_ATTEMPT.json"
+        if marker_path.exists() or (output_dir / "summary.json").exists():
+            raise SystemExit("FINAL_TEST_ALREADY_ATTEMPTED")
+        marker_path.write_text(
+            json.dumps(
+                {
+                    "started_at": datetime.now(timezone.utc).isoformat(),
+                    "candidate_commit": args.candidate_commit,
+                    "evaluation_commit": evaluation_commit,
+                    "test_sha256": sha256(cases_path),
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+    elif manifest.get("final_test") is not False:
+        raise SystemExit("PILOT_FIXTURE_MANIFEST_INVALID")
+    else:
+        output_dir.mkdir(parents=True, exist_ok=True)
+    if args.limit:
+        cases = cases[: args.limit]
     base_url = f"http://127.0.0.1:{args.port}"
     baseline_gpu = gpu_memory_mib()
     summaries = []
 
     for candidate_arg in args.candidate:
-        if "=" not in candidate_arg:
-            raise SystemExit("CANDIDATE_FORMAT_NAME_EQUALS_PATH")
-        name, raw_path = candidate_arg.split("=", 1)
-        model_part, separator, lora_part = raw_path.partition("::")
-        model_path = Path(model_part).resolve()
-        lora_path = Path(lora_part).resolve() if separator else None
-        if not model_path.is_file():
-            raise SystemExit(f"MODEL_NOT_FOUND:{name}")
-        if lora_path is not None and not lora_path.is_file():
-            raise SystemExit(f"LORA_NOT_FOUND:{name}")
+        name, model_path, lora_path = parse_candidate(candidate_arg)
         log_path = output_dir / f"{safe_name(name)}-server.log"
         command = [
             args.llama_server,
@@ -424,7 +708,11 @@ def main() -> int:
 
     summary = {
         "schema_version": "g5-intent-context-benchmark-v2",
-        "scope": "D0 fictional pilot; not final TEST and not legal-answer evaluation",
+        "scope": (
+            "Locked private G5 intent/context final test; not legal-answer evaluation"
+            if args.final_test
+            else "D0 fictional pilot; not final TEST and not legal-answer evaluation"
+        ),
         "fixture_sha256": sha256(cases_path),
         "schema_sha256": sha256(args.schema),
         "system_prompt_version": SYSTEM_PROMPT_VERSION,
@@ -438,11 +726,34 @@ def main() -> int:
         "candidate_count": len(summaries),
         "candidates": summaries,
     }
+    if args.final_test:
+        metrics = summaries[0]["metrics"]
+        group_gate = all(
+            item["accuracy"] >= 0.7
+            for item in summaries[0]["per_group_full_state_case"].values()
+        )
+        gate_passed = (
+            metrics["schema_valid"] == 1
+            and metrics["semantic_valid"] == 1
+            and metrics["dialogue_act"] >= 0.9
+            and metrics["topic_action"] >= 0.9
+            and metrics["field_macro_f1"] >= 0.95
+            and metrics["field_state_exact"] >= 0.9
+            and metrics["joint_state"] >= 0.9
+            and metrics["full_state_case"] >= 0.9
+            and summaries[0]["conversation_success"] >= 0.9
+            and group_gate
+        )
+        summary["final_test_gate"] = {
+            "status": "PASS" if gate_passed else "FAIL",
+            "thresholds_locked_before_run": True,
+            "group_minimum": 0.7,
+        }
     (output_dir / "summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     print(json.dumps(summary, ensure_ascii=False, indent=2))
-    return 0
+    return 0 if not args.final_test or gate_passed else 1
 
 
 if __name__ == "__main__":

@@ -1,0 +1,37 @@
+{
+  "schema_version": "g5-intent-context-final-candidate-lock-v1",
+  "locked_at": "2026-09-13",
+  "candidate_commit": "30849fd375f84e6192e1d01de315ac41e90e91a5",
+  "candidate": {
+    "name": "Qwen3-4B-Intent-hard-v2-r16",
+    "base_model": "qwen3-4b-instruct-2507-q8_0.gguf",
+    "base_model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+    "adapter": "qwen3-4b-intent-hard-v2-r16/adapter-f16.gguf",
+    "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
+    "prompt_version": "g5-intent-context-prompt-v2",
+    "prompt_sha256": "d6c196d1cca836a8f3e2f1448c76a50ba1ea965981d546e752982d4657841225",
+    "policy_version": "g5-intent-context-policy-v1"
+  },
+  "selection_inputs": {
+    "train_sha256": "705740428aaeaabbea37f1ca850efa2fda12e5493b03ceb6733dacdd0ec296d5",
+    "dev_sha256": "4808d068f8b033de529e1ea5ada50b296501db497e7c095962ab9e55e48e4533"
+  },
+  "final_test_protocol": {
+    "conversations": 20,
+    "turns_per_conversation": 3,
+    "case_count": 60,
+    "single_attempt": true,
+    "private_gold": true,
+    "schema_valid_min": 1.0,
+    "semantic_valid_min": 1.0,
+    "dialogue_act_min": 0.9,
+    "topic_action_min": 0.9,
+    "field_macro_f1_min": 0.95,
+    "field_state_exact_min": 0.9,
+    "joint_state_min": 0.9,
+    "full_state_case_min": 0.9,
+    "conversation_success_min": 0.9,
+    "per_group_min": 0.7
+  },
+  "final_test_used": false
+}
