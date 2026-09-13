@@ -1,0 +1,47 @@
+{
+  "schema_version": "g6-opened-regression-result-v1",
+  "evaluated_at": "2026-09-13",
+  "scope": "Opened G5 V1-V3 regression only; not G6 acceptance or legal-answer evaluation",
+  "policy_commit": "c516b45a967567010a011bcaeab18a38a11b974f",
+  "runtime_commit": "5a26953b82fa0f8cc50a450ad70f55612d4df801",
+  "candidate": "Qwen3-4B-hard-v2-r16 + g6-intent-context-policy-v4",
+  "model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+  "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
+  "results": {
+    "opened_v1": {
+      "full_state_case": 1.0,
+      "field_macro_f1": 1.0,
+      "conversation_success": 1.0,
+      "minimum_group": 1.0,
+      "p95_ms": 2933.332
+    },
+    "opened_v2": {
+      "full_state_case": 0.983333,
+      "field_macro_f1": 1.0,
+      "conversation_success": 0.95,
+      "minimum_group": 0.8,
+      "p95_ms": 3239.619
+    },
+    "opened_v3": {
+      "full_state_case": 1.0,
+      "field_macro_f1": 1.0,
+      "conversation_success": 1.0,
+      "minimum_group": 1.0,
+      "p95_ms": 2926.847
+    }
+  },
+  "fast_path": {
+    "status": "IMPLEMENTED",
+    "model_calls_for_high_confidence_unit_case": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "deferred_classes": [
+      "pending_clarification",
+      "date",
+      "jurisdiction",
+      "possible_out_of_scope",
+      "ambiguous"
+    ]
+  },
+  "decision": "PROCEED_TO_FRESH_G6_DEV; OPENED_REGRESSIONS_MUST_NOT_BE_USED_AS_ACCEPTANCE"
+}

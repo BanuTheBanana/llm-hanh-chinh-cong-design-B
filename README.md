@@ -63,6 +63,11 @@ nhiều lượt và feedback hai trục. Tuy nhiên FINAL V3 độc lập cuối
 65% hội thoại trọn chuỗi, nên **không đạt acceptance intent/context** và không phải release.
 Corpus đầy đủ vẫn BLOCKED. Xem [biên bản nghiệm thu G5](docs/giai-doan-5/07-nghiem-thu-giai-doan-5.md).
 
+**Giai đoạn 6 đang triển khai trên nhánh `g6/intent-context-quality`:** policy hybrid v4 đã sửa
+các bất biến clarification/follow-up/scope và thêm fast path 0-token cho yêu cầu chắc chắn.
+V1–V3 đã mở đều được giữ làm regression, không dùng làm nghiệm thu. Xem
+[phạm vi và gate G6](docs/giai-doan-6/01-pham-vi-va-gate.md).
+
 ## Chạy nhanh
 
 Yêu cầu Docker Engine/Desktop và Docker Compose v2:
