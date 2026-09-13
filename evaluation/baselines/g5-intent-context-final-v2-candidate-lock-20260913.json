@@ -23,5 +23,7 @@
     "exclude_prior_holdout": true,
     "same_locked_thresholds_as_v1": true
   },
-  "final_test_used": false
+  "final_test_used": true,
+  "final_test_sha256": "4571fdfafc735517526d40bef84339e5dd972701a8c2ab7bc42277b813c34082",
+  "final_test_gate": "FAIL"
 }

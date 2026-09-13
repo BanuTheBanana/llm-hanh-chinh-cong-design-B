@@ -20,6 +20,14 @@ và giá trị scope đầu tiên không phải correction. Policy v2 giữ DEV 
 regression đã mở đạt 98,33% theo lượt và 19/20 hội thoại. Số này chỉ dùng kiểm tra lỗi cũ,
 không thay đổi kết luận FAIL và không thay cho holdout độc lập tiếp theo.
 
+Candidate policy v2 tiếp tục được khóa trước khi chạy FINAL TEST V2 độc lập. Bộ V2 vẫn gồm
+20 hội thoại × 3 lượt, loại trừ cả TRAIN, DEV và holdout V1. Lần chạy duy nhất đạt 73,33%
+full-state, 74,88% field macro-F1 và 60% hội thoại đúng trọn chuỗi, nên gate tiếp tục **FAIL**.
+V2 cho thấy model còn nhạy với diễn đạt tự nhiên của địa danh, câu làm rõ, câu chuyển chủ đề
+và câu chưa đủ thông tin. Aggregate công khai nằm ở
+[`evaluation/baselines/g5-intent-context-final-v2-result-20260913.json`](../../evaluation/baselines/g5-intent-context-final-v2-result-20260913.json);
+raw output và gold label vẫn nằm ngoài Git.
+
 ## 2. Feedback người dùng
 
 Mỗi câu trả lời hoàn tất ở Web G5 có hai đánh giá độc lập:
