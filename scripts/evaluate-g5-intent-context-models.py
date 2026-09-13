@@ -34,6 +34,7 @@ sys.path.insert(0, str(ROOT / "ai-service"))
 from app.intent_context_policy import (
     POLICY_VERSION,
     apply_intent_context_policy,
+    resolve_high_confidence_without_model,
 )
 
 from training.intent_context import (
@@ -358,6 +359,7 @@ def evaluate_candidate(
     schema: dict,
     *,
     apply_policy: bool,
+    apply_fast_route: bool,
 ) -> dict:
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     latencies = []
@@ -372,6 +374,7 @@ def evaluate_candidate(
     replay_states: dict[str, dict] = {}
     conversation_passes: dict[str, bool] = {}
     field_counts = {label: Counter() for label in FIELD_INTENTS}
+    route_counts = Counter()
 
     for case in cases:
         evaluation_case = copy.deepcopy(case)
@@ -390,6 +393,12 @@ def evaluate_candidate(
                 "pending_clarification": case["state_before"].get("pending_clarification"),
             }
         group_counts[case["group"]] += 1
+        policy_payload = {
+            "message_id": "current-user",
+            "current_user_message": case["current_user_message"],
+            "state_before": evaluation_case["state_before"],
+            "procedure_candidates": case["procedure_candidates"],
+        }
         request_body = {
             "model": model_name,
             "messages": build_messages(evaluation_case),
@@ -408,28 +417,36 @@ def evaluate_candidate(
         policy_actions: list[str] = []
         error_codes = []
         try:
-            response = request_json(base_url + "/v1/chat/completions", body=request_body)
-            latencies.append((time.perf_counter() - started) * 1000)
-            choice = response["choices"][0]
-            content = choice["message"].get("content") or ""
-            usage = response.get("usage", {})
-            input_tokens.append(int(usage.get("prompt_tokens", 0)))
-            output_tokens.append(int(usage.get("completion_tokens", 0)))
-            raw_predicted = json.loads(content)
-            predicted = raw_predicted
+            deterministic = (
+                resolve_high_confidence_without_model(policy_payload)
+                if apply_fast_route
+                else None
+            )
+            if deterministic is not None:
+                predicted, policy_actions = deterministic
+                route_counts["fast_path"] += 1
+                input_tokens.append(0)
+                output_tokens.append(0)
+                latencies.append((time.perf_counter() - started) * 1000)
+            else:
+                route_counts["model_fallback"] += 1
+                response = request_json(base_url + "/v1/chat/completions", body=request_body)
+                latencies.append((time.perf_counter() - started) * 1000)
+                choice = response["choices"][0]
+                content = choice["message"].get("content") or ""
+                usage = response.get("usage", {})
+                input_tokens.append(int(usage.get("prompt_tokens", 0)))
+                output_tokens.append(int(usage.get("completion_tokens", 0)))
+                raw_predicted = json.loads(content)
+                predicted = raw_predicted
             schema_errors = list(validator.iter_errors(predicted))
             if schema_errors:
                 error_codes.append("SCHEMA_INVALID")
             else:
-                if apply_policy:
+                if apply_policy and deterministic is None:
                     predicted, policy_actions = apply_intent_context_policy(
                         predicted,
-                        {
-                            "message_id": "current-user",
-                            "current_user_message": case["current_user_message"],
-                            "state_before": evaluation_case["state_before"],
-                            "procedure_candidates": case["procedure_candidates"],
-                        },
+                        policy_payload,
                     )
                 score_counts["schema_valid"] += 1
                 error_codes.extend(semantic_errors(case, predicted))
@@ -548,6 +565,7 @@ def evaluate_candidate(
             "prompt_mean": round(statistics.fmean(input_tokens), 3) if input_tokens else None,
             "completion_mean": round(statistics.fmean(output_tokens), 3) if output_tokens else None,
         },
+        "routes": dict(sorted(route_counts.items())),
         "conversation_count": conversation_count,
         "conversation_success": conversation_success,
         "raw_rows": raw_rows,
@@ -582,6 +600,11 @@ def main() -> int:
         action="store_true",
         help="Apply the same deterministic intent/context policy as the AI service.",
     )
+    parser.add_argument(
+        "--apply-fast-route",
+        action="store_true",
+        help="Resolve narrow high-confidence turns before model inference.",
+    )
     parser.add_argument("--final-test", action="store_true")
     parser.add_argument(
         "--opened-regression",
@@ -599,6 +622,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.final_test and args.opened_regression:
         raise SystemExit("FINAL_TEST_AND_OPENED_REGRESSION_ARE_EXCLUSIVE")
+    if args.apply_fast_route and not args.apply_policy:
+        raise SystemExit("FAST_ROUTE_REQUIRES_POLICY")
     output_dir = args.output_dir.resolve()
     if not output_dir.is_relative_to(ALLOWED_OUTPUT_ROOT):
         raise SystemExit("PRIVATE_EVALUATION_OUTPUT_REQUIRED")
@@ -740,7 +765,12 @@ def main() -> int:
                 load_seconds = wait_ready(base_url, process, args.startup_timeout)
                 loaded_gpu = gpu_memory_mib()
                 result = evaluate_candidate(
-                    base_url, name, cases, schema, apply_policy=args.apply_policy
+                    base_url,
+                    name,
+                    cases,
+                    schema,
+                    apply_policy=args.apply_policy,
+                    apply_fast_route=args.apply_fast_route,
                 )
             finally:
                 process.terminate()
@@ -788,6 +818,7 @@ def main() -> int:
         "system_prompt_version": SYSTEM_PROMPT_VERSION,
         "system_prompt_sha256": hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest(),
         "policy_applied": args.apply_policy,
+        "fast_route_applied": args.apply_fast_route,
         "policy_version": POLICY_VERSION if args.apply_policy else None,
         "llama_server": str(args.llama_server),
         "llama_server_version": subprocess.check_output(

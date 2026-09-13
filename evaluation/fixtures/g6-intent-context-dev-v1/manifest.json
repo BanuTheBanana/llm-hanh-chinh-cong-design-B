@@ -1,0 +1,36 @@
+{
+  "schema_version": "g6-intent-context-dev-manifest-v1",
+  "classification": "D0_SYSTEM_DEVELOPMENT",
+  "purpose": "Reviewed conversational development gate; never final acceptance.",
+  "source_file": "cases.jsonl",
+  "split": "DEV",
+  "final_test": false,
+  "contains_company_data": false,
+  "review_status": "APPROVED_DEV",
+  "case_count": 60,
+  "conversation_count": 20,
+  "turns_per_conversation": 3,
+  "groups": {
+    "boundary": 7,
+    "clarification": 6,
+    "correction_switch": 9,
+    "direct": 18,
+    "followup": 11,
+    "reset": 3,
+    "scope_date": 6
+  },
+  "content_sha256": "05def78ca7290426c6a18c211cff62a53ec13e62f914f8e01f35fc307a36828f",
+  "leakage_audit": {
+    "reference_hashes": {
+      "intent-context-train-hard-v2": "705740428aaeaabbea37f1ca850efa2fda12e5493b03ceb6733dacdd0ec296d5",
+      "intent-context-pilot-v1": "4808d068f8b033de529e1ea5ada50b296501db497e7c095962ab9e55e48e4533",
+      "G5_Hoan_Final_Test_V1_private": "884cd86a58ce4215e8a1beacdcf648d0144cc66f37f7f75a66639833e6717925",
+      "G5_Hoan_Final_Test_V2_private": "4571fdfafc735517526d40bef84339e5dd972701a8c2ab7bc42277b813c34082",
+      "G5_Hoan_Final_Test_V3_private": "7d06d13dc752a083c80ce227b2a21fbab4dff1444172989736045be1bfeb9469"
+    },
+    "near_duplicate_threshold": 0.9,
+    "exact_overlap_count": 0,
+    "near_duplicate_count": 0,
+    "maximum_similarity": 0.896
+  }
+}
