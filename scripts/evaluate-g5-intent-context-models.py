@@ -279,6 +279,11 @@ def validate_final_conversations(cases: list[dict]) -> bool:
             or case_id in case_ids
             or not isinstance(conversation_id, str)
             or type(turn_index) is not int
+            or (turn_index == 1 and case.get("assistant_message_before") is not None)
+            or (
+                turn_index > 1
+                and not isinstance(case.get("assistant_message_before"), str)
+            )
         ):
             return False
         if turn_index != len(conversations.get(conversation_id, [])) + 1:

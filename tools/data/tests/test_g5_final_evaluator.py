@@ -40,6 +40,7 @@ def test_final_conversations_require_twenty_ordered_three_turn_chains():
                     "case_id": f"case-{conversation_number}-{turn}",
                     "conversation_id": f"conversation-{conversation_number}",
                     "turn_index": turn,
+                    "assistant_message_before": None if turn == 1 else "Câu chuyển lượt.",
                     "state_before": {
                         "procedure_id": None,
                         "field_intents": [],
