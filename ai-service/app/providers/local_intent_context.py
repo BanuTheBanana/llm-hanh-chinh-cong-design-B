@@ -7,7 +7,10 @@ from urllib.parse import urlsplit
 import httpx
 from pydantic import ValidationError
 
-from app.intent_context_policy import apply_intent_context_policy
+from app.intent_context_policy import (
+    apply_intent_context_policy,
+    resolve_high_confidence_without_model,
+)
 from app.providers.base import (
     ProviderError,
     ProviderPolicyError,
@@ -166,6 +169,19 @@ class LocalIntentContextProvider(IntentContextProvider):
                 candidate.model_dump(mode="json") for candidate in payload.procedure_candidates
             ],
         }
+        deterministic = resolve_high_confidence_without_model(user_payload)
+        if deterministic is not None:
+            normalized, policy_actions = deterministic
+            output = IntentContextModelOutput.model_validate(normalized)
+            self._validate_semantics(output, payload)
+            return IntentContextGenerationResult(
+                output=output,
+                provider=self.name,
+                model=self.model_name,
+                input_tokens=0,
+                output_tokens=0,
+                policy_actions=tuple(policy_actions),
+            )
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {

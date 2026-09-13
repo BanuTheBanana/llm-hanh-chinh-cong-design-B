@@ -47,6 +47,16 @@ _ACKNOWLEDGEMENTS = {
     "u",
     "vang",
 }
+_DATE_SIGNAL = re.compile(
+    r"\b(?:ngay\s+\d{1,2}(?:\s+thang\s+\d{1,2}(?:\s+nam\s+\d{4})?)?"
+    r"|\d{1,2}[/-]\d{1,2}[/-]\d{4}|\d{4}-\d{2}-\d{2})\b"
+)
+_JURISDICTION_SIGNAL = re.compile(
+    r"\b(?:tinh|thanh pho|quan|huyen|phuong|thi xa)\s+[a-z0-9]"
+)
+_OUT_OF_SCOPE_SIGNAL = re.compile(
+    r"\b(?:bai tho|quang cao|dien thoai|may tinh|lap trinh|du bao thoi tiet)\b"
+)
 _PROCEDURE_GENERIC_TOKENS = {
     "cap",
     "dang",
@@ -251,6 +261,65 @@ _CLEAR_CUES = {
 
 def _clear_is_supported(slot: str, message: str) -> bool:
     return any(cue in message for cue in _CLEAR_CUES[slot])
+
+
+def _base_output(*, dialogue_act: str, topic_action: str) -> dict:
+    return {
+        "schema_version": "g5-intent-context-v2",
+        "dialogue_act": dialogue_act,
+        "topic_action": topic_action,
+        "patch": {slot: _keep_patch() for slot in CONTEXT_SLOTS},
+    }
+
+
+def resolve_high_confidence_without_model(payload: dict) -> tuple[dict, list[str]] | None:
+    """Resolve only deterministic turns and leave every ambiguous turn to Qwen.
+
+    The route deliberately excludes pending clarification, dates, jurisdictions and
+    possible out-of-scope requests. This keeps the fast path narrow and auditable.
+    """
+
+    message = _plain_text(payload["current_user_message"])
+    state = payload["state_before"]
+    has_context = any(
+        state.get(slot) not in (None, [], "")
+        for slot in ("procedure_id", "field_intents", "jurisdiction", "as_of")
+    )
+    if _matches_any(message, _RESET_PATTERNS):
+        return (
+            _base_output(dialogue_act="RESET_CONTEXT", topic_action="RESET"),
+            ["DETERMINISTIC_EXPLICIT_RESET"],
+        )
+    if message in _ACKNOWLEDGEMENTS and has_context:
+        return (
+            _base_output(dialogue_act="ASK_INFORMATION", topic_action="KEEP"),
+            ["DETERMINISTIC_ACKNOWLEDGEMENT"],
+        )
+    if (
+        state.get("pending_clarification") is not None
+        or _DATE_SIGNAL.search(message)
+        or _JURISDICTION_SIGNAL.search(message)
+        or _OUT_OF_SCOPE_SIGNAL.search(message)
+    ):
+        return None
+
+    procedure = _detect_procedure(payload, message)
+    fields = sorted(set(_detect_fields(message)))
+    current_procedure = state.get("procedure_id")
+    if not fields or (procedure is None and not current_procedure):
+        return None
+
+    topic_action = "SWITCH" if procedure and procedure != current_procedure else "KEEP"
+    dialogue_act = (
+        "CORRECT_CONTEXT"
+        if _matches_any(message, _CORRECTION_PATTERNS)
+        else "ASK_INFORMATION"
+    )
+    output = _base_output(dialogue_act=dialogue_act, topic_action=topic_action)
+    if topic_action == "SWITCH":
+        output["patch"]["procedure_id"] = _set_patch(procedure, payload)
+    output["patch"]["field_intents"] = _set_patch(fields, payload)
+    return output, ["DETERMINISTIC_HIGH_CONFIDENCE_ROUTE"]
 
 
 def _detect_procedure(payload: dict, message: str) -> str | None:

@@ -107,6 +107,25 @@ async def test_local_provider_sends_deterministic_constrained_request(provider_f
     assert result.output_tokens == 50
 
 
+async def test_high_confidence_route_skips_the_model(provider_factory):
+    body = request_body()
+    body["current_user_message"] = "Đăng ký khai sinh cần chuẩn bị giấy tờ nào?"
+    calls = 0
+
+    def handler(_request):
+        nonlocal calls
+        calls += 1
+        return httpx.Response(500)
+
+    result = await provider_factory(handler).analyze(IntentContextRequest.model_validate(body))
+    assert result.output.patch.procedure_id.value == "p_birth"
+    assert result.output.patch.field_intents.value == ["required_documents"]
+    assert result.input_tokens == 0
+    assert result.output_tokens == 0
+    assert result.policy_actions == ("DETERMINISTIC_HIGH_CONFIDENCE_ROUTE",)
+    assert calls == 0
+
+
 async def test_unknown_procedure_is_retried_once_then_rejected(provider_factory):
     body = request_body()
     calls = 0

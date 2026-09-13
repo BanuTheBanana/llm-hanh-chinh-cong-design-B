@@ -1,4 +1,8 @@
-from app.intent_context_policy import POLICY_VERSION, apply_intent_context_policy
+from app.intent_context_policy import (
+    POLICY_VERSION,
+    apply_intent_context_policy,
+    resolve_high_confidence_without_model,
+)
 
 
 def output(*, act="ASK_INFORMATION", topic="KEEP"):
@@ -457,3 +461,28 @@ def test_explicit_jurisdiction_edit_is_a_correction():
     )
     assert normalized["dialogue_act"] == "CORRECT_CONTEXT"
     assert "NEW_VALUE_IS_NOT_A_CORRECTION" not in actions
+
+
+def test_fast_route_handles_only_clear_procedure_and_field():
+    resolved = resolve_high_confidence_without_model(
+        payload("Đăng ký khai sinh cần chuẩn bị giấy tờ nào?")
+    )
+    assert resolved is not None
+    output, actions = resolved
+    assert output["topic_action"] == "SWITCH"
+    assert output["patch"]["procedure_id"]["value"] == "p_birth"
+    assert output["patch"]["field_intents"]["value"] == ["required_documents"]
+    assert actions == ["DETERMINISTIC_HIGH_CONFIDENCE_ROUTE"]
+
+
+def test_fast_route_defers_pending_scope_date_and_out_of_scope():
+    cases = [
+        payload(
+            "Đăng ký khai sinh cần giấy tờ nào?",
+            pending_clarification="jurisdiction",
+        ),
+        payload("Đăng ký khai sinh tại quận 1 cần giấy tờ nào?"),
+        payload("Đăng ký khai sinh ngày 12/09/2026 cần giấy tờ nào?"),
+        payload("Viết bài quảng cáo về lệ phí.", procedure_id="p_birth"),
+    ]
+    assert all(resolve_high_confidence_without_model(item) is None for item in cases)
