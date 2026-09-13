@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import App from './App'
+import App, { FeedbackPanel } from './App'
 import * as api from './services/api'
 import type { Conversation, CreateMessageResponse, Grounding, Message, User } from './types/api'
 
@@ -11,11 +11,14 @@ vi.mock('./services/api', async (importOriginal) => {
     ...actual,
     createConversation: vi.fn(),
     createMessage: vi.fn(),
+    deleteMessageFeedback: vi.fn(),
     getConversations: vi.fn(),
+    getConversationFeedback: vi.fn(),
     getCurrentUser: vi.fn(),
     getMessages: vi.fn(),
     login: vi.fn(),
     logout: vi.fn(),
+    putMessageFeedback: vi.fn(),
   }
 })
 
@@ -39,6 +42,8 @@ const getMessagesMock = vi.mocked(api.getMessages)
 const createMessageMock = vi.mocked(api.createMessage)
 const loginMock = vi.mocked(api.login)
 const logoutMock = vi.mocked(api.logout)
+const putMessageFeedbackMock = vi.mocked(api.putMessageFeedback)
+const deleteMessageFeedbackMock = vi.mocked(api.deleteMessageFeedback)
 
 function message(
   id: string,
@@ -74,6 +79,8 @@ describe('G1 web flow', () => {
     getMessagesMock.mockResolvedValue([])
     loginMock.mockResolvedValue(currentUser)
     logoutMock.mockResolvedValue(undefined)
+    putMessageFeedbackMock.mockReset()
+    deleteMessageFeedbackMock.mockReset()
   })
 
   it('shows login for an unauthenticated user and logs in through the Core API', async () => {
@@ -261,6 +268,67 @@ describe('G1 web flow', () => {
     expect(screen.getByText(fallback
       ? /Trích xuất nguyên văn: câu trả lời của model/
       : /Nội dung được dựng từ evidence/)).toBeInTheDocument()
+  })
+
+  it('collects two independent feedback axes and an optional reason', async () => {
+    const saved = {
+      id: 'feedback-1',
+      message_id: 'assistant-1',
+      relevance: 'relevant' as const,
+      satisfaction: 'not_satisfied' as const,
+      reason: 'Thiếu chi tiết',
+      created_at: '2026-09-13T01:00:00Z',
+      updated_at: '2026-09-13T01:00:00Z',
+    }
+    putMessageFeedbackMock.mockResolvedValue(saved)
+    const onChange = vi.fn()
+    const onError = vi.fn()
+    const user = userEvent.setup()
+
+    render(
+      <FeedbackPanel
+        messageId="assistant-1"
+        onChange={onChange}
+        onError={onError}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: /^Phù hợp$/ }))
+    await user.click(screen.getByRole('button', { name: 'Chưa hài lòng' }))
+    await user.type(screen.getByLabelText('Lý do phản hồi'), 'Thiếu chi tiết')
+    await user.click(screen.getByRole('button', { name: 'Lưu phản hồi' }))
+
+    expect(putMessageFeedbackMock).toHaveBeenCalledWith('assistant-1', {
+      relevance: 'relevant',
+      satisfaction: 'not_satisfied',
+      reason: 'Thiếu chi tiết',
+    })
+    expect(onChange).toHaveBeenCalledWith(saved)
+    expect(onError).not.toHaveBeenCalled()
+  })
+
+  it('allows the owner to delete an existing feedback', async () => {
+    deleteMessageFeedbackMock.mockResolvedValue(undefined)
+    const onChange = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <FeedbackPanel
+        messageId="assistant-1"
+        initial={{
+          id: 'feedback-1',
+          message_id: 'assistant-1',
+          relevance: 'not_relevant',
+          satisfaction: 'not_satisfied',
+          created_at: '2026-09-13T01:00:00Z',
+          updated_at: '2026-09-13T01:00:00Z',
+        }}
+        onChange={onChange}
+        onError={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Xóa' }))
+    expect(deleteMessageFeedbackMock).toHaveBeenCalledWith('assistant-1')
+    expect(onChange).toHaveBeenCalledWith(null)
   })
 
   it('renders a private reviewed D2 source without inventing a public link', async () => {

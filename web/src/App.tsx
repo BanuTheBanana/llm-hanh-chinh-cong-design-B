@@ -5,13 +5,24 @@ import {
   ApiError,
   createConversation,
   createMessage,
+  deleteMessageFeedback,
+  getConversationFeedback,
   getConversations,
   getCurrentUser,
   getMessages,
   login,
   logout,
+  putMessageFeedback,
 } from './services/api'
-import type { Conversation, Grounding, Message, User } from './types/api'
+import type {
+  Conversation,
+  FeedbackRelevance,
+  FeedbackSatisfaction,
+  Grounding,
+  Message,
+  MessageFeedback,
+  User,
+} from './types/api'
 
 type BusyAction = 'login' | 'create-conversation' | 'send-message' | 'logout' | null
 type ErrorKind = 'unauthorized' | 'api' | 'ai-timeout' | ''
@@ -40,6 +51,7 @@ function App() {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
+  const [feedbackByMessage, setFeedbackByMessage] = useState<Record<string, MessageFeedback>>({})
   const [displayName, setDisplayName] = useState('')
   const [messageDraft, setMessageDraft] = useState('')
   const [retryTurn, setRetryTurn] = useState<RetryTurn | null>(null)
@@ -75,9 +87,17 @@ function App() {
         activeConversationIdRef.current = rememberedConversation.id
         setActiveConversation(rememberedConversation)
         setLoadingMessages(true)
-        const history = await getMessages(rememberedConversation.id)
+        const [history, feedback] = await Promise.all([
+          getMessages(rememberedConversation.id),
+          APP_STAGE === 'G5'
+            ? getConversationFeedback(rememberedConversation.id)
+            : Promise.resolve([]),
+        ])
         if (!cancelled && activeConversationIdRef.current === rememberedConversation.id) {
           setMessages(history)
+          setFeedbackByMessage(
+            Object.fromEntries(feedback.map((item) => [item.message_id, item])),
+          )
         }
       } catch (requestError) {
         if (cancelled) return
@@ -88,6 +108,7 @@ function App() {
           setConversations([])
           setActiveConversation(null)
           setMessages([])
+          setFeedbackByMessage({})
           setRetryTurn(null)
           setErrorKind('unauthorized')
           setError(UNAUTHORIZED_MESSAGE)
@@ -121,6 +142,7 @@ function App() {
     setConversations([])
     setActiveConversation(null)
     setMessages([])
+    setFeedbackByMessage({})
     setMessageDraft('')
     setRetryTurn(null)
     setLoadingMessages(false)
@@ -148,16 +170,25 @@ function App() {
     options: { clearBeforeLoad?: boolean; reportError?: boolean } = {},
   ) {
     const loadVersion = ++loadVersionRef.current
-    if (options.clearBeforeLoad) setMessages([])
+    if (options.clearBeforeLoad) {
+      setMessages([])
+      setFeedbackByMessage({})
+    }
     setLoadingMessages(true)
 
     try {
-      const history = await getMessages(conversationId)
+      const [history, feedback] = await Promise.all([
+        getMessages(conversationId),
+        APP_STAGE === 'G5' ? getConversationFeedback(conversationId) : Promise.resolve([]),
+      ])
       if (
         loadVersion === loadVersionRef.current &&
         activeConversationIdRef.current === conversationId
       ) {
         setMessages(history)
+        setFeedbackByMessage(
+          Object.fromEntries(feedback.map((item) => [item.message_id, item])),
+        )
       }
       return history
     } catch (requestError) {
@@ -191,6 +222,7 @@ function App() {
       setActiveConversation(null)
       activeConversationIdRef.current = null
       setMessages([])
+      setFeedbackByMessage({})
       setDisplayName('')
     } catch (requestError) {
       showRequestError(requestError)
@@ -224,6 +256,7 @@ function App() {
       setConversations((current) => [conversation, ...current])
       setActiveConversation(conversation)
       setMessages([])
+      setFeedbackByMessage({})
       setMessageDraft('')
       setRetryTurn(null)
     } catch (requestError) {
@@ -498,6 +531,23 @@ function App() {
                 {message.role === 'assistant' && message.grounding && (
                   <GroundingPanel grounding={message.grounding} />
                 )}
+                {APP_STAGE === 'G5' &&
+                  message.role === 'assistant' &&
+                  message.status === 'completed' && (
+                    <FeedbackPanel
+                      messageId={message.id}
+                      initial={feedbackByMessage[message.id]}
+                      onChange={(feedback) =>
+                        setFeedbackByMessage((current) => {
+                          const next = { ...current }
+                          if (feedback) next[message.id] = feedback
+                          else delete next[message.id]
+                          return next
+                        })
+                      }
+                      onError={showRequestError}
+                    />
+                  )}
               </article>
             ))
           )}
@@ -525,6 +575,138 @@ function App() {
         </form>
       </section>
     </main>
+  )
+}
+
+export function FeedbackPanel({
+  messageId,
+  initial,
+  onChange,
+  onError,
+}: {
+  messageId: string
+  initial?: MessageFeedback
+  onChange: (feedback: MessageFeedback | null) => void
+  onError: (error: unknown) => void
+}) {
+  const [relevance, setRelevance] = useState<FeedbackRelevance | ''>(
+    initial?.relevance ?? '',
+  )
+  const [satisfaction, setSatisfaction] = useState<FeedbackSatisfaction | ''>(
+    initial?.satisfaction ?? '',
+  )
+  const [reason, setReason] = useState(initial?.reason ?? '')
+  const [busy, setBusy] = useState(false)
+  const [saved, setSaved] = useState(Boolean(initial))
+
+  async function saveFeedback() {
+    if (!relevance || !satisfaction || busy) return
+    setBusy(true)
+    try {
+      const result = await putMessageFeedback(messageId, {
+        relevance,
+        satisfaction,
+        reason: reason.trim() || null,
+      })
+      onChange(result)
+      setSaved(true)
+    } catch (requestError) {
+      onError(requestError)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function removeFeedback() {
+    if (!initial || busy) return
+    setBusy(true)
+    try {
+      await deleteMessageFeedback(messageId)
+      setRelevance('')
+      setSatisfaction('')
+      setReason('')
+      setSaved(false)
+      onChange(null)
+    } catch (requestError) {
+      onError(requestError)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <section className="feedback" aria-label="Đánh giá câu trả lời">
+      <div className="feedback-heading">
+        <strong>Phản hồi câu trả lời</strong>
+        {saved && <span>Đã lưu</span>}
+      </div>
+      <div className="feedback-row" role="group" aria-label="Câu trả lời có phù hợp không?">
+        <span>Phù hợp?</span>
+        <button
+          type="button"
+          className={relevance === 'relevant' ? 'selected' : ''}
+          aria-pressed={relevance === 'relevant'}
+          onClick={() => { setRelevance('relevant'); setSaved(false) }}
+          disabled={busy}
+        >
+          Phù hợp
+        </button>
+        <button
+          type="button"
+          className={relevance === 'not_relevant' ? 'selected negative' : ''}
+          aria-pressed={relevance === 'not_relevant'}
+          onClick={() => { setRelevance('not_relevant'); setSaved(false) }}
+          disabled={busy}
+        >
+          Không phù hợp
+        </button>
+      </div>
+      <div className="feedback-row" role="group" aria-label="Bạn có hài lòng không?">
+        <span>Hài lòng?</span>
+        <button
+          type="button"
+          className={satisfaction === 'satisfied' ? 'selected' : ''}
+          aria-pressed={satisfaction === 'satisfied'}
+          onClick={() => { setSatisfaction('satisfied'); setSaved(false) }}
+          disabled={busy}
+        >
+          Hài lòng
+        </button>
+        <button
+          type="button"
+          className={satisfaction === 'not_satisfied' ? 'selected negative' : ''}
+          aria-pressed={satisfaction === 'not_satisfied'}
+          onClick={() => { setSatisfaction('not_satisfied'); setSaved(false) }}
+          disabled={busy}
+        >
+          Chưa hài lòng
+        </button>
+      </div>
+      <textarea
+        value={reason}
+        onChange={(event) => { setReason(event.target.value); setSaved(false) }}
+        placeholder="Lý do (không bắt buộc)"
+        aria-label="Lý do phản hồi"
+        maxLength={1000}
+        rows={2}
+        disabled={busy}
+      />
+      <div className="feedback-actions">
+        <button
+          type="button"
+          className="feedback-save"
+          onClick={() => void saveFeedback()}
+          disabled={!relevance || !satisfaction || busy}
+        >
+          {busy ? 'Đang lưu...' : initial ? 'Cập nhật' : 'Lưu phản hồi'}
+        </button>
+        {initial && (
+          <button type="button" className="feedback-delete" onClick={() => void removeFeedback()} disabled={busy}>
+            Xóa
+          </button>
+        )}
+      </div>
+    </section>
   )
 }
 

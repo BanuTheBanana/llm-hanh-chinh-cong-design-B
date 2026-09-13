@@ -25,6 +25,12 @@ class MessageInput(InputModel):
     content: str = Field(min_length=1, max_length=10000)
 
 
+class FeedbackInput(InputModel):
+    relevance: Literal["relevant", "not_relevant"]
+    satisfaction: Literal["satisfied", "not_satisfied"]
+    reason: str | None = Field(default=None, max_length=1000)
+
+
 class OutputModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -37,6 +43,20 @@ class UserOutput(OutputModel):
 class ConversationOutput(OutputModel):
     id: UUID
     title: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class FeedbackOutput(OutputModel):
+    id: UUID
+    message_id: UUID
+    relevance: Literal["relevant", "not_relevant"]
+    satisfaction: Literal["satisfied", "not_satisfied"]
+    reason: str | None = None
+    provider: str | None = None
+    model: str | None = None
+    corpus_version: str | None = None
+    prompt_version: str | None = None
     created_at: datetime
     updated_at: datetime
 

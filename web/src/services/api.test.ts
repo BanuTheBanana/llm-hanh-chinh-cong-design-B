@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, getCurrentUser, login } from './api'
+import { ApiError, getCurrentUser, login, putMessageFeedback } from './api'
 
 describe('Core API client', () => {
   const fetchMock = vi.fn()
@@ -67,5 +67,35 @@ describe('Core API client', () => {
       code: 'AI_SERVICE_TIMEOUT',
       requestId: 'request-1',
     } satisfies Partial<ApiError>)
+  })
+
+  it('sends both feedback axes with PUT and credentials', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 'feedback-1',
+          message_id: 'assistant-1',
+          relevance: 'relevant',
+          satisfaction: 'satisfied',
+          created_at: '2026-09-13T01:00:00Z',
+          updated_at: '2026-09-13T01:00:00Z',
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    )
+
+    await putMessageFeedback('assistant-1', {
+      relevance: 'relevant',
+      satisfaction: 'satisfied',
+      reason: null,
+    })
+
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toBe('http://localhost:8000/api/v1/messages/assistant-1/feedback')
+    expect(options.method).toBe('PUT')
+    expect(options.credentials).toBe('include')
+    expect(options.body).toBe(
+      JSON.stringify({ relevance: 'relevant', satisfaction: 'satisfied', reason: null }),
+    )
   })
 })

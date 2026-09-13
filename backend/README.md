@@ -89,6 +89,15 @@ uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-lo
 - Swagger: `http://localhost:8000/docs`
 - OpenAPI: `http://localhost:8000/openapi.json`
 
+Feedback G5 dùng ba endpoint đã xác thực:
+
+- `GET /api/v1/conversations/{conversation_id}/feedback`
+- `PUT /api/v1/messages/{message_id}/feedback`
+- `DELETE /api/v1/messages/{message_id}/feedback`
+
+`PUT` bắt buộc cả hai trục `relevance` và `satisfaction`; `reason` là tùy chọn, tối đa
+1.000 ký tự. Chỉ chủ conversation được đánh giá assistant message đã hoàn tất.
+
 ## Environment Backend
 
 | Biến | Mặc định local | Ý nghĩa |
@@ -135,6 +144,7 @@ và AI host thành `ai-service`; không dùng `localhost` để gọi container 
    evidence projection tối thiểu, không gửi chat history sang AI Service.
 8. Log chỉ ghi `request_id`, route template, method, status, latency và loại lỗi;
    không ghi body, cookie, token, DSN hay exception text.
+9. Feedback giữ provenance của câu trả lời nhưng không tự động trở thành dữ liệu fine-tune.
 
 Login G1 chỉ nhận `display_name`, do đó không xác minh danh tính người thật.
 Nó chỉ phù hợp smoke/demo bằng D0, tuyệt đối không nhập PII thật.

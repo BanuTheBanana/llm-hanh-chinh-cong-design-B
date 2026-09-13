@@ -47,3 +47,23 @@ export type Message = {
 }
 export type CreateMessageInput = { client_message_id: string; content: string }
 export type CreateMessageResponse = { user_message: Message; assistant_message: Message }
+export type FeedbackRelevance = 'relevant' | 'not_relevant'
+export type FeedbackSatisfaction = 'satisfied' | 'not_satisfied'
+export type MessageFeedback = {
+  id: string
+  message_id: string
+  relevance: FeedbackRelevance
+  satisfaction: FeedbackSatisfaction
+  reason?: string | null
+  provider?: string | null
+  model?: string | null
+  corpus_version?: string | null
+  prompt_version?: string | null
+  created_at: string
+  updated_at: string
+}
+export type FeedbackInput = {
+  relevance: FeedbackRelevance
+  satisfaction: FeedbackSatisfaction
+  reason?: string | null
+}

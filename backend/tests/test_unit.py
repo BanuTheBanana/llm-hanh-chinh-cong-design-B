@@ -224,9 +224,11 @@ def test_openapi_contract():
         "/api/v1/auth/login": {"post"},
         "/api/v1/auth/logout": {"post"},
         "/api/v1/auth/me": {"get"},
-        "/api/v1/conversations": {"get", "post"},
-        "/api/v1/conversations/{conversation_id}/messages": {"get", "post"},
-    }
+            "/api/v1/conversations": {"get", "post"},
+            "/api/v1/conversations/{conversation_id}/messages": {"get", "post"},
+            "/api/v1/conversations/{conversation_id}/feedback": {"get"},
+            "/api/v1/messages/{message_id}/feedback": {"put", "delete"},
+        }
     assert {path: set(methods) for path, methods in schema["paths"].items()} == expected
     message = schema["components"]["schemas"]["MessageOutput"]["properties"]
     assert set(message) == {

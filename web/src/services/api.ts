@@ -1,4 +1,12 @@
-import type { Conversation, CreateMessageInput, CreateMessageResponse, Message, User } from '../types/api'
+import type {
+  Conversation,
+  CreateMessageInput,
+  CreateMessageResponse,
+  FeedbackInput,
+  Message,
+  MessageFeedback,
+  User,
+} from '../types/api'
 
 type ErrorResponse = {
   error?: {
@@ -85,3 +93,12 @@ export const createMessage = (conversationId: string, input: CreateMessageInput)
     method: 'POST',
     body: JSON.stringify(input),
   })
+export const getConversationFeedback = (conversationId: string, signal?: AbortSignal) =>
+  request<MessageFeedback[]>(`${conversationPath(conversationId)}/feedback`, { signal })
+export const putMessageFeedback = (messageId: string, input: FeedbackInput) =>
+  request<MessageFeedback>(`/messages/${encodeURIComponent(messageId)}/feedback`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+  })
+export const deleteMessageFeedback = (messageId: string) =>
+  request<void>(`/messages/${encodeURIComponent(messageId)}/feedback`, { method: 'DELETE' })

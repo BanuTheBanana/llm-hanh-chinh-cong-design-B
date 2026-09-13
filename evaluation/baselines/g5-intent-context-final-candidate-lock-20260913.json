@@ -33,5 +33,7 @@
     "conversation_success_min": 0.9,
     "per_group_min": 0.7
   },
-  "final_test_used": false
+  "final_test_used": true,
+  "final_test_sha256": "884cd86a58ce4215e8a1beacdcf648d0144cc66f37f7f75a66639833e6717925",
+  "final_test_gate": "FAIL"
 }

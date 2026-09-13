@@ -66,3 +66,37 @@ class Message(Base):
     status: Mapped[str] = mapped_column(String(16))
     request_id: Mapped[UUID] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class MessageFeedback(Base):
+    __tablename__ = "message_feedback"
+    __table_args__ = (
+        UniqueConstraint("message_id", name="uq_message_feedback_message"),
+        CheckConstraint(
+            "relevance IN ('relevant', 'not_relevant')",
+            name="ck_message_feedback_relevance",
+        ),
+        CheckConstraint(
+            "satisfaction IN ('satisfied', 'not_satisfied')",
+            name="ck_message_feedback_satisfaction",
+        ),
+        CheckConstraint(
+            "reason IS NULL OR char_length(reason) <= 1000",
+            name="ck_message_feedback_reason_length",
+        ),
+        Index("ix_message_feedback_user_updated", "user_id", "updated_at"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    message_id: Mapped[UUID] = mapped_column(
+        ForeignKey("messages.id", ondelete="CASCADE")
+    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    relevance: Mapped[str] = mapped_column(String(16))
+    satisfaction: Mapped[str] = mapped_column(String(16))
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    provider: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    model: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    corpus_version: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    prompt_version: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

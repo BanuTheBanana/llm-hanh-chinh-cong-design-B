@@ -36,7 +36,8 @@ Generation Qwen3-1.7B, intent Qwen3-4B+LoRA và embedding 0.6B chạy thành ba 
 2. Hỏi tiếp về thời gian, phí hoặc nơi nộp mà không lặp lại tên thủ tục.
 3. Sửa tên thủ tục, sau đó gửi “Bắt đầu lại” để kiểm tra switch/reset context.
 4. Chỉ ra checklist, citation và phiên bản tri thức dưới câu trả lời.
-5. Với phần quản trị, dùng `scripts/g5-source-update.py` để stage một bản kiểm thử, duyệt,
+5. Chọn đủ hai trục phản hồi dưới câu trả lời, lưu, sửa rồi xóa để kiểm tra ownership và persistence.
+6. Với phần quản trị, dùng `scripts/g5-source-update.py` để stage một bản kiểm thử, duyệt,
    publish, hỏi lại trên Web, sau đó rollback. Không dùng PII hoặc nội dung chưa được phép.
 
 Smoke tự động cho vòng đời MCP:

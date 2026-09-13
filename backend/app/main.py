@@ -21,7 +21,7 @@ from app.chat import owned_conversation, send_message
 from app.config import get_settings
 from app.db import engine, get_db
 from app.errors import APIError
-from app.models import Conversation, Message, SessionRecord, User, utcnow
+from app.models import Conversation, Message, MessageFeedback, SessionRecord, User, utcnow
 from app.rag.corpus import CorpusError
 from app.rag.g3.runtime import load_active_dataset
 from app.rag.g5.hybrid import HybridProcedureRouter
@@ -31,6 +31,8 @@ from app.schemas import (
     ConversationInput,
     ConversationOutput,
     ErrorOutput,
+    FeedbackInput,
+    FeedbackOutput,
     LoginInput,
     MessageInput,
     MessageOutput,
@@ -144,7 +146,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=list(settings.allowed_web_origins),
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type"],
     expose_headers=["X-Request-ID"],
 )
@@ -291,6 +293,104 @@ async def post_message(
     await owned_conversation(db, conversation_id, user.id)
     await db.commit()
     return await send_message(conversation_id, user.id, body, request.state.request_id, ai)
+
+
+async def owned_assistant_message(
+    db: AsyncSession, message_id: UUID, user_id: UUID
+) -> Message:
+    message = await db.scalar(
+        select(Message)
+        .join(Conversation, Conversation.id == Message.conversation_id)
+        .where(Message.id == message_id, Conversation.user_id == user_id)
+    )
+    if message is None:
+        raise APIError(404, "NOT_FOUND", "Không tìm thấy câu trả lời.")
+    if message.role != "assistant" or message.status != "completed":
+        raise APIError(422, "ASSISTANT_MESSAGE_REQUIRED", "Chỉ đánh giá câu trả lời đã hoàn tất.")
+    return message
+
+
+@router.get(
+    "/conversations/{conversation_id}/feedback",
+    response_model=list[FeedbackOutput],
+    response_model_exclude_none=True,
+)
+async def conversation_feedback(
+    conversation_id: UUID,
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    await owned_conversation(db, conversation_id, user.id)
+    return (
+        await db.scalars(
+            select(MessageFeedback)
+            .join(Message, Message.id == MessageFeedback.message_id)
+            .where(
+                Message.conversation_id == conversation_id,
+                MessageFeedback.user_id == user.id,
+            )
+            .order_by(MessageFeedback.updated_at, MessageFeedback.id)
+        )
+    ).all()
+
+
+@router.put(
+    "/messages/{message_id}/feedback",
+    response_model=FeedbackOutput,
+    response_model_exclude_none=True,
+)
+async def put_feedback(
+    message_id: UUID,
+    body: FeedbackInput,
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    message = await owned_assistant_message(db, message_id, user.id)
+    grounding = message.grounding if isinstance(message.grounding, dict) else {}
+    now = utcnow()
+    values = {
+        "user_id": user.id,
+        "relevance": body.relevance,
+        "satisfaction": body.satisfaction,
+        "reason": body.reason.strip() if body.reason and body.reason.strip() else None,
+        "provider": grounding.get("provider"),
+        "model": grounding.get("model"),
+        "corpus_version": grounding.get("corpus_version"),
+        "prompt_version": grounding.get("prompt_version"),
+        "updated_at": now,
+    }
+    await db.execute(
+        insert(MessageFeedback)
+        .values(message_id=message.id, created_at=now, **values)
+        .on_conflict_do_update(
+            index_elements=[MessageFeedback.message_id],
+            set_=values,
+        )
+    )
+    await db.commit()
+    return await db.scalar(
+        select(MessageFeedback).where(
+            MessageFeedback.message_id == message.id,
+            MessageFeedback.user_id == user.id,
+        )
+    )
+
+
+@router.delete("/messages/{message_id}/feedback", status_code=204)
+async def delete_feedback(
+    message_id: UUID,
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    message = await owned_assistant_message(db, message_id, user.id)
+    await db.execute(
+        delete(MessageFeedback).where(
+            MessageFeedback.message_id == message.id,
+            MessageFeedback.user_id == user.id,
+        )
+    )
+    await db.commit()
+    return Response(status_code=204)
 
 
 @app.get("/health")
