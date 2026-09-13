@@ -486,3 +486,74 @@ def test_fast_route_defers_pending_scope_date_and_out_of_scope():
         payload("Viết bài quảng cáo về lệ phí.", procedure_id="p_birth"),
     ]
     assert all(resolve_high_confidence_without_model(item) is None for item in cases)
+
+
+def test_receiving_question_does_not_inherit_incidental_file_field():
+    resolved = resolve_high_confidence_without_model(
+        payload(
+            "Nơi nào nhận bộ hồ sơ này?",
+            procedure_id="p_birth",
+            field_intents=["required_documents"],
+        )
+    )
+    assert resolved is not None
+    output, _ = resolved
+    assert output["patch"]["field_intents"]["value"] == ["receiving_authority"]
+
+
+def test_explicit_slot_clear_is_recovered_when_model_keeps_it():
+    normalized, actions = apply_intent_context_policy(
+        output(act="CORRECT_CONTEXT"),
+        payload(
+            "Bỏ mốc ngày đã chọn nhưng giữ thủ tục.",
+            procedure_id="p_birth",
+            as_of="2026-02-11",
+        ),
+    )
+    assert normalized["patch"]["as_of"]["op"] == "CLEAR"
+    assert "EXPLICIT_CLEAR_AS_OF_APPLIED" in actions
+
+
+def test_unknown_service_wording_is_unresolved_not_out_of_scope():
+    normalized, actions = apply_intent_context_policy(
+        output(act="OUT_OF_SCOPE", topic="UNRESOLVED"),
+        payload("Tôi không rõ dịch vụ mình cần gọi là gì."),
+    )
+    assert normalized["dialogue_act"] == "ASK_INFORMATION"
+    assert normalized["topic_action"] == "UNRESOLVED"
+    assert "EXPLICIT_UNRESOLVED_REQUEST" in actions
+
+
+def test_switch_after_negated_old_topic_keeps_positive_field_clause():
+    candidate = output(act="CORRECT_CONTEXT", topic="SWITCH")
+    candidate["patch"]["procedure_id"] = {
+        "op": "SET",
+        "value": "p_birth",
+        "evidence": [{"message_id": "current-user", "quote": "khai sinh"}],
+    }
+    candidate["patch"]["field_intents"] = {
+        "op": "CLEAR",
+        "value": None,
+        "evidence": [{"message_id": "current-user", "quote": "khai sinh"}],
+    }
+    message = "Không tiếp tục hỏi kết hôn; chuyển sang khai sinh và cho biết nơi tiếp nhận."
+    normalized, _ = apply_intent_context_policy(
+        candidate,
+        payload(message, procedure_id="p_marriage", field_intents=["steps"]),
+    )
+    assert normalized["patch"]["procedure_id"]["value"] == "p_birth"
+    assert normalized["patch"]["field_intents"]["value"] == ["receiving_authority"]
+
+
+def test_negated_old_field_is_not_kept_by_fast_route():
+    resolved = resolve_high_confidence_without_model(
+        payload(
+            "Không cần hình thức nộp nữa, tôi hỏi thời gian trả kết quả.",
+            procedure_id="p_copy",
+            field_intents=["submission_methods"],
+        )
+    )
+    assert resolved is not None
+    output, _ = resolved
+    assert output["dialogue_act"] == "CORRECT_CONTEXT"
+    assert output["patch"]["field_intents"]["value"] == ["processing_times"]

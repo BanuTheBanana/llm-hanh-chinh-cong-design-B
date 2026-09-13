@@ -17,6 +17,7 @@ _CORRECTION_PATTERNS = (
     r"\bthay chu de\b",
     r"\bthay bang\b",
     r"\bsua\b[^,.!?;]{0,40}\bdia ban\b",
+    r"\bkhong can\b.*\bnua\b",
 )
 _RESET_PATTERNS = (
     r"\bbat dau lai\b",
@@ -37,6 +38,7 @@ _UNRESOLVED_PATTERNS = (
     r"\bchua biet ten (?:thu tuc|dich vu)\b",
     r"\bchua xac dinh (?:duoc )?ten\b",
     r"\bkhong biet ten (?:thu tuc|dich vu)\b",
+    r"\bkhong ro (?:ten )?(?:thu tuc|dich vu)\b",
 )
 _ACKNOWLEDGEMENTS = {
     "dung",
@@ -81,6 +83,7 @@ _FIELD_CUES = {
         "don vi nao",
         "noi tiep nhan",
         "noi nao tiep nhan",
+        "noi nao nhan",
         "ben nao co tham quyen",
         "bo phan nao",
         "tham quyen tiep nhan",
@@ -184,6 +187,12 @@ def _matches_any(message: str, patterns: tuple[str, ...]) -> bool:
 
 
 def _positive_clause(message: str) -> str:
+    transition = re.search(
+        r"\b(?:doi (?:qua|sang)|chuyen (?:han )?(?:chu de )?sang|thay chu de)\b",
+        message,
+    )
+    if transition is not None:
+        message = message[transition.start() :]
     positive_message = re.sub(
         r"\bkhong (?:con |tiep tuc )?hoi\b.*?\bnua\b(?:\s+ma)?",
         " ",
@@ -196,6 +205,11 @@ def _positive_clause(message: str) -> str:
     )
     positive_message = re.sub(
         r"\bkhong (?:lam|phai)\b.*?\bnua\b(?:\s+ma)?",
+        " ",
+        positive_message,
+    )
+    positive_message = re.sub(
+        r"\bkhong can\b.*?\bnua\b(?:\s+ma)?",
         " ",
         positive_message,
     )
@@ -232,6 +246,17 @@ def _detect_fields(message: str) -> list[str]:
         if any(cue in positive_message for cue in cues)
     ]
     if "steps" in detected and "required_documents" in detected:
+        strong_document_cues = (
+            "giay to",
+            "tai lieu",
+            "thanh phan",
+            "kem theo",
+            "mang theo",
+            "mang gi",
+        )
+        if not any(cue in positive_message for cue in strong_document_cues):
+            detected.remove("required_documents")
+    if "receiving_authority" in detected and "required_documents" in detected:
         strong_document_cues = (
             "giay to",
             "tai lieu",
@@ -413,6 +438,27 @@ def apply_intent_context_policy(output: dict, payload: dict) -> tuple[dict, list
         if patch[slot].get("op") == "CLEAR" and not _clear_is_supported(slot, message):
             patch[slot] = _keep_patch()
             actions.append(f"UNSUPPORTED_CLEAR_{slot.upper()}_REMOVED")
+        if (
+            state.get(slot) not in (None, [], "")
+            and _clear_is_supported(slot, message)
+            and patch[slot].get("op") != "CLEAR"
+        ):
+            patch[slot] = {
+                "op": "CLEAR",
+                "value": None,
+                "evidence": [
+                    {
+                        "message_id": payload.get("message_id")
+                        or payload.get("current_message_id")
+                        or "current-user",
+                        "quote": payload["current_user_message"],
+                    }
+                ],
+            }
+            normalized["dialogue_act"] = "CORRECT_CONTEXT"
+            normalized["topic_action"] = "KEEP"
+            dialogue_act = "CORRECT_CONTEXT"
+            actions.append(f"EXPLICIT_CLEAR_{slot.upper()}_APPLIED")
 
     if detected_procedure is not None:
         candidate_ids = {
