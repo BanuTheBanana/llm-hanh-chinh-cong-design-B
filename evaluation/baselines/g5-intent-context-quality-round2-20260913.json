@@ -1,0 +1,44 @@
+{
+  "schema_version": "g5-intent-context-quality-round2-v1",
+  "evaluated_at": "2026-09-13",
+  "scope": "D0 fictional DEV; not final TEST and not legal-answer evaluation",
+  "case_count": 60,
+  "dev_sha256": "4808d068f8b033de529e1ea5ada50b296501db497e7c095962ab9e55e48e4533",
+  "train": {
+    "case_count": 252,
+    "contains_company_data": false,
+    "sha256": "705740428aaeaabbea37f1ca850efa2fda12e5493b03ceb6733dacdd0ec296d5"
+  },
+  "runtime": {
+    "base_model": "Qwen3-4B-Instruct-2507-Q8_0",
+    "base_model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+    "adapter": "qwen3-4b-intent-hard-v2-r16",
+    "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
+    "prompt_version": "g5-intent-context-prompt-v2",
+    "prompt_sha256": "d6c196d1cca836a8f3e2f1448c76a50ba1ea965981d546e752982d4657841225",
+    "policy_version": "g5-intent-context-policy-v1"
+  },
+  "model_only": {
+    "schema_valid": 1.0,
+    "semantic_valid": 1.0,
+    "dialogue_act": 0.933333,
+    "topic_action": 0.95,
+    "joint_patch": 0.95,
+    "joint_state": 0.983333,
+    "full_state_case": 0.866667,
+    "p95_ms": 3121.232
+  },
+  "deployed_pipeline": {
+    "schema_valid": 1.0,
+    "semantic_valid": 1.0,
+    "dialogue_act": 1.0,
+    "topic_action": 0.966667,
+    "joint_patch": 0.9,
+    "joint_state": 0.983333,
+    "full_state_case": 0.95,
+    "p95_ms": 3143.936,
+    "gpu_memory_delta_mib": 4879
+  },
+  "decision": "PROMOTE_ADAPTER_AND_POLICY_TO_G5_DEV_RUNTIME",
+  "final_test_used": false
+}

@@ -193,9 +193,7 @@ hoặc đưa thẳng mọi phản hồi vào lần training sau.
   kèm fallback G4; thay đổi không áp dụng cho demo G3.
 - Đã chạy baseline ba model, pilot QLoRA hai model và xác nhận winner bằng seed thứ hai.
   Chọn **Qwen3-4B-Instruct-2507** cho nhánh phát triển; Qwen3.5-2B là fallback nhẹ.
-- Kết quả tốt nhất hiện tại trên DEV hư cấu: schema/ngữ nghĩa 100%, dialogue act 91,67%,
-  topic 93,33%, joint state 75,00%, full state 63,33%, P95 2,52 giây và tăng 4.843 MiB VRAM.
-- Đây là **model-selection pilot**, không phải TEST cuối: joint state chưa đạt 90%, chưa
-  replay toàn bộ DEV hội thoại và chưa dùng nhãn công ty đã review. Một smoke Docker ba
-  lượt trực tiếp → follow-up → reset đã đạt. Xem
-  [kết quả chi tiết](11-ket-qua-chon-model-intent-context.md).
+- Vòng hard-v2 đã fine-tune trên 252 ca TRAIN D0 không trùng DEV. Model thuần đạt joint-state
+  98,33%, full-state 86,67%; pipeline có policy trạng thái đạt full-state 95,00%, P95 3,14 giây.
+- Candidate DEV đã đạt ngưỡng context và được tích hợp vào G5. Đây chưa phải TEST cuối và không
+  phải phép đo độ đúng câu trả lời pháp lý. Xem [kết quả chi tiết](13-nang-chat-luong-intent-context.md).

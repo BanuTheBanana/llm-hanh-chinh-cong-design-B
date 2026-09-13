@@ -11,6 +11,7 @@ class IntentContextGenerationResult:
     model: str
     input_tokens: int = 0
     output_tokens: int = 0
+    policy_actions: tuple[str, ...] = ()
 
 
 class IntentContextProvider(ABC):

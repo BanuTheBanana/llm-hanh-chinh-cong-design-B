@@ -30,7 +30,12 @@ from transformers import (
     set_seed,
 )
 
-from training.intent_context import build_messages, build_target
+from training.intent_context import (
+    SYSTEM_PROMPT,
+    SYSTEM_PROMPT_VERSION,
+    build_messages,
+    build_target,
+)
 
 PRIVATE_OUTPUT_ROOT = (ROOT / "training/output").resolve()
 
@@ -284,6 +289,8 @@ def main() -> int:
         "seed": args.seed,
         "epochs": args.epochs,
         "learning_rate": args.learning_rate,
+        "system_prompt_version": SYSTEM_PROMPT_VERSION,
+        "system_prompt_sha256": hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest(),
         "train_fixture_version": train_manifest["schema_version"],
         "train_fixture_sha256": train_sha,
         "dev_fixture_version": dev_manifest["schema_version"],

@@ -5,7 +5,8 @@ Ngày chạy: **12/09/2026**. Kết luận ngắn: chọn
 intent/context. **Qwen3.5-2B** giữ làm phương án nhẹ hơn. Qwen3-1.7B bị loại khỏi nhánh
 intent/context mới.
 
-Đây là quyết định chọn model từ pilot, **chưa phải nghiệm thu intent/context**.
+Đây là quyết định chọn model từ pilot. Kết quả vòng nâng chất lượng ngày 13/09 nằm ở cuối tài liệu;
+đó vẫn là DEV, chưa phải TEST kín cuối.
 
 ## Phạm vi thử nghiệm
 
@@ -46,10 +47,9 @@ quality-first không cho chọn model nhỏ hơn.
 
 - Checkpoint phát triển: `Qwen/Qwen3-4B-Instruct-2507`, revision
   `cdbee75f17c01a7cc42f958dc650907174af0554`.
-- Adapter pilot đang tốt nhất: seed 42, SHA-256 GGUF bắt đầu bằng `f081fee9`.
+- Adapter vòng đầu: seed 42, SHA-256 GGUF bắt đầu bằng `f081fee9`.
 - Qwen3.5-2B là fallback khi thiết bị yếu hơn; chưa phải model chính.
-- Cả hai bản fine-tune đều dưới ngưỡng joint state 90%. Không đưa pilot này vào Web rồi
-  gọi là đã hoàn thiện.
+- Cả hai adapter vòng đầu đều dưới ngưỡng joint state 90% và không được chọn làm bản cuối.
 - DEV là fixture hư cấu nhỏ theo từng lượt, chưa chứng minh hội thoại replay đầy đủ,
   độ đúng pháp lý hoặc khả năng tổng quát trên dữ liệu công ty.
 
@@ -62,3 +62,25 @@ Ngày 13/09, output đã được nối vào AI Service và chat G5 với verifi
 live smoke một ca D0 qua đúng model+adapter. Việc còn lại là chạy full Docker replay và
 cải thiện chất lượng, không phải chọn lại model. Xem
 [mốc tích hợp runtime](12-tich-hop-intent-context-runtime.md).
+
+## Vòng nâng chất lượng ngày 13/09
+
+Từ phân tích lỗi DEV, TRAIN được mở rộng từ 120 lên 252 ca D0 hư cấu, tập trung vào phân biệt
+field, câu nối tiếp, nhiều field, sửa/chuyển thủ tục, reset, phạm vi, ngày và câu biên. TRAIN mới
+không trùng nguyên văn hoặc ID với DEV. QLoRA vẫn dùng base revision, seed 42 và rank 16 đã khóa.
+
+| Cấu hình | Schema/ngữ nghĩa | Dialogue act | Topic | Joint state | Full state | P95 |
+|---|---:|---:|---:|---:|---:|---:|
+| Adapter vòng đầu | 100% / 100% | 91,67% | 93,33% | 75,00% | 63,33% | 2,52 s |
+| Adapter hard-v2, model thuần | 100% / 100% | 93,33% | 95,00% | **98,33%** | 86,67% | 3,12 s |
+| Adapter hard-v2 + policy v1 | 100% / 100% | **100%** | **96,67%** | **98,33%** | **95,00%** | 3,14 s |
+
+Policy v1 chỉ giải quyết các bất biến trạng thái xác định được: reset không được nạp lại context,
+greet/out-of-scope không được đổi context, trả lời đúng slot đang chờ, sửa giá trị đã có và câu xác
+nhận ngắn. Policy không sinh procedure, field, địa phương hay ngày thay model. Vì vậy báo cáo tách
+điểm model thuần 86,67% khỏi điểm pipeline triển khai 95,00%.
+
+Adapter được chọn có SHA-256
+`71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0`. Kết quả có fingerprint
+tại [`evaluation/baselines/g5-intent-context-quality-round2-20260913.json`](../../evaluation/baselines/g5-intent-context-quality-round2-20260913.json).
+TEST kín chưa được sử dụng; kết quả này chỉ chốt candidate DEV để tiếp tục nghiệm thu.

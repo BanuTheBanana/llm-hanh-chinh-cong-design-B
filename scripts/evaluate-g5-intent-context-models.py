@@ -24,9 +24,17 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "ai-service"))
+
+from app.intent_context_policy import (  # noqa: E402
+    POLICY_VERSION,
+    apply_intent_context_policy,
+)
 
 from training.intent_context import (  # noqa: E402
     CONTEXT_SLOTS,
+    SYSTEM_PROMPT,
+    SYSTEM_PROMPT_VERSION,
     apply_output_to_state,
     build_messages,
 )
@@ -123,7 +131,14 @@ def semantic_errors(case: dict, predicted: dict) -> list[str]:
     return errors
 
 
-def evaluate_candidate(base_url: str, model_name: str, cases: list[dict], schema: dict) -> dict:
+def evaluate_candidate(
+    base_url: str,
+    model_name: str,
+    cases: list[dict],
+    schema: dict,
+    *,
+    apply_policy: bool,
+) -> dict:
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     latencies = []
     failures = Counter()
@@ -151,6 +166,8 @@ def evaluate_candidate(base_url: str, model_name: str, cases: list[dict], schema
         started = time.perf_counter()
         content = ""
         predicted = None
+        raw_predicted = None
+        policy_actions: list[str] = []
         error_codes = []
         try:
             response = request_json(base_url + "/v1/chat/completions", body=request_body)
@@ -160,11 +177,20 @@ def evaluate_candidate(base_url: str, model_name: str, cases: list[dict], schema
             usage = response.get("usage", {})
             input_tokens.append(int(usage.get("prompt_tokens", 0)))
             output_tokens.append(int(usage.get("completion_tokens", 0)))
-            predicted = json.loads(content)
+            raw_predicted = json.loads(content)
+            predicted = raw_predicted
             schema_errors = list(validator.iter_errors(predicted))
             if schema_errors:
                 error_codes.append("SCHEMA_INVALID")
             else:
+                if apply_policy:
+                    predicted, policy_actions = apply_intent_context_policy(
+                        predicted,
+                        {
+                            "current_user_message": case["current_user_message"],
+                            "state_before": case["state_before"],
+                        },
+                    )
                 score_counts["schema_valid"] += 1
                 error_codes.extend(semantic_errors(case, predicted))
         except (
@@ -215,6 +241,8 @@ def evaluate_candidate(base_url: str, model_name: str, cases: list[dict], schema
                 "exact_patch_passed": exact_full_ok if semantic_ok else False,
                 "errors": sorted(set(error_codes)),
                 "predicted": predicted,
+                "raw_predicted": raw_predicted if policy_actions else None,
+                "policy_actions": policy_actions,
                 "raw_content": content if predicted is None else None,
             }
         )
@@ -286,6 +314,11 @@ def main() -> int:
     parser.add_argument("--port", type=int, default=18085)
     parser.add_argument("--startup-timeout", type=float, default=120)
     parser.add_argument("--limit", type=int)
+    parser.add_argument(
+        "--apply-policy",
+        action="store_true",
+        help="Apply the same deterministic intent/context policy as the AI service.",
+    )
     args = parser.parse_args()
     output_dir = args.output_dir.resolve()
     if not output_dir.is_relative_to(ALLOWED_OUTPUT_ROOT):
@@ -356,7 +389,9 @@ def main() -> int:
             try:
                 load_seconds = wait_ready(base_url, process, args.startup_timeout)
                 loaded_gpu = gpu_memory_mib()
-                result = evaluate_candidate(base_url, name, cases, schema)
+                result = evaluate_candidate(
+                    base_url, name, cases, schema, apply_policy=args.apply_policy
+                )
             finally:
                 process.terminate()
                 try:
@@ -392,6 +427,10 @@ def main() -> int:
         "scope": "D0 fictional pilot; not final TEST and not legal-answer evaluation",
         "fixture_sha256": sha256(cases_path),
         "schema_sha256": sha256(args.schema),
+        "system_prompt_version": SYSTEM_PROMPT_VERSION,
+        "system_prompt_sha256": hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest(),
+        "policy_applied": args.apply_policy,
+        "policy_version": POLICY_VERSION if args.apply_policy else None,
         "llama_server": str(args.llama_server),
         "llama_server_version": subprocess.check_output(
             [args.llama_server, "--version"], text=True, stderr=subprocess.STDOUT

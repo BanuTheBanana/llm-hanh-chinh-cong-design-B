@@ -133,7 +133,7 @@ async def test_g5_rag_readiness_checks_intent_context(client, database, corpus, 
                 "service": "ai-service",
                 "endpoint": "intent-context-v2",
                 "provider": "local-intent-context",
-                "model": "Qwen3-4B-Intent-r16",
+                "model": "Qwen3-4B-Intent-hard-v2-r16",
                 "external_calls_enabled": False,
                 "allowed_data_classifications": ["D0_SYSTEM_SMOKE", "D2_COMPANY_REAL"],
             },
@@ -144,7 +144,7 @@ async def test_g5_rag_readiness_checks_intent_context(client, database, corpus, 
         result = await client.get("/health/rag")
     assert result.status_code == 200
     assert result.json()["intent_context_enabled"] is True
-    assert result.json()["intent_context_model"] == "Qwen3-4B-Intent-r16"
+    assert result.json()["intent_context_model"] == "Qwen3-4B-Intent-hard-v2-r16"
 
 
 async def test_rag_rejects_query_over_grounded_contract_limit(

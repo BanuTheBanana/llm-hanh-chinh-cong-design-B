@@ -36,7 +36,11 @@ def expanded_target(row):
 
 
 def test_manifests_counts_hashes_and_classification():
-    for name in ("intent-context-train-pilot-v1", "intent-context-pilot-v1"):
+    for name in (
+        "intent-context-train-pilot-v1",
+        "intent-context-train-hard-v2",
+        "intent-context-pilot-v1",
+    ):
         manifest, source, rows = load_fixture(name)
         assert manifest["classification"] == "D0_SYSTEM_SMOKE"
         assert manifest["contains_company_data"] is False
@@ -53,9 +57,21 @@ def test_train_and_dev_have_no_id_or_exact_utterance_overlap():
     dev_text = {" ".join(row["current_user_message"].casefold().split()) for row in dev}
     assert train_text.isdisjoint(dev_text)
 
+    _, _, hard_train = load_fixture("intent-context-train-hard-v2")
+    hard_ids = {row["case_id"] for row in hard_train}
+    hard_text = {" ".join(row["current_user_message"].casefold().split()) for row in hard_train}
+    assert len(hard_ids) == len(hard_train)
+    assert len(hard_text) == len(hard_train)
+    assert hard_ids.isdisjoint(row["case_id"] for row in dev)
+    assert hard_text.isdisjoint(dev_text)
+
 
 def test_all_reviewed_labels_expand_to_contract_and_known_candidates():
-    for name in ("intent-context-train-pilot-v1", "intent-context-pilot-v1"):
+    for name in (
+        "intent-context-train-pilot-v1",
+        "intent-context-train-hard-v2",
+        "intent-context-pilot-v1",
+    ):
         _, _, rows = load_fixture(name)
         assert len({row["case_id"] for row in rows}) == len(rows)
         for row in rows:

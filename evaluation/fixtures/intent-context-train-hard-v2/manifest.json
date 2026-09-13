@@ -1,0 +1,30 @@
+{
+  "schema_version": "g5-intent-context-train-hard-manifest-v2",
+  "source_file": "cases.jsonl",
+  "split": "TRAIN",
+  "final_test": false,
+  "classification": "D0_SYSTEM_SMOKE",
+  "contains_company_data": false,
+  "case_count": 252,
+  "groups": {
+    "boundary": 8,
+    "correction_switch": 12,
+    "direct": 48,
+    "followup": 24,
+    "hard_boundary": 12,
+    "hard_correction_switch": 12,
+    "hard_date_pending": 6,
+    "hard_field_direct": 48,
+    "hard_field_followup": 24,
+    "hard_multi_followup": 12,
+    "hard_reset": 6,
+    "hard_scope_correction": 6,
+    "hard_scope_direct": 6,
+    "hard_scope_pending": 6,
+    "multi": 6,
+    "reset": 6,
+    "scope_date": 10
+  },
+  "content_sha256": "705740428aaeaabbea37f1ca850efa2fda12e5493b03ceb6733dacdd0ec296d5",
+  "strategy": "deduplicated pilot plus manually reviewed error-class templates"
+}

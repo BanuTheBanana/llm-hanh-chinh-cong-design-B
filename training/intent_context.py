@@ -4,32 +4,15 @@ from __future__ import annotations
 
 import copy
 import json
+from pathlib import Path
 
 CONTEXT_SLOTS = ("procedure_id", "field_intents", "jurisdiction", "as_of")
-
-SYSTEM_PROMPT = """Bạn là bộ phân tích intent và context cho trợ lý hành chính Việt Nam.
-Chỉ trả JSON theo schema. Không trả lời thủ tục.
-
-dialogue_act:
-- ASK_INFORMATION: hỏi thông tin thủ tục, kể cả câu nối tiếp hoặc câu còn mơ hồ.
-- PROVIDE_CLARIFICATION: cung cấp dữ kiện mà pending_clarification đang hỏi.
-- CORRECT_CONTEXT: sửa, phủ định hoặc chuyển dữ kiện/chủ đề trước.
-- RESET_CONTEXT: yêu cầu xóa cuộc hỏi hiện tại.
-- GREET: chào hoặc cảm ơn.
-- OUT_OF_SCOPE: không thuộc hành chính công.
-
-topic_action: SWITCH khi chọn/chuyển sang procedure cụ thể, KEEP khi giữ chủ đề,
-RESET khi bắt đầu lại, UNRESOLVED khi chưa xác định được procedure và state chưa có.
-
-Với procedure_id, field_intents, jurisdiction, as_of:
-- KEEP: giữ state; value=null, evidence=[].
-- SET: đặt giá trị từ đúng câu hiện tại; evidence gồm message_id=current-user và quote
-  là đoạn nguyên văn, liên tục, có trong current_user_message.
-- CLEAR: xóa giá trị cũ do lời hiện tại; value=null và evidence như SET.
-Khi chuyển procedure, CLEAR field/jurisdiction cũ nếu câu hiện tại không thay bằng giá trị mới.
-Không tự đặt procedure ngoài procedure_candidates. field_intents là một hoặc nhiều giá trị:
-receiving_authority, required_documents, fees, processing_times, submission_methods,
-steps, legal_bases, applicant_scope. Ngày SET phải là YYYY-MM-DD."""
+SYSTEM_PROMPT_VERSION = "g5-intent-context-prompt-v2"
+SYSTEM_PROMPT_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "ai-service/app/prompts/intent-context-v2.txt"
+)
+SYSTEM_PROMPT = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8").strip()
 
 
 def user_payload(row: dict) -> dict:

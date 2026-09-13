@@ -34,7 +34,7 @@ if (-not $IntentModelPath) {
     $IntentModelPath = Join-Path $taskRepo '../LLM/models/qwen3-4b-instruct-2507-q8_0.gguf'
 }
 if (-not $IntentAdapterPath) {
-    $IntentAdapterPath = Join-Path $taskRepo 'training/output/qwen3-4b-intent-pilot-r16/adapter-f16.gguf'
+    $IntentAdapterPath = Join-Path $taskRepo 'training/output/qwen3-4b-intent-hard-v2-r16/adapter-f16.gguf'
 }
 foreach ($taskPath in @(
     $DatasetPath,

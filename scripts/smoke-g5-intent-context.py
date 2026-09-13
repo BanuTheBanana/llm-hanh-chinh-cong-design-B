@@ -69,7 +69,7 @@ def main() -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", default="http://127.0.0.1:18087/v1")
-    parser.add_argument("--model", default="Qwen3-4B-Intent-r16")
+    parser.add_argument("--model", default="Qwen3-4B-Intent-hard-v2-r16")
     parser.add_argument("--timeout", type=float, default=30)
     return asyncio.run(run(parser.parse_args()))
 

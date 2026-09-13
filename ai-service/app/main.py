@@ -316,11 +316,13 @@ def create_app() -> FastAPI:
         result = await provider.analyze(payload)
         latency_ms = round((perf_counter() - started_at) * 1000)
         logger.info(
-            "intent_context_success request_id=%s provider=%s model=%s latency_ms=%d",
+            "intent_context_success request_id=%s provider=%s model=%s latency_ms=%d "
+            "policy_actions=%s",
             payload.request_id,
             result.provider,
             result.model,
             latency_ms,
+            ",".join(result.policy_actions) or "none",
         )
         return IntentContextResponse(
             request_id=payload.request_id,

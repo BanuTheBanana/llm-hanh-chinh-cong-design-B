@@ -12,11 +12,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
   -GenerationModelPath 'D:\duong-dan-rieng\Qwen3-1.7B-Q8_0.gguf' `
   -EmbeddingModelPath 'D:\duong-dan-rieng\Qwen3-Embedding-0.6B-Q8_0.gguf' `
   -IntentModelPath 'D:\duong-dan-rieng\qwen3-4b-instruct-2507-q8_0.gguf' `
-  -IntentAdapterPath 'D:\duong-dan-rieng\intent-r16.gguf' `
+  -IntentAdapterPath 'D:\duong-dan-rieng\intent-hard-v2-r16.gguf' `
   -GenerationModelSha256 '061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a' `
   -EmbeddingModelSha256 '06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439' `
   -IntentModelSha256 'ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1' `
-  -IntentAdapterSha256 'f081fee903c9c7c6daabd53baa0bbce6d9680fdad43b2e45a0261aeacdff4fa2' `
+  -IntentAdapterSha256 '71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0' `
   -ReviewToken '<token-local-it-nhat-12-ky-tu>'
 ```
 
@@ -53,7 +53,7 @@ Smoke trực tiếp model intent bằng fixture D0, không cần dữ liệu cô
 ```powershell
 uv run --project ai-service python scripts/smoke-g5-intent-context.py `
   --base-url http://127.0.0.1:8087/v1 `
-  --model Qwen3-4B-Intent-r16
+  --model Qwen3-4B-Intent-hard-v2-r16
 ```
 
 ## 3. Kiểm tra và dừng
@@ -65,7 +65,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
   -GenerationModelPath 'D:\duong-dan-rieng\Qwen3-1.7B-Q8_0.gguf' `
   -EmbeddingModelPath 'D:\duong-dan-rieng\Qwen3-Embedding-0.6B-Q8_0.gguf' `
   -IntentModelPath 'D:\duong-dan-rieng\qwen3-4b-instruct-2507-q8_0.gguf' `
-  -IntentAdapterPath 'D:\duong-dan-rieng\intent-r16.gguf' `
+  -IntentAdapterPath 'D:\duong-dan-rieng\intent-hard-v2-r16.gguf' `
   -ReviewToken '<cùng-token-khi-start>'
 
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
@@ -74,7 +74,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
   -GenerationModelPath 'D:\duong-dan-rieng\Qwen3-1.7B-Q8_0.gguf' `
   -EmbeddingModelPath 'D:\duong-dan-rieng\Qwen3-Embedding-0.6B-Q8_0.gguf' `
   -IntentModelPath 'D:\duong-dan-rieng\qwen3-4b-instruct-2507-q8_0.gguf' `
-  -IntentAdapterPath 'D:\duong-dan-rieng\intent-r16.gguf' `
+  -IntentAdapterPath 'D:\duong-dan-rieng\intent-hard-v2-r16.gguf' `
   -ReviewToken '<cùng-token-khi-start>'
 ```
 

@@ -10,8 +10,10 @@ User message + state đã lưu + catalog thủ tục
                     ↓
 AI Service /internal/v3/intent-context
                     ↓
-Qwen3-4B-Instruct-2507 Q8_0 + LoRA r16
+Qwen3-4B-Instruct-2507 Q8_0 + LoRA hard-v2 r16
                     ↓ JSON KEEP / SET / CLEAR
+Policy v1 chặn mâu thuẫn trạng thái xác định được
+                    ↓
 Backend kiểm schema + candidate + evidence
                     ↓
 Reducer đổi/reset state → RetrievalInput → RAG có nguồn
@@ -44,7 +46,7 @@ khi nhận stack G5 là sẵn sàng. Tham số cụ thể nằm trong
   field `fees`, JSON và evidence UUID.
 - Full Docker có 8 service healthy: Web, Backend, PostgreSQL, AI Service, generation model,
   embedding model, intent model và source service. `/health/rag` xác nhận intent local,
-  non-external và đúng model `Qwen3-4B-Intent-r16`.
+  non-external và đúng model `Qwen3-4B-Intent-hard-v2-r16`.
 - Live chat ba lượt đạt: câu đầu chọn đúng thủ tục và field phí; câu follow-up giữ thủ tục,
   chuyển sang thời gian; câu reset xóa context và không gọi RAG. Cả ba lời gọi intent trả
   thành công, không dùng fallback G4; hai câu nghiệp vụ trả evidence đúng field.
@@ -53,7 +55,7 @@ khi nhận stack G5 là sẵn sàng. Tham số cụ thể nằm trong
 - Test đầy đủ đã phát hiện và sửa một hồi quy health: khi cờ G5 tắt, response G3 không còn
   bị thêm field G5. Compose merge, lint và cú pháp PowerShell đều đạt.
 
-Đây là mốc **runtime integrated**, chưa phải nghiệm thu chất lượng. Điểm DEV vẫn dưới
-ngưỡng 90%; bước sau là replay toàn DEV, phân tích lỗi và fine-tune vòng dữ liệu tiếp theo
-trước một lần TEST kín cuối. Không tạo TEST mới liên tục và không dùng smoke live để thay
-cho bộ đánh giá khóa.
+Vòng DEV mới đã replay đủ 60 ca: model thuần đạt joint-state 98,33% và full-state 86,67%; sau
+policy v1, pipeline đạt full-state 95,00%, P95 3,14 giây. Adapter và cấu hình này được đưa vào
+runtime G5. Đây chưa phải kết quả TEST kín hoặc chứng nhận độ đúng câu trả lời pháp lý; TEST chỉ
+được mở một lần sau khi candidate và tiêu chí nghiệm thu đã khóa.

@@ -1,8 +1,8 @@
 # Giai đoạn 5 – chuyên biệt hóa và cập nhật nguồn
 
-> Ưu tiên mới theo mentor (12/09/2026): [kế hoạch fine-tune, intent và context trong
-> 5 ngày làm việc](08-ke-hoach-intent-context-finetune.md). Yêu cầu model đã fine-tune
-> thực sự xử lý intent/context chưa được nghiệm thu; kết quả demo10 dưới đây là mốc trước đó.
+> Ưu tiên theo mentor (12/09/2026): [kế hoạch fine-tune, intent và context trong
+> 5 ngày làm việc](08-ke-hoach-intent-context-finetune.md). Ngày 13/09, Qwen3-4B đã được
+> fine-tune và tích hợp thật; pipeline DEV đạt full-state 95%. TEST kín chưa được mở.
 
 G5 nâng hệ thống cơ bản thành một bản **limited release nội bộ** trên đúng phạm vi dữ liệu
 đã được duyệt. Hệ thống vẫn ưu tiên độ tin cậy: dùng nguồn làm căn cứ, từ chối khi thiếu
@@ -11,7 +11,7 @@ nguồn và không đưa dữ liệu công ty lên Git.
 ## Kết quả chốt
 
 - Phạm vi phục vụ: 10 thủ tục, 10 nguồn, 49 fragment đã duyệt.
-- Model phục vụ: Qwen3-1.7B Q8_0 gốc; adapter QLoRA đã thử nhưng không được triển khai.
+- Model trả lời: Qwen3-1.7B Q8_0. Model intent/context: Qwen3-4B Q8_0 + adapter QLoRA r16.
 - Truy xuất: Exact/BM25 là tuyến chính, Qwen3 Embedding là fallback có kiểm soát.
 - Nguồn cập nhật: registry nội bộ qua MCP, có review, publish, version và rollback.
 - Giao diện: hiển thị checklist, citation, phiên bản tri thức và thời điểm duyệt nguồn.
@@ -31,3 +31,4 @@ chứng nhận độ đúng pháp lý, chưa phục vụ toàn bộ corpus và c
 7. [Cơ sở nghiên cứu](10-co-so-nghien-cuu-intent-context.md)
 8. [Kết quả chọn model intent/context](11-ket-qua-chon-model-intent-context.md)
 9. [Tích hợp intent/context vào runtime](12-tich-hop-intent-context-runtime.md)
+10. [Vòng nâng chất lượng intent/context](13-nang-chat-luong-intent-context.md)

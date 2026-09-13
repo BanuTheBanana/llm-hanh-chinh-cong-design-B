@@ -1,11 +1,13 @@
 """Local-only Qwen provider for the G5 intent/context contract."""
 
 import json
+from pathlib import Path
 from urllib.parse import urlsplit
 
 import httpx
 from pydantic import ValidationError
 
+from app.intent_context_policy import apply_intent_context_policy
 from app.providers.base import (
     ProviderError,
     ProviderPolicyError,
@@ -18,29 +20,12 @@ from app.providers.intent_context_base import (
 )
 from app.schemas import IntentContextModelOutput, IntentContextRequest
 
-SYSTEM_PROMPT = """Bạn là bộ phân tích intent và context cho trợ lý hành chính Việt Nam.
-Chỉ trả JSON theo schema. Không trả lời thủ tục.
-
-dialogue_act:
-- ASK_INFORMATION: hỏi thông tin thủ tục, kể cả câu nối tiếp hoặc câu còn mơ hồ.
-- PROVIDE_CLARIFICATION: cung cấp dữ kiện mà pending_clarification đang hỏi.
-- CORRECT_CONTEXT: sửa, phủ định hoặc chuyển dữ kiện/chủ đề trước.
-- RESET_CONTEXT: yêu cầu xóa cuộc hỏi hiện tại.
-- GREET: chào hoặc cảm ơn.
-- OUT_OF_SCOPE: không thuộc hành chính công.
-
-topic_action: SWITCH khi chọn/chuyển sang procedure cụ thể, KEEP khi giữ chủ đề,
-RESET khi bắt đầu lại, UNRESOLVED khi chưa xác định được procedure và state chưa có.
-
-Với procedure_id, field_intents, jurisdiction, as_of:
-- KEEP: giữ state; value=null, evidence=[].
-- SET: đặt giá trị từ đúng câu hiện tại; evidence chứa current_message_id và quote là
-  đoạn nguyên văn, liên tục, có trong current_user_message.
-- CLEAR: xóa giá trị cũ do lời hiện tại; value=null và evidence như SET.
-Khi chuyển procedure, dữ kiện phụ thuộc cũ sẽ được Backend xóa an toàn.
-Không đặt procedure ngoài procedure_candidates. field_intents chỉ gồm:
-receiving_authority, required_documents, fees, processing_times, submission_methods,
-steps, legal_bases, applicant_scope. Ngày SET phải là YYYY-MM-DD."""
+SYSTEM_PROMPT_VERSION = "g5-intent-context-prompt-v2"
+SYSTEM_PROMPT = (
+    (Path(__file__).resolve().parents[1] / "prompts/intent-context-v2.txt")
+    .read_text(encoding="utf-8")
+    .strip()
+)
 
 INTENT_OUTPUT_JSON_SCHEMA = IntentContextModelOutput.model_json_schema()
 
@@ -209,6 +194,10 @@ class LocalIntentContextProvider(IntentContextProvider):
             total_output += output_tokens
             try:
                 output = IntentContextModelOutput.model_validate_json(raw)
+                normalized, policy_actions = apply_intent_context_policy(
+                    output.model_dump(mode="json"), user_payload
+                )
+                output = IntentContextModelOutput.model_validate(normalized)
                 self._validate_semantics(output, payload)
                 return IntentContextGenerationResult(
                     output=output,
@@ -216,6 +205,7 @@ class LocalIntentContextProvider(IntentContextProvider):
                     model=self.model_name,
                     input_tokens=total_input,
                     output_tokens=total_output,
+                    policy_actions=tuple(policy_actions),
                 )
             except (ValidationError, ProviderResponseError):
                 if attempt == 1:

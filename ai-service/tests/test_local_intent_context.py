@@ -132,9 +132,30 @@ async def test_conflicting_reset_semantics_are_retried_then_rejected(provider_fa
         calls += 1
         return httpx.Response(200, json=completion(invalid))
 
-    with pytest.raises(ProviderResponseError):
-        await provider_factory(handler).analyze(IntentContextRequest.model_validate(body))
-    assert calls == 2
+    result = await provider_factory(handler).analyze(IntentContextRequest.model_validate(body))
+    assert result.output.dialogue_act == "RESET_CONTEXT"
+    assert result.output.topic_action == "RESET"
+    assert result.policy_actions == ("RESET_ACT_CLEARS_STATE_MACHINE",)
+    assert calls == 1
+
+
+async def test_policy_intent_cannot_mutate_existing_context(provider_factory):
+    body = request_body()
+    body["state_before"]["procedure_id"] = "p_birth"
+    body["current_user_message"] = "Viết giúp tôi một bài thơ."
+    invalid = model_output(body)
+    invalid["dialogue_act"] = "OUT_OF_SCOPE"
+    invalid["topic_action"] = "UNRESOLVED"
+
+    def handler(_request):
+        return httpx.Response(200, json=completion(invalid))
+
+    result = await provider_factory(handler).analyze(IntentContextRequest.model_validate(body))
+    assert result.output.topic_action == "KEEP"
+    assert all(
+        getattr(result.output.patch, slot).op == "KEEP"
+        for slot in ("procedure_id", "field_intents", "jurisdiction", "as_of")
+    )
 
 
 def test_state_contract_accepts_as_of_clarification():

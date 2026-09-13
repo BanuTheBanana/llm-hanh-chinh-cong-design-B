@@ -10,7 +10,7 @@ services:
       - --lora
       - /models/intent-adapter.gguf
       - --alias
-      - Qwen3-4B-Intent-r16
+      - Qwen3-4B-Intent-hard-v2-r16
       - --host
       - 0.0.0.0
       - --port
@@ -143,7 +143,7 @@ services:
     environment:
       INTENT_CONTEXT_PROVIDER: local
       INTENT_LLM_BASE_URL: http://intent-model:8087/v1
-      INTENT_LLM_MODEL: Qwen3-4B-Intent-r16
+      INTENT_LLM_MODEL: Qwen3-4B-Intent-hard-v2-r16
       INTENT_LLM_TIMEOUT_SECONDS: "30"
       INTENT_LLM_CONTEXT: "4096"
       INTENT_LLM_MAX_PROMPT_CHARACTERS: "12000"
