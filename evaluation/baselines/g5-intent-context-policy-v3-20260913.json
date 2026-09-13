@@ -4,7 +4,7 @@
   "scope": "D0 DEV and opened regressions only; not final acceptance or legal-answer evaluation",
   "candidate_commit": "e59d214b992cb5ab260c0be8d13a2cfc4b35fc97",
   "candidate": "Qwen3-4B-hard-v2-r16 + policy-v3",
-  "base_model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1c0",
+  "base_model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
   "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
   "prompt_sha256": "d6c196d1cca836a8f3e2f1448c76a50ba1ea965981d546e752982d4657841225",
   "policy_version": "g5-intent-context-policy-v3",
