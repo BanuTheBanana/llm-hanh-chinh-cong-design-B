@@ -1,0 +1,77 @@
+{
+  "schema_version": "g6-intent-context-final-result-v1",
+  "created_at": "2026-09-14",
+  "scope": "Locked private D0 intent/context FINAL; not legal-answer evaluation",
+  "attempt_count": 1,
+  "terminal": true,
+  "candidate": {
+    "name": "Qwen3-4B-hard-v2-r16-policy-v4",
+    "candidate_commit": "592e9d2f648b2bf3bf9cc752fd40a1a139f5b404",
+    "evaluation_commit": "9f42eb1f6b00028042d9d1b37b0ba7b123bb8784",
+    "model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+    "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
+    "prompt_sha256": "d6c196d1cca836a8f3e2f1448c76a50ba1ea965981d546e752982d4657841225",
+    "policy_version": "g6-intent-context-policy-v4",
+    "fast_route_enabled": true
+  },
+  "fixture": {
+    "classification": "D0_PRIVATE_FINAL_HOLDOUT",
+    "sha256": "df52d955a11ecb1ed9b96aa9923ac7a87ac22a958ab95228a2e96c950e25308e",
+    "case_count": 60,
+    "conversation_count": 20,
+    "turns_per_conversation": 3,
+    "exact_overlap_count": 0,
+    "near_duplicate_count_at_0_9": 0,
+    "maximum_similarity_to_references": 0.818792,
+    "raw_gold_committed": false
+  },
+  "metrics": {
+    "schema_valid": 1.0,
+    "semantic_valid": 1.0,
+    "dialogue_act": 0.916667,
+    "topic_action": 0.966667,
+    "joint_state": 0.866667,
+    "full_state_case": 0.833333,
+    "field_state_exact": 0.883333,
+    "field_macro_f1": 0.907366,
+    "conversation_success": 0.6,
+    "p95_latency_ms": 2561.836,
+    "fast_path_cases": 29,
+    "model_fallback_cases": 31
+  },
+  "per_group_full_state_case": {
+    "boundary": 0.714286,
+    "clarification": 1.0,
+    "correction_switch": 0.555556,
+    "direct": 1.0,
+    "followup": 0.909091,
+    "reset": 0.333333,
+    "scope_date": 0.833333
+  },
+  "gate": {
+    "profile": "g6",
+    "status": "FAIL",
+    "thresholds_locked_before_run": true,
+    "failed_metrics": [
+      "full_state_case",
+      "field_state_exact",
+      "field_macro_f1",
+      "conversation_success",
+      "every_group_full_state"
+    ],
+    "passed_metrics": [
+      "schema_valid",
+      "semantic_valid",
+      "dialogue_act",
+      "topic_action",
+      "p95_latency_ms"
+    ]
+  },
+  "decision": {
+    "g6_status": "TECHNICAL_COMPLETE_ACCEPTANCE_FAILED",
+    "accepted_release": false,
+    "rerun_or_tuning_after_final": false,
+    "next_action": "Open a new improvement cycle focused on correction/switch, reset and boundary robustness; use a new independent holdout only after model or policy changes are locked.",
+    "legal_correctness_claim": false
+  }
+}
