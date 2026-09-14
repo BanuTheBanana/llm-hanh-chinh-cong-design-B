@@ -607,6 +607,12 @@ def main() -> int:
     )
     parser.add_argument("--final-test", action="store_true")
     parser.add_argument(
+        "--gate-profile",
+        choices=("g5", "g6"),
+        default="g5",
+        help="Locked acceptance thresholds to apply to a final test.",
+    )
+    parser.add_argument(
         "--opened-regression",
         action="store_true",
         help="Re-score an already opened final fixture; never use this as final acceptance.",
@@ -661,12 +667,14 @@ def main() -> int:
                 tuple(path.resolve() for path in args.prior_fixture),
             )
             and all(case.get("split") == "FINAL_TEST" for case in cases)
+            and (args.gate_profile != "g6" or manifest.get("gate_profile") == "g6")
         )
         if (
             not final_manifest_ok
             or args.limit
             or len(args.candidate) != 1
             or not args.apply_policy
+            or (args.gate_profile == "g6" and not args.apply_fast_route)
         ):
             raise SystemExit("LOCKED_FINAL_TEST_MANIFEST_REQUIRED")
 
@@ -805,7 +813,7 @@ def main() -> int:
     summary = {
         "schema_version": "g5-intent-context-benchmark-v2",
         "scope": (
-            "Locked private G5 intent/context final test; not legal-answer evaluation"
+            "Locked private intent/context final test; not legal-answer evaluation"
             if args.final_test
             else (
                 "Opened G5 intent/context regression; not final acceptance or legal-answer evaluation"
@@ -829,26 +837,60 @@ def main() -> int:
     }
     if args.final_test:
         metrics = summaries[0]["metrics"]
+        if args.gate_profile == "g6":
+            thresholds = {
+                "schema_valid": 1.0,
+                "semantic_valid": 1.0,
+                "dialogue_act": 0.9,
+                "topic_action": 0.9,
+                "field_macro_f1": 0.95,
+                "field_state_exact": 0.95,
+                "joint_state": 0.95,
+                "full_state_case": 0.95,
+                "conversation_success": 0.9,
+                "every_group_full_state": 0.8,
+                "p95_latency_ms_max": 3000,
+            }
+        else:
+            thresholds = {
+                "schema_valid": 1.0,
+                "semantic_valid": 1.0,
+                "dialogue_act": 0.9,
+                "topic_action": 0.9,
+                "field_macro_f1": 0.95,
+                "field_state_exact": 0.9,
+                "joint_state": 0.9,
+                "full_state_case": 0.9,
+                "conversation_success": 0.9,
+                "every_group_full_state": 0.7,
+            }
         group_gate = all(
-            item["accuracy"] >= 0.7
+            item["accuracy"] >= thresholds["every_group_full_state"]
             for item in summaries[0]["per_group_full_state_case"].values()
         )
         gate_passed = (
-            metrics["schema_valid"] == 1
-            and metrics["semantic_valid"] == 1
-            and metrics["dialogue_act"] >= 0.9
-            and metrics["topic_action"] >= 0.9
-            and metrics["field_macro_f1"] >= 0.95
-            and metrics["field_state_exact"] >= 0.9
-            and metrics["joint_state"] >= 0.9
-            and metrics["full_state_case"] >= 0.9
-            and summaries[0]["conversation_success"] >= 0.9
+            metrics["schema_valid"] >= thresholds["schema_valid"]
+            and metrics["semantic_valid"] >= thresholds["semantic_valid"]
+            and metrics["dialogue_act"] >= thresholds["dialogue_act"]
+            and metrics["topic_action"] >= thresholds["topic_action"]
+            and metrics["field_macro_f1"] >= thresholds["field_macro_f1"]
+            and metrics["field_state_exact"] >= thresholds["field_state_exact"]
+            and metrics["joint_state"] >= thresholds["joint_state"]
+            and metrics["full_state_case"] >= thresholds["full_state_case"]
+            and summaries[0]["conversation_success"]
+            >= thresholds["conversation_success"]
             and group_gate
+            and (
+                "p95_latency_ms_max" not in thresholds
+                or summaries[0]["latency_ms"]["p95"]
+                <= thresholds["p95_latency_ms_max"]
+            )
         )
         summary["final_test_gate"] = {
             "status": "PASS" if gate_passed else "FAIL",
+            "profile": args.gate_profile,
             "thresholds_locked_before_run": True,
-            "group_minimum": 0.7,
+            "thresholds": thresholds,
         }
     (output_dir / "summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
