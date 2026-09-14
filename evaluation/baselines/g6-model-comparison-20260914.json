@@ -1,0 +1,95 @@
+{
+  "schema_version": "g6-model-selection-v1",
+  "created_at": "2026-09-14",
+  "scope": "D0 fictional conversational DEV; model selection only, not FINAL acceptance or legal-answer evaluation",
+  "candidate_commit": "592e9d2f648b2bf3bf9cc752fd40a1a139f5b404",
+  "fixture": {
+    "name": "g6-intent-context-dev-v1",
+    "case_count": 60,
+    "conversation_count": 20,
+    "sha256": "05def78ca7290426c6a18c211cff62a53ec13e62f914f8e01f35fc307a36828f"
+  },
+  "runtime": {
+    "policy_version": "g6-intent-context-policy-v4",
+    "fast_route_enabled": true,
+    "fast_route_cases": 36,
+    "model_fallback_cases": 24,
+    "llama_server_version": "0.4.0-dev build 10853, commit 9dcf84e5a"
+  },
+  "gates": {
+    "schema_valid_min": 1.0,
+    "semantic_valid_min": 1.0,
+    "full_state_case_min": 0.95,
+    "conversation_success_min": 0.9,
+    "field_macro_f1_min": 0.95,
+    "every_group_full_state_min": 0.8,
+    "p95_latency_ms_max": 3000
+  },
+  "candidates": [
+    {
+      "name": "Qwen3-1.7B-base-policy-v4",
+      "model_sha256": "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a",
+      "adapter_sha256": null,
+      "full_state_case": 0.583333,
+      "conversation_success": 0.4,
+      "field_macro_f1": 0.984375,
+      "minimum_group_full_state": 0.0,
+      "p95_latency_ms": 2416.854,
+      "gpu_memory_delta_mib": 2262,
+      "gate_passed": false
+    },
+    {
+      "name": "Qwen3.5-2B-pilot-r16-policy-v4",
+      "model_sha256": "042ff4f34740d5dcb2499080d1b53dabc7c48cdb67c6126d6ee1312dffe3f5e8",
+      "adapter_sha256": "4c4d2a283cd44b237355b3134422a1efd6613c472099fcb961955ca75a0aa069",
+      "full_state_case": 0.85,
+      "conversation_success": 0.7,
+      "field_macro_f1": 0.863831,
+      "minimum_group_full_state": 0.5,
+      "p95_latency_ms": 1791.203,
+      "gpu_memory_delta_mib": 2222,
+      "gate_passed": false
+    },
+    {
+      "name": "Qwen3.5-2B-hard-v2-r16-policy-v4",
+      "model_sha256": "042ff4f34740d5dcb2499080d1b53dabc7c48cdb67c6126d6ee1312dffe3f5e8",
+      "adapter_sha256": "52bf3b55ddef4b8859600d02568ec79c11687d23437475d490ef2dea3f7540a8",
+      "training": {
+        "train_examples": 252,
+        "epochs": 1.5,
+        "lora_rank": 16,
+        "seed": 42
+      },
+      "full_state_case": 0.95,
+      "conversation_success": 0.85,
+      "field_macro_f1": 0.972222,
+      "minimum_group_full_state": 0.777778,
+      "p95_latency_ms": 1465.308,
+      "gpu_memory_delta_mib": 2311,
+      "gate_passed": false,
+      "failed_gates": [
+        "conversation_success",
+        "every_group_full_state"
+      ]
+    },
+    {
+      "name": "Qwen3-4B-hard-v2-r16-policy-v4",
+      "model_sha256": "ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1",
+      "adapter_sha256": "71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0",
+      "full_state_case": 1.0,
+      "conversation_success": 1.0,
+      "field_macro_f1": 1.0,
+      "minimum_group_full_state": 1.0,
+      "p95_latency_ms": 2857.663,
+      "gpu_memory_delta_mib": 4913,
+      "gate_passed": true
+    }
+  ],
+  "decision": {
+    "selected_candidate": "Qwen3-4B-hard-v2-r16-policy-v4",
+    "status": "SELECTED_FOR_LOCKED_INTEGRATION",
+    "reason": "Only candidate passing every predeclared quality, conversation, group and latency gate. Qwen3.5-2B remains a lightweight fallback candidate, not the G6 release candidate.",
+    "final_test_run": false,
+    "legal_correctness_claim": false
+  }
+}

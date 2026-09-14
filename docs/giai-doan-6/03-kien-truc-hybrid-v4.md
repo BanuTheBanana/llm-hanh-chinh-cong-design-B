@@ -24,10 +24,10 @@ ngoài phạm vi hoặc không đủ bằng chứng. Các quyết định đều
 tự tạo câu trả lời pháp lý.
 
 Phiên bản `g6-intent-context-policy-v4` đã có test cho false clarification, false greeting,
-field phụ, CLEAR không có căn cứ, correction địa bàn và định tuyến 0-token. Toàn bộ 102 AI Service
+field phụ, CLEAR không có căn cứ, correction địa bàn và định tuyến 0-token. Toàn bộ 107 AI Service
 test và Ruff đã pass tại nhánh `g6/intent-context-quality`.
 
 Ba regression mở cho thấy lỗi G5 không tái diễn đáng kể: V1 100%, V2 98,33% và V3 100%
-full-state. Đây chưa phải bằng chứng tổng quát hóa. Bước tiếp theo bắt buộc là tạo DEV mới trước
-khi quyết định có cần fine-tune thêm hoặc đổi xuống model 1.7B hay không.
-
+full-state. Bộ DEV độc lập sau đó cho thấy Qwen3-4B đạt 100% state và 100% hội thoại; bản
+Qwen3.5-2B fine-tune mới đạt 95% state nhưng chỉ 85% hội thoại. Vì vậy 4B được chọn cho bước
+khóa candidate và kiểm thử tích hợp. Đây vẫn chưa phải kết quả FINAL.

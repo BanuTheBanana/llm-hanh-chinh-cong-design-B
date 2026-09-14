@@ -7,13 +7,15 @@ Trạng thái hiện tại:
 
 - Đã phân tích aggregate lỗi FINAL V3 mà không đưa câu hỏi/gold private lên Git.
 - Đã triển khai policy hybrid v4 và fast path 0-token cho yêu cầu chắc chắn.
-- 102 AI Service test đã pass.
+- 107 AI Service test và Ruff đã pass.
 - V1–V3 đã mở đạt lần lượt 100%, 98,33% và 100% full-state khi dùng policy v4.
-- Các số trên chỉ là regression. G6 chưa có FINAL TEST và chưa được nghiệm thu.
+- Đã fine-tune lại Qwen3.5-2B trên 252 mẫu TRAIN và so sánh bốn cấu hình cùng một DEV mới.
+- Qwen3-4B + LoRA hard-v2 là cấu hình duy nhất qua toàn bộ gate nên được chọn để kiểm thử tích hợp.
+- Các số trên mới là regression/DEV. G6 chưa có FINAL TEST và chưa được nghiệm thu.
 
 Tài liệu:
 
 1. [Phạm vi và gate](01-pham-vi-va-gate.md)
 2. [Phân tích lỗi G5](02-phan-tich-loi-g5.md)
 3. [Kiến trúc và trạng thái triển khai](03-kien-truc-hybrid-v4.md)
-
+4. [Kết quả chọn model](04-ket-qua-chon-model.md)
