@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -42,6 +43,9 @@ class Settings(BaseSettings):
     g5_source_mcp_timeout_seconds: float = Field(default=5, gt=0, le=30)
     g5_intent_context_enabled: bool = False
     g5_intent_context_fallback_enabled: bool = True
+    g8_evidence_mode: Literal["hybrid_retrieval", "direct_catalog", "guarded_direct"] = (
+        "hybrid_retrieval"
+    )
     # Root Compose provides the origin; AIClient owns the internal route path.
     ai_service_url: str = "http://localhost:8001"
     ai_request_timeout_seconds: float = Field(default=10, gt=0, le=120)
@@ -70,6 +74,14 @@ class Settings(BaseSettings):
             raise ValueError("G5 MCP source updates require the G4 grounded pipeline.")
         if self.g5_intent_context_enabled and not self.g4_answer_plan_enabled:
             raise ValueError("G5 intent/context requires the G4 grounded pipeline.")
+        if self.g8_evidence_mode != "hybrid_retrieval" and not (
+            self.g3_d2_enabled and self.g4_answer_plan_enabled and self.g5_intent_context_enabled
+        ):
+            raise ValueError(
+                "G8 direct evidence modes require G3 D2, G4 AnswerPlan and G5 intent/context."
+            )
+        if self.g8_evidence_mode == "guarded_direct" and not self.g5_hybrid_enabled:
+            raise ValueError("G8 guarded direct requires the global hybrid procedure verifier.")
         if not self.allowed_web_origins:
             raise ValueError("At least one Web origin is required.")
         if self.rag_enabled and not self.rag_corpus_version.strip():

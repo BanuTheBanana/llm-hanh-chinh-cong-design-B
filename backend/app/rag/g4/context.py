@@ -6,6 +6,7 @@ from uuid import UUID
 
 from pydantic import Field
 
+from app.rag.catalog_policy import preferred_procedure_id
 from app.rag.g3.retrieval import fields_for_query, procedure_names, retrieve, routing_query
 from app.rag.retrieval import normalize
 from app.rag.schemas import ID, Filters, RetrievalInput, Scope, Strict
@@ -63,6 +64,7 @@ def prepare_turn(data, query, previous, message_id: UUID, *, procedure_hint: str
         state = ConversationContext(corpus_version=data.version)
     else:
         state = previous.model_copy(deep=True)
+        state.active_procedure_id = preferred_procedure_id(state.active_procedure_id)
     detected = fields_for_query(data, query.query)
     q = " " + normalize(query.query) + " "
     explicit = any(
@@ -81,7 +83,7 @@ def prepare_turn(data, query, previous, message_id: UUID, *, procedure_hint: str
         and (short_followup or state.pending_clarification in {"procedure_id", "jurisdiction"})
     ):
         fields = state.field_intents
-    pid = query.filters.procedure_id
+    pid = preferred_procedure_id(query.filters.procedure_id)
     inherited = False
     if (
         pid is None
@@ -101,7 +103,7 @@ def prepare_turn(data, query, previous, message_id: UUID, *, procedure_hint: str
     elif pid is None and procedure_hint is not None and not explicit:
         if procedure_hint not in data.procedures:
             raise ValueError("UNKNOWN_PROCEDURE_HINT")
-        pid = procedure_hint
+        pid = preferred_procedure_id(procedure_hint)
     # Persist an explicitly supplied place, including an unsupported place; retrieval abstains.
     scope = requested_scope or state.confirmed_jurisdiction
     prepared = RetrievalInput(
@@ -109,6 +111,7 @@ def prepare_turn(data, query, previous, message_id: UUID, *, procedure_hint: str
         top_k=query.top_k,
         field_intents=fields or None,
         filters=Filters(procedure_id=pid, jurisdiction=scope, as_of=query.filters.as_of),
+        acquisition_mode=query.acquisition_mode,
     )
     found = retrieve(
         data,
@@ -119,7 +122,19 @@ def prepare_turn(data, query, previous, message_id: UUID, *, procedure_hint: str
         field_intents=fields or None,
         as_of=query.filters.as_of.isoformat() if query.filters.as_of else None,
     )
-    resolved = found["procedure_id"]
+    raw_resolved = found["procedure_id"]
+    resolved = preferred_procedure_id(raw_resolved)
+    if resolved is not None and resolved != raw_resolved:
+        found = retrieve(
+            data,
+            prepared.query,
+            prepared.top_k,
+            procedure_id=resolved,
+            jurisdiction=scope,
+            field_intents=fields or None,
+            as_of=query.filters.as_of.isoformat() if query.filters.as_of else None,
+        )
+        resolved = found["procedure_id"]
     if resolved:
         if not inherited:
             state.source_message_ids["active_procedure_id"] = message_id

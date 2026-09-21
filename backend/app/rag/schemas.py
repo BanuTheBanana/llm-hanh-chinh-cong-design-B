@@ -138,6 +138,8 @@ class Filters(Strict):
 class RetrievalInput(Strict):
     # Internal override for a pending clarification; not exposed by MessageInput.
     field_intents: list[ID] | None = None
+    # Server-owned evidence acquisition policy. Clients cannot set this value.
+    acquisition_mode: Literal["hybrid_retrieval", "direct_catalog"] = "hybrid_retrieval"
     query: QueryText
     top_k: int = Field(default=5, ge=1, le=8, strict=True)
     filters: Filters = Field(default_factory=Filters)

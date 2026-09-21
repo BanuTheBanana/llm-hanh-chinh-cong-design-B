@@ -1,7 +1,5 @@
 """Run the bounded G5 QLoRA experiment on a private SFT bundle."""
 
-# ruff: noqa: E402 -- the private ai-service package is added to sys.path below.
-
 from __future__ import annotations
 
 import argparse
@@ -36,7 +34,11 @@ def _sha256(path: Path) -> str:
 
 
 def _load_jsonl(path: Path) -> list[dict]:
-    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+    return [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line
+    ]
 
 
 def _private_output(path: Path) -> Path:
@@ -70,6 +72,23 @@ def _validate_bundle(
         row.get("split") != "VALIDATION" for row in validation_rows
     ):
         raise SystemExit("G5_QLORA_SPLIT_INVALID")
+    row_versions = {
+        row.get("dataset_version") for row in [*train_rows, *validation_rows]
+    }
+    if row_versions != {manifest.get("dataset_version")}:
+        raise SystemExit("G5_QLORA_DATASET_VERSION_MISMATCH")
+    for row in [*train_rows, *validation_rows]:
+        target = row.get("target", {})
+        cited = target.get("cited_fragment_ids", [])
+        evidence_ids = {item.get("fragment_id") for item in row.get("evidence", [])}
+        if target.get("status") == "ANSWER" and (
+            not cited or not set(cited) <= evidence_ids
+        ):
+            raise SystemExit("G5_QLORA_ANSWER_TARGET_INVALID")
+        if target.get("status") == "INSUFFICIENT_DATA" and (
+            cited or not target.get("missing_information")
+        ):
+            raise SystemExit("G5_QLORA_ABSTENTION_TARGET_INVALID")
     train_procedures = {row.get("procedure_id") for row in train_rows}
     validation_procedures = {row.get("procedure_id") for row in validation_rows}
     if train_procedures & validation_procedures:
@@ -79,10 +98,17 @@ def _validate_bundle(
 class SFTDataset(Dataset):
     def __init__(self, rows, tokenizer, max_length):
         self.items = []
+        self.source_count = len(rows)
+        self.dropped = 0
         for row in rows:
-            evidence = [GroundingEvidenceFragment.model_validate(item) for item in row["evidence"]]
+            evidence = [
+                GroundingEvidenceFragment.model_validate(item)
+                for item in row["evidence"]
+            ]
             messages = build_grounded_messages(query=row["query"], evidence=evidence)
-            target = json.dumps(row["target"], ensure_ascii=False, separators=(",", ":"))
+            target = json.dumps(
+                row["target"], ensure_ascii=False, separators=(",", ":")
+            )
             prompt_encoding = tokenizer.apply_chat_template(
                 messages,
                 tokenize=True,
@@ -98,6 +124,7 @@ class SFTDataset(Dataset):
             prompt_ids = _input_ids(prompt_encoding)
             full_ids = _input_ids(full_encoding)
             if len(prompt_ids) >= max_length or len(full_ids) > max_length:
+                self.dropped += 1
                 continue
             labels = [-100] * len(prompt_ids) + full_ids[len(prompt_ids) :]
             self.items.append(
@@ -142,7 +169,9 @@ class Collator:
             batch["input_ids"].append(item["input_ids"] + [self.pad_token_id] * padding)
             batch["attention_mask"].append(item["attention_mask"] + [0] * padding)
             batch["labels"].append(item["labels"] + [-100] * padding)
-        return {key: torch.tensor(value, dtype=torch.long) for key, value in batch.items()}
+        return {
+            key: torch.tensor(value, dtype=torch.long) for key, value in batch.items()
+        }
 
 
 def main() -> int:
@@ -151,7 +180,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", default="Qwen/Qwen3-1.7B")
     parser.add_argument("--revision", default=DEFAULT_QWEN_REVISION)
-    parser.add_argument("--max-length", type=int, default=2048)
+    parser.add_argument("--max-length", type=int, default=2304)
     parser.add_argument("--epochs", type=float, default=1.0)
     parser.add_argument("--learning-rate", type=float, default=0.0002)
     parser.add_argument("--lora-rank", type=int, choices=(8, 16), default=16)
@@ -160,6 +189,10 @@ def main() -> int:
     args = parser.parse_args()
     if not torch.cuda.is_available() or not torch.cuda.is_bf16_supported():
         raise SystemExit("G5_QLORA_REQUIRES_BF16_CUDA")
+    torch.cuda.empty_cache()
+    torch.cuda.reset_peak_memory_stats()
+    gpu_baseline_allocated = torch.cuda.memory_allocated()
+    gpu_baseline_reserved = torch.cuda.memory_reserved()
     output = _private_output(args.output)
     output.mkdir(parents=True, exist_ok=True)
     if (output / "adapter_config.json").exists():
@@ -189,7 +222,7 @@ def main() -> int:
         args.model,
         revision=args.revision,
         quantization_config=quantization,
-        torch_dtype=torch.bfloat16,
+        dtype=torch.bfloat16,
         device_map={"": 0},
         trust_remote_code=False,
     )
@@ -216,6 +249,8 @@ def main() -> int:
     )
     train_dataset = SFTDataset(train_rows, tokenizer, args.max_length)
     validation_dataset = SFTDataset(validation_rows, tokenizer, args.max_length)
+    if train_dataset.dropped or validation_dataset.dropped:
+        raise SystemExit("G5_SFT_EXAMPLE_EXCEEDS_CONTEXT")
     training_args = TrainingArguments(
         output_dir=str(output / "checkpoints"),
         num_train_epochs=args.epochs,
@@ -247,6 +282,7 @@ def main() -> int:
     )
     train_result = trainer.train()
     eval_result = trainer.evaluate()
+    torch.cuda.synchronize()
     model.save_pretrained(output, safe_serialization=True)
     tokenizer.save_pretrained(output)
     adapter_files = {
@@ -275,6 +311,14 @@ def main() -> int:
         },
         "train_metrics": train_result.metrics,
         "eval_metrics": eval_result,
+        "resource_metrics": {
+            "gpu_name": torch.cuda.get_device_name(0),
+            "gpu_total_memory_bytes": torch.cuda.get_device_properties(0).total_memory,
+            "process_baseline_allocated_bytes": gpu_baseline_allocated,
+            "process_baseline_reserved_bytes": gpu_baseline_reserved,
+            "process_peak_allocated_bytes": torch.cuda.max_memory_allocated(),
+            "process_peak_reserved_bytes": torch.cuda.max_memory_reserved(),
+        },
         "artifacts": adapter_files,
     }
     (output / "training_manifest.json").write_text(

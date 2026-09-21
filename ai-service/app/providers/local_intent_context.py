@@ -2,13 +2,15 @@
 
 import json
 from pathlib import Path
+from typing import Literal
 from urllib.parse import urlsplit
 
 import httpx
-from pydantic import ValidationError
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from app.intent_context_policy import (
     apply_intent_context_policy,
+    bounded_evidence_quote,
     resolve_high_confidence_without_model,
 )
 from app.providers.base import (
@@ -30,7 +32,62 @@ SYSTEM_PROMPT = (
     .strip()
 )
 
-INTENT_OUTPUT_JSON_SCHEMA = IntentContextModelOutput.model_json_schema()
+
+class _CompactStringPatch(BaseModel):
+    """Model-facing patch; audit evidence is attached by the trusted service."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    op: Literal["KEEP", "SET", "CLEAR"]
+    value: str | None
+
+
+class _CompactFieldPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    op: Literal["KEEP", "SET", "CLEAR"]
+    value: list[
+        Literal[
+            "receiving_authority",
+            "required_documents",
+            "fees",
+            "processing_times",
+            "submission_methods",
+            "steps",
+            "legal_bases",
+            "applicant_scope",
+        ]
+    ] | None
+
+
+class _CompactPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    procedure_id: _CompactStringPatch
+    field_intents: _CompactFieldPatch
+    jurisdiction: _CompactStringPatch
+    as_of: _CompactStringPatch
+
+
+class _CompactIntentOutput(BaseModel):
+    """Bounded structured output used only between Qwen and AI Service."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["g5-intent-context-compact-v1"]
+    dialogue_act: Literal[
+        "ASK_INFORMATION",
+        "PROVIDE_CLARIFICATION",
+        "CORRECT_CONTEXT",
+        "RESET_CONTEXT",
+        "GREET",
+        "OUT_OF_SCOPE",
+    ]
+    topic_action: Literal["KEEP", "SWITCH", "RESET", "UNRESOLVED"]
+    patch: _CompactPatch
+
+
+INTENT_OUTPUT_JSON_SCHEMA = _CompactIntentOutput.model_json_schema()
 
 
 class LocalIntentContextProvider(IntentContextProvider):
@@ -90,6 +147,34 @@ class LocalIntentContextProvider(IntentContextProvider):
 
     async def aclose(self) -> None:
         await self._client.aclose()
+
+    @staticmethod
+    def _hydrate_model_output(
+        compact: _CompactIntentOutput, payload: IntentContextRequest
+    ) -> IntentContextModelOutput:
+        """Attach trusted message evidence and expose the stable Backend contract."""
+
+        raw = compact.model_dump(mode="json")
+        raw["schema_version"] = "g5-intent-context-v2"
+        evidence_payload = {
+            "current_user_message": payload.current_user_message,
+            "procedure_candidates": [
+                candidate.model_dump(mode="json") for candidate in payload.procedure_candidates
+            ],
+        }
+        for slot in ("procedure_id", "field_intents", "jurisdiction", "as_of"):
+            operation = raw["patch"][slot]
+            operation["evidence"] = (
+                []
+                if operation["op"] == "KEEP"
+                else [
+                    {
+                        "message_id": payload.current_message_id,
+                        "quote": bounded_evidence_quote(evidence_payload, operation["value"]),
+                    }
+                ]
+            )
+        return IntentContextModelOutput.model_validate(raw)
 
     async def _request(self, request_payload: dict) -> tuple[str, int, int]:
         try:
@@ -200,8 +285,10 @@ class LocalIntentContextProvider(IntentContextProvider):
             "top_k": 1,
             "seed": self._seed,
             "chat_template_kwargs": {"enable_thinking": False},
-            "response_format": {"type": "json_object"},
-            "json_schema": INTENT_OUTPUT_JSON_SCHEMA,
+            "response_format": {
+                "type": "json_object",
+                "schema": INTENT_OUTPUT_JSON_SCHEMA,
+            },
         }
         total_input = total_output = 0
         for attempt in range(2):
@@ -209,7 +296,8 @@ class LocalIntentContextProvider(IntentContextProvider):
             total_input += input_tokens
             total_output += output_tokens
             try:
-                output = IntentContextModelOutput.model_validate_json(raw)
+                compact = _CompactIntentOutput.model_validate_json(raw)
+                output = self._hydrate_model_output(compact, payload)
                 normalized, policy_actions = apply_intent_context_policy(
                     output.model_dump(mode="json"), user_payload
                 )
@@ -235,8 +323,8 @@ class LocalIntentContextProvider(IntentContextProvider):
                         {
                             "role": "user",
                             "content": (
-                                "Tạo lại đúng JSON schema. Chỉ dùng procedure candidate và "
-                                "evidence nguyên văn từ current_user_message."
+                                "Tạo lại đúng JSON schema rút gọn. Không thêm evidence hoặc "
+                                "giải thích. Chỉ chọn procedure trong procedure_candidates."
                             ),
                         },
                     ],

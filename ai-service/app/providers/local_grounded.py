@@ -314,7 +314,9 @@ class LocalGroundedProvider(GroundedProvider):
                         "content": (
                             "Hãy tạo lại đúng một JSON object theo schema. "
                             "Nếu status là ANSWER, cited_fragment_ids phải chứa ít nhất "
-                            "một fragment_id có trong EVIDENCE; không thêm ID mới."
+                            "một fragment_id có trong EVIDENCE; không thêm ID mới. "
+                            "Nếu status là INSUFFICIENT_DATA, cited_fragment_ids phải rỗng "
+                            "và missing_information phải nêu mục nguồn còn thiếu."
                         ),
                     },
                 ]

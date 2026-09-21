@@ -7,7 +7,8 @@
 Lộ trình sau nền tảng cơ bản: [Chiến lược dài hạn và chặng G5](lo-trinh-phat-trien-he-thong.md).
 Tài liệu này định hướng các chặng lớn; biên bản từng giai đoạn vẫn lưu kết quả thực tế.
 
-1. [Chỉ mục và kết quả Giai đoạn 5](giai-doan-5/README.md)
+1. [Phân công Minh/Tú: MCP thời gian thực và từ điển 38 thủ tục](phan-cong-minh-tu-mcp-dictionary.md)
+2. [Chỉ mục và kết quả Giai đoạn 5](giai-doan-5/README.md)
 2. [Biên bản nghiệm thu Giai đoạn 5](giai-doan-5/07-nghiem-thu-giai-doan-5.md)
 3. [Chiến lược triển khai từ nhỏ đến lớn](00-chien-luoc-trien-khai-tu-nho-den-lon.md)
 4. [Định hướng Giai đoạn 4](giai-doan-4/00-nghien-cuu-va-dinh-huong-g4.md)

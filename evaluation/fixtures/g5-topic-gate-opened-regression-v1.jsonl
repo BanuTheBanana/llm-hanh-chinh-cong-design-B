@@ -1,0 +1,7 @@
+{"case_id":"foreign-marriage-first","query":"Tôi muốn đăng ký kết hôn với người nước ngoài. Hồ sơ cần gì?","active_title":null,"expected_action":"SWITCH","expected_title":"Đăng ký kết hôn có yếu tố nước ngoài"}
+{"case_id":"foreign-marriage-inventory","query":"Tôi đã có CCCD, còn cần bổ sung gì?","active_title":"Đăng ký kết hôn có yếu tố nước ngoài","expected_action":"KEEP","expected_title":null}
+{"case_id":"new-ownership-term-outside-catalog","query":"Nhà tôi chưa hoàn công, tôi muốn xin cấp sổ nhà. Cần hồ sơ gì, nộp trực tuyến được không?","active_title":"Đăng ký kết hôn có yếu tố nước ngoài","expected_action":"CLARIFY","expected_title":null}
+{"case_id":"house-number-confirmed","query":"Tôi muốn xin cấp số nhà. Cần hồ sơ gì?","active_title":null,"expected_action":"SWITCH","expected_title":"HỒ SƠ CẤP SỐ NHÀ"}
+{"case_id":"birth-new-topic","query":"Tôi muốn đăng ký khai sinh, cần giấy tờ gì?","active_title":"HỒ SƠ CẤP SỐ NHÀ","expected_action":"SWITCH","expected_title":"Thủ tục đăng ký khai sinh"}
+{"case_id":"domestic-after-foreign-negation","query":"Tôi muốn đăng ký kết hôn, không có yếu tố nước ngoài.","active_title":"Đăng ký kết hôn có yếu tố nước ngoài","expected_action":"SWITCH","expected_title":"Thủ tục đăng ký kết hôn"}
+{"case_id":"same-procedure-followup","query":"Vậy nộp ở đâu và mất bao lâu?","active_title":"Thủ tục đăng ký khai sinh","expected_action":"KEEP","expected_title":null}

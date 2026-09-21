@@ -12,7 +12,11 @@ import pytest
 from app.rag.corpus import CorpusError
 from app.rag.g3.cli import main
 from app.rag.g3.retrieval import evaluate, retrieve
-from app.rag.g3.runtime import load_active_dataset, retrieve_active_dataset
+from app.rag.g3.runtime import (
+    load_active_dataset,
+    retrieve_active_dataset,
+    retrieve_direct_active_dataset,
+)
 from app.rag.g3.validator import FILES, SECTIONS, digest, load, load_serving
 from app.rag.schemas import RetrievalInput
 
@@ -167,6 +171,52 @@ def test_runtime_projects_private_dataset_without_internal_locator(dataset):
     projection = bundle.model_dump(mode="json")
     assert "source_uri" not in str(projection)
     assert "source_locator" not in str(projection)
+
+
+def test_direct_catalog_projects_bound_field_without_ranking(dataset):
+    data = load_serving(dataset, VERSION, 2)
+    bundle, status, missing = retrieve_direct_active_dataset(
+        data,
+        RetrievalInput(
+            query="câu chữ không cần khớp dữ liệu",
+            field_intents=["fees"],
+            filters={"procedure_id": "fictional-alpha"},
+            acquisition_mode="direct_catalog",
+        ),
+        uuid4(),
+    )
+
+    assert status == "ANSWER" and missing == []
+    assert [item.fragment_id for item in bundle.evidence] == ["frag-alpha"]
+    assert bundle.evidence[0].metadata["acquisition"] == "direct_catalog"
+    projection = bundle.model_dump(mode="json")
+    assert "source_locator" not in str(projection)
+    assert "source_uri" not in str(projection)
+
+
+@pytest.mark.parametrize(
+    ("procedure_id", "fields", "status", "missing"),
+    [
+        (None, ["fees"], "NEED_CLARIFICATION", ["procedure_id"]),
+        ("fictional-alpha", [], "NEED_CLARIFICATION", ["field_intents"]),
+        ("fictional-alpha", ["steps"], "INSUFFICIENT_DATA", ["steps"]),
+    ],
+)
+def test_direct_catalog_fails_closed(dataset, procedure_id, fields, status, missing):
+    data = load_serving(dataset, VERSION, 2)
+    bundle, actual_status, actual_missing = retrieve_direct_active_dataset(
+        data,
+        RetrievalInput(
+            query="kiểm tra",
+            field_intents=fields,
+            filters={"procedure_id": procedure_id},
+            acquisition_mode="direct_catalog",
+        ),
+        uuid4(),
+    )
+    assert actual_status == status
+    assert actual_missing == missing
+    assert bundle.evidence == []
 
 
 def test_runtime_rejects_a_changed_corpus_under_the_same_version(dataset):

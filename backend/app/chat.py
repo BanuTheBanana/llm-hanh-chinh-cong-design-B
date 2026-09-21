@@ -12,17 +12,21 @@ from app.config import get_settings
 from app.db import engine
 from app.errors import APIError
 from app.models import Conversation, Message, utcnow
+from app.rag.catalog_policy import needs_realtime_offer
 from app.rag.corpus import CorpusError
 from app.rag.g3.runtime import load_active_dataset
 from app.rag.g4.context import prepare_turn
 from app.rag.g5.intent_context import (
+    IntentContextState,
     load_context,
     merge_legacy_context,
     model_state,
     prepare_model_turn,
     procedure_candidates,
+    record_grounded_turn,
     to_legacy_context,
 )
+from app.rag.g5.topic_gate import decide_topic
 from app.rag.grounding import answer_with_rag
 from app.rag.schemas import Filters, RetrievalInput
 from app.schemas import MessageInput, MessagePair
@@ -172,6 +176,12 @@ async def send_message(
                         if settings.g5_intent_context_enabled:
                             candidates = procedure_candidates(data)
                             try:
+                                topic_decision = await decide_topic(
+                                    data,
+                                    body.content,
+                                    previous_model.procedure_id,
+                                    ai.hybrid_router if settings.g5_hybrid_enabled else None,
+                                )
                                 intent_output = await ai.analyze_intent_context(
                                     request_id=request_id,
                                     current_message_id=user_message.id,
@@ -186,6 +196,14 @@ async def send_message(
                                     previous_model,
                                     intent_output,
                                     message_id=str(user_message.id),
+                                    topic_decision=topic_decision,
+                                    evidence_mode=settings.g8_evidence_mode,
+                                )
+                                logger.info(
+                                    "topic_gate request_id=%s action=%s reason=%s",
+                                    request_id,
+                                    topic_decision.action,
+                                    topic_decision.reason,
                                 )
                             except (APIError, ValueError, ValidationError) as exc:
                                 if not settings.g5_intent_context_fallback_enabled:
@@ -245,6 +263,23 @@ async def send_message(
                         request_id,
                         ai,
                     )
+                    if (
+                        isinstance(next_context, IntentContextState)
+                        and grounding
+                        and needs_realtime_offer(
+                            next_context.procedure_id,
+                            {
+                                item.get("field")
+                                for item in grounding.get("checklist") or []
+                                if isinstance(item, dict) and item.get("field")
+                            },
+                        )
+                    ):
+                        answer += (
+                            "\n\nBạn có muốn kiểm tra thông tin hiện tại trên Cổng Dịch vụ "
+                            "công Quốc gia không? Chức năng đối chiếu thời gian thực sẽ được "
+                            "kết nối qua MCP ở bước tiếp theo."
+                        )
             else:
                 answer = await ai.generate(
                     request_id,
@@ -255,6 +290,13 @@ async def send_message(
             conversation.updated_at = utcnow()
             await db.commit()
             raise
+        if isinstance(next_context, IntentContextState):
+            next_context = record_grounded_turn(
+                next_context,
+                user_query=body.content,
+                message_id=str(user_message.id),
+                grounding=grounding,
+            )
         if next_context is not None:
             conversation.rag_context = next_context.model_dump(mode="json")
         user_message.status = "completed"

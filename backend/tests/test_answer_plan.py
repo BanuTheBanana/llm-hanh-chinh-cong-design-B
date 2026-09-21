@@ -128,6 +128,83 @@ def test_verbatim_passes_and_preserves_conditions():
     assert plan_citations(plan) == ["f1"]
 
 
+def test_reviewed_full_corpus_sft_format_passes_without_weakening_claim_check():
+    b = bundle()
+    answer = "Theo ngu\u1ed3n \u0111\u00e3 duy\u1ec7t:\n- " + b.evidence[0].text
+    assert verify_candidate(plan_for(b), candidate(b, answer=answer)) == []
+
+
+def test_single_field_render_is_direct_and_conversational():
+    text = render_plan(plan_for(bundle()))
+    assert text.startswith("Lệ phí theo nguồn đã duyệt là:")
+    assert bundle().evidence[0].text in text
+
+
+def test_document_followup_acknowledges_existing_identity_document_safely():
+    b = bundle(section="REQUIRED_DOCUMENTS")
+    b.evidence[0].text = (
+        "CCCD của cả hai vợ chồng (01 bản photo); Giấy chứng sinh (bản chính)."
+    )
+    plan = build_answer_plan(
+        b,
+        fields=["required_documents"],
+        field_evidence={"required_documents": ["f1"]},
+    )
+
+    text = render_plan(plan, query="Tôi có CCCD rồi, cần bổ sung gì nữa?")
+
+    assert text.startswith("Giấy tờ tùy thân bạn nêu có trong thành phần hồ sơ")
+    assert b.evidence[0].text in text
+
+
+def test_document_followup_acknowledges_marriage_certificate_from_source():
+    b = bundle(section="REQUIRED_DOCUMENTS")
+    b.evidence[0].text = "Giấy chứng nhận kết hôn (01 bản photo)."
+    plan = build_answer_plan(
+        b,
+        fields=["required_documents"],
+        field_evidence={"required_documents": ["f1"]},
+    )
+
+    text = render_plan(plan, query="Tôi có giấy chứng nhận kết hôn, có được tính không?")
+
+    assert text.startswith("Giấy chứng nhận kết hôn bạn nêu có trong thành phần hồ sơ")
+    assert b.evidence[0].text in text
+
+
+def test_online_original_followup_combines_both_sources_without_inventing_timing():
+    b = bundle(
+        text="Giấy chứng sinh (bản chính, xuất trình để đối chiếu).",
+        section="REQUIRED_DOCUMENTS",
+    )
+    b.query = "Nếu tôi nộp onl thì vẫn phải mang bản chính tới đối chiếu à?"
+    b.evidence.append(
+        Evidence(
+            fragment_id="f2",
+            source_id="s2",
+            procedure_id="p1",
+            section_type="SUBMISSION_METHODS",
+            title="Fixture",
+            url=None,
+            text="Cả trực tiếp và trực tuyến.",
+            score=1,
+            metadata={},
+        )
+    )
+    plan = build_answer_plan(
+        b,
+        fields=["required_documents", "submission_methods"],
+        field_evidence={"required_documents": ["f1"], "submission_methods": ["f2"]},
+    )
+
+    text = render_plan(plan, query=b.query)
+
+    assert "Cả trực tiếp và trực tuyến." in text
+    assert "Giấy chứng sinh (bản chính, xuất trình để đối chiếu)." in text
+    assert "chưa nêu rõ thời điểm hoặc cách đối chiếu bản chính" in text
+    assert plan_citations(plan) == ["f1", "f2"]
+
+
 def test_wrong_field_and_missing_manifest_abstain():
     b = bundle(section="REQUIRED_DOCUMENTS")
     assert plan_for(b).status == "INSUFFICIENT_DATA"

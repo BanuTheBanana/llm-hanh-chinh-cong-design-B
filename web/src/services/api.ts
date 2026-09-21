@@ -30,12 +30,27 @@ export class ApiError extends Error {
   }
 }
 
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1'])
+
+export function resolveApiBaseUrl(configuredValue: string, pageUrl: string) {
+  const configured = new URL(configuredValue)
+  const page = new URL(pageUrl)
+  if (
+    LOOPBACK_HOSTS.has(configured.hostname) &&
+    LOOPBACK_HOSTS.has(page.hostname) &&
+    configured.hostname !== page.hostname
+  ) {
+    configured.hostname = page.hostname
+  }
+  return configured.toString().replace(/\/$/, '')
+}
+
 function getApiBaseUrl() {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/$/, '')
   if (!apiBaseUrl) {
     throw new Error('Thiếu VITE_API_BASE_URL. Hãy cấu hình URL của Core Backend.')
   }
-  return apiBaseUrl
+  return resolveApiBaseUrl(apiBaseUrl, window.location.href)
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {

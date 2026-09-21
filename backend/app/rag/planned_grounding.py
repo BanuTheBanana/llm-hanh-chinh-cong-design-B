@@ -105,4 +105,4 @@ async def answer_with_plan(client, bundle, data, *, fields=None, field_evidence=
         verification.fallback_used,
         ",".join(reasons),
     )
-    return render_plan(plan), grounding.model_dump(mode="json")
+    return render_plan(plan, query=bundle.query), grounding.model_dump(mode="json")

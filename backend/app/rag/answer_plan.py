@@ -24,7 +24,29 @@ LABELS = {
     "legal_bases": "Căn cứ pháp lý",
     "applicant_scope": "Đối tượng thực hiện",
 }
-PREFIX = "Theo nguồn nội bộ đã duyệt cho demo:"
+PREFIX = "Mình đã đối chiếu nguồn đã duyệt. Các thông tin bạn cần như sau:"
+SINGLE_FIELD_INTROS = {
+    "required_documents": "Nếu bạn đang kiểm tra hồ sơ, nguồn đã duyệt yêu cầu các giấy tờ sau:",
+    "fees": "Lệ phí theo nguồn đã duyệt là:",
+    "processing_times": "Thời gian giải quyết theo nguồn đã duyệt là:",
+    "receiving_authority": "Nơi tiếp nhận hồ sơ theo nguồn đã duyệt là:",
+    "submission_methods": "Hình thức nộp theo nguồn đã duyệt là:",
+    "steps": "Trình tự thực hiện theo nguồn đã duyệt gồm:",
+    "legal_bases": "Căn cứ pháp lý theo nguồn đã duyệt gồm:",
+    "applicant_scope": "Đối tượng thực hiện theo nguồn đã duyệt là:",
+}
+DOCUMENT_MENTIONS = (
+    (
+        ("cccd", "can cuoc cong dan", "cmnd", "chung minh nhan dan", "ho chieu"),
+        "Giấy tờ tùy thân bạn nêu",
+    ),
+    (("giay chung sinh",), "Giấy chứng sinh bạn nêu"),
+    (("giay chung nhan ket hon",), "Giấy chứng nhận kết hôn bạn nêu"),
+    (
+        ("giay to chung minh thong tin cu tru", "thong bao dang ky tam tru"),
+        "Giấy tờ cư trú bạn nêu",
+    ),
+)
 
 
 class PlannedClaim(Strict):
@@ -113,15 +135,51 @@ def requested_fields(query: str, *, procedure_titles=()) -> list[str]:
     return [field for field, matched in flags.items() if matched]
 
 
-def render_plan(plan: AnswerPlan) -> str:
+def render_plan(plan: AnswerPlan, *, query: str = "") -> str:
     if plan.status == "NEED_CLARIFICATION":
         return "Bạn muốn biết hồ sơ, lệ phí, thời gian hay nơi nộp của thủ tục này?"
     if plan.status != "ANSWER":
         labels = ", ".join(LABELS.get(field, field) for field in plan.missing_fields)
         suffix = f" ({labels})" if labels else ""
         return f"Chưa đủ căn cứ từ nguồn phù hợp để trả lời đầy đủ{suffix}."
+    if len(plan.claims) == 1:
+        claim = plan.claims[0]
+        normalized_query = normalize(query)
+        normalized_value = normalize(claim.value)
+        if claim.field == "required_documents":
+            for phrases, label in DOCUMENT_MENTIONS:
+                if any(phrase in normalized_query for phrase in phrases) and any(
+                    phrase in normalized_value for phrase in phrases
+                ):
+                    return (
+                        f"{label} có trong thành phần hồ sơ theo nguồn đã duyệt. "
+                        "Bạn vẫn cần đối chiếu các điều kiện và giấy tờ còn lại "
+                        "trong danh sách đầy đủ dưới đây:\n"
+                        + claim.value
+                    )
+        return f"{SINGLE_FIELD_INTROS[claim.field]}\n{claim.value}"
+    normalized_query = normalize(query)
+    claim_by_field = {claim.field: claim for claim in plan.claims}
+    online_original_question = (
+        set(claim_by_field) == {"required_documents", "submission_methods"}
+        and any(term in normalized_query for term in ("onl", "online", "truc tuyen", "qua mang"))
+        and any(term in normalized_query for term in ("ban chinh", "doi chieu", "xuat trinh"))
+    )
+    if online_original_question:
+        submission = claim_by_field["submission_methods"]
+        documents = claim_by_field["required_documents"]
+        return (
+            "Theo nguồn đã duyệt:\n\n"
+            f"{LABELS[submission.field]}:\n{submission.value}\n\n"
+            f"{LABELS[documents.field]}:\n{documents.value}\n\n"
+            "Nguồn hiện chỉ xác nhận hai nội dung trên, chưa nêu rõ thời điểm hoặc cách "
+            "đối chiếu bản chính đối với hồ sơ nộp trực tuyến. Vì vậy chưa đủ căn cứ để "
+            "khẳng định bạn phải mang bản chính ngay khi nộp trực tuyến."
+        )
     return (
-        PREFIX + "\n" + "\n".join(f"{LABELS[claim.field]}: {claim.value}" for claim in plan.claims)
+        PREFIX
+        + "\n\n"
+        + "\n\n".join(f"{LABELS[claim.field]}:\n{claim.value}" for claim in plan.claims)
     )
 
 
@@ -216,6 +274,10 @@ def verify_candidate(plan: AnswerPlan, answer: GroundedAnswer) -> list[str]:
         errors.append("CLAIM_CITATIONS_INCOMPLETE")
     values = [claim.value for claim in plan.claims]
     alternatives = [render_plan(plan), "\n".join(values), "\n".join("- " + v for v in values)]
+    # Exact answer form used by the reviewed full-corpus SFT bundle. Claim text
+    # remains verbatim; status and citation binding are checked above.
+    trained_prefix = "Theo ngu\u1ed3n \u0111\u00e3 duy\u1ec7t:"
+    alternatives.append(trained_prefix + "\n" + "\n".join("- " + v for v in values))
     alternatives.append(
         "Theo nguồn đã duyệt (chế độ trích xuất an toàn):\n" + "\n".join("- " + v for v in values)
     )

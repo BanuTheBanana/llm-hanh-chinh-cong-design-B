@@ -149,6 +149,7 @@ def test_context_refresh_provenance_switch_and_isolation(g4_data):
         ("Tôi muốn hỏi rõ thêm chính xác phải chuẩn bị những giấy tờ gì?", "required_documents"),
         ("Vậy bạn cho tôi biết cụ thể mức lệ phí cần nộp?", "fees"),
         ("Còn thời gian giải quyết chi tiết là bao lâu?", "processing_times"),
+        ("Có gửi hồ sơ qua mạng được không?", "submission_methods"),
     ],
 )
 def test_polite_verbose_followup_keeps_active_procedure(g4_data, followup, field):

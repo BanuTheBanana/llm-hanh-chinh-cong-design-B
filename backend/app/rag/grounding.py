@@ -8,7 +8,11 @@ from pydantic import ValidationError
 from app.config import get_settings
 from app.errors import APIError
 from app.rag.corpus import CorpusError
-from app.rag.g3.runtime import load_active_dataset, retrieve_active_dataset
+from app.rag.g3.runtime import (
+    load_active_dataset,
+    retrieve_active_dataset,
+    retrieve_direct_active_dataset,
+)
 from app.rag.retrieval import retrieve
 from app.rag.schemas import (
     Citation,
@@ -136,9 +140,14 @@ async def _answer_with_rag(db, query: RetrievalInput, request_id, ai):
                 settings.g3_expected_rows,
                 settings.g3_corpus_sha256,
             )
-            bundle, retrieval_status, missing_fields = retrieve_active_dataset(
-                data, query, request_id
-            )
+            if query.acquisition_mode == "direct_catalog":
+                bundle, retrieval_status, missing_fields = retrieve_direct_active_dataset(
+                    data, query, request_id
+                )
+            else:
+                bundle, retrieval_status, missing_fields = retrieve_active_dataset(
+                    data, query, request_id
+                )
             corpus_version = data.version
         else:
             corpus = await load_corpus(db, settings.rag_corpus_version, settings.rag_allow_fixtures)
@@ -155,8 +164,9 @@ async def _answer_with_rag(db, query: RetrievalInput, request_id, ai):
         raise APIError(503, "RAG_CORPUS_UNAVAILABLE", "Corpus RAG chưa sẵn sàng.") from exc
     await db.commit()  # Release transaction before external generation.
     logger.info(
-        "request_id=%s stage=retrieval latency_ms=%.3f hits=%s",
+        "request_id=%s stage=retrieval mode=%s latency_ms=%.3f hits=%s",
         request_id,
+        query.acquisition_mode,
         (time.perf_counter() - started) * 1000,
         len(bundle.evidence),
     )

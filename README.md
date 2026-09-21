@@ -121,7 +121,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
 
 ## Tài liệu trung tâm
 
-1. [Nghiệm thu Giai đoạn 5](docs/giai-doan-5/07-nghiem-thu-giai-doan-5.md)
+1. [Phân công Minh/Tú: MCP thời gian thực và từ điển 38 thủ tục](docs/phan-cong-minh-tu-mcp-dictionary.md)
+2. [Nghiệm thu Giai đoạn 5](docs/giai-doan-5/07-nghiem-thu-giai-doan-5.md)
 2. [Lộ trình phát triển dài hạn](docs/lo-trinh-phat-trien-he-thong.md)
 3. [Chiến lược từ nhỏ đến lớn](docs/00-chien-luoc-trien-khai-tu-nho-den-lon.md)
 4. [Chiến lược và phân công Giai đoạn 3](docs/giai-doan-3/03-chien-luoc-va-phan-cong-giai-doan-3.md)
@@ -170,11 +171,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
 
 | Vai trò | Branch |
 |---|---|
-| Bản chính đã hoàn tất G1 | `main`, tag `g1-v1.0.0` |
+| Baseline tích hợp G5 hiện tại | `main` (G1 được lưu tại tag `g1-v1.0.0`) |
 | Bản G2 synthetic đã nghiệm thu | `g2/integration`, phát hành bằng tag `g2-v1.0.0` |
 | Nền tảng G3 đã hoàn tất, chờ merge | `g3/integration` |
 | G4 đã tích hợp, giữ kết quả gate lịch sử | `g4/integration` |
-| G5 limited-release candidate | `g5/integration` |
+| Lịch sử tích hợp G5 trước khi đưa lên main | `g5/integration` |
 | AI/evaluation G2 của Hoan | `g2/ai-eval-hoan` |
 | Nhánh dữ liệu Tú đã nhập | `data/frontend-tu` |
 | Nhánh RAG Minh đã nhập | `Minh-RAG_test` |

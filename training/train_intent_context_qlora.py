@@ -55,13 +55,31 @@ def load_cases(directory: Path, expected_split: str) -> tuple[list[dict], dict, 
     cases = [json.loads(line) for line in cases_path.read_text(encoding="utf-8").splitlines()]
     if len(cases) != manifest["case_count"]:
         raise SystemExit(f"{expected_split}_COUNT_MISMATCH")
-    if manifest.get("contains_company_data") is not False:
-        raise SystemExit(f"{expected_split}_PILOT_MUST_BE_D0")
+    cases_sha = sha256(cases_path)
+    if manifest.get("content_sha256") not in (None, cases_sha):
+        raise SystemExit(f"{expected_split}_CONTENT_HASH_MISMATCH")
+    contains_company_data = manifest.get("contains_company_data") is True
+    if contains_company_data:
+        if (
+            manifest.get("classification") != "D2_COMPANY_REAL_LOCAL_TRAINING"
+            or manifest.get("local_use_only") is not True
+            or manifest.get("source_corpus_version") is None
+            or manifest.get("source_corpus_sha256") is None
+            or manifest.get("review_status") != "GENERATED_VALIDATED_LOCAL"
+            or manifest.get("final_test") is not False
+        ):
+            raise SystemExit(f"{expected_split}_D2_GOVERNANCE_INVALID")
+    elif manifest.get("contains_company_data") is not False:
+        raise SystemExit(f"{expected_split}_DATA_CLASSIFICATION_REQUIRED")
     if expected_split == "TRAIN" and manifest.get("split") != "TRAIN":
         raise SystemExit("TRAIN_SPLIT_REQUIRED")
-    if expected_split == "DEV" and manifest.get("final_test") is not False:
+    if expected_split == "DEV" and (
+        manifest.get("split") != "DEV" or manifest.get("final_test") is not False
+    ):
         raise SystemExit("DEV_MUST_NOT_BE_FINAL_TEST")
-    return cases, manifest, sha256(cases_path)
+    if any(row.get("split", expected_split) != expected_split for row in cases):
+        raise SystemExit(f"{expected_split}_CASE_SPLIT_INVALID")
+    return cases, manifest, cases_sha
 
 
 def input_ids(value) -> list[int]:

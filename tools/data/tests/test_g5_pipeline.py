@@ -1,6 +1,8 @@
 import hashlib
 import json
 
+import pytest
+
 from g3_pipeline.common import write_jsonl
 from g5_pipeline.scope import audit_scope
 from g5_pipeline.sft import build_sft_bundle, validate_sft_bundle
@@ -140,3 +142,36 @@ def test_sft_validator_detects_cross_split_leakage(tmp_path):
     )
     report = validate_sft_bundle(output)
     assert report["errors"]["PROCEDURE_SPLIT_LEAKAGE"] == 1
+
+
+def test_sft_builder_rejects_corpus_scenario_version_mismatch(tmp_path):
+    dataset, dev = _fixture(tmp_path)
+    rows = [json.loads(line) for line in dev.read_text(encoding="utf-8").splitlines()]
+    rows[0]["dataset_version"] = "different-release-v1"
+    write_jsonl(dev, rows, "scenario_id")
+
+    with pytest.raises(ValueError, match="G5_SFT_DATASET_VERSION_MISMATCH"):
+        build_sft_bundle(dataset, dev, tmp_path / "bundle", variants=1)
+
+
+def test_sft_validator_accepts_valid_abstention_target(tmp_path):
+    dataset, dev = _fixture(tmp_path)
+    output = tmp_path / "bundle"
+    build_sft_bundle(dataset, dev, output, variants=1)
+    validation_path = output / "validation.jsonl"
+    rows = [json.loads(line) for line in validation_path.read_text(encoding="utf-8").splitlines()]
+    rows[0]["target"] = {
+        "answer": "Nguồn đã duyệt chưa cung cấp thông tin này.",
+        "status": "INSUFFICIENT_DATA",
+        "cited_fragment_ids": [],
+        "missing_information": [rows[0]["field"]],
+    }
+    write_jsonl(validation_path, rows, "example_id")
+    manifest_path = output / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["files"]["validation"]["sha256"] = hashlib.sha256(
+        validation_path.read_bytes()
+    ).hexdigest()
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    assert validate_sft_bundle(output)["status"] == "PASS"

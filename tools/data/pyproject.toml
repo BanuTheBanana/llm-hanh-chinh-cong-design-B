@@ -21,6 +21,7 @@ hcc-validate-g4-evaluation = "g3_pipeline.g4_tu_validator:main"
 hcc-lock-g4-evaluation = "g3_pipeline.g4_tu_review:main"
 hcc-audit-g5-scope = "g5_pipeline.scope:main"
 hcc-build-g5-sft = "g5_pipeline.sft:main"
+hcc-build-full-corpus-sft = "g5_pipeline.full_corpus_sft:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

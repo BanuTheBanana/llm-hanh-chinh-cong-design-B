@@ -94,6 +94,10 @@ def build_sft_bundle(dataset_dir: Path, dev_path: Path, output_dir: Path, *, var
     source_by_id = {row["source_id"]: row for row in sources}
     procedure_by_id = {row["procedure_id"]: row for row in procedures}
     fragment_by_id = {row["fragment_id"]: row for row in fragments}
+    corpus_versions = {row.get("dataset_version") for row in [*sources, *procedures, *fragments]}
+    scenario_versions = {row.get("dataset_version") for row in scenarios}
+    if len(corpus_versions) != 1 or scenario_versions != corpus_versions:
+        raise ValueError("G5_SFT_DATASET_VERSION_MISMATCH")
     procedure_ids = sorted({row["procedure_id"] for row in scenarios})
     if len(procedure_ids) < 3:
         raise ValueError("G5_SFT_PROCEDURE_SPLIT_TOO_SMALL")
@@ -229,8 +233,13 @@ def validate_sft_bundle(bundle_dir: Path) -> dict[str, Any]:
             target = row.get("target", {})
             evidence_ids = {item.get("fragment_id") for item in evidence}
             cited = target.get("cited_fragment_ids", [])
-            if not cited or not set(cited) <= evidence_ids:
+            status = target.get("status")
+            if status == "ANSWER" and (not cited or not set(cited) <= evidence_ids):
                 errors["TARGET_CITATION_INVALID"] += 1
+            elif status == "INSUFFICIENT_DATA" and (cited or not target.get("missing_information")):
+                errors["TARGET_ABSTENTION_INVALID"] += 1
+            elif status not in {"ANSWER", "INSUFFICIENT_DATA"}:
+                errors["TARGET_STATUS_INVALID"] += 1
             if row.get("review", {}).get("status") != "APPROVED":
                 errors["ROW_NOT_REVIEWED"] += 1
     ids = [row.get("example_id") for values in rows.values() for row in values]
@@ -240,6 +249,9 @@ def validate_sft_bundle(bundle_dir: Path) -> dict[str, Any]:
     validation_procedures = {row.get("procedure_id") for row in rows["VALIDATION"]}
     if train_procedures & validation_procedures:
         errors["PROCEDURE_SPLIT_LEAKAGE"] += 1
+    row_versions = {row.get("dataset_version") for values in rows.values() for row in values}
+    if row_versions != {manifest.get("dataset_version")}:
+        errors["DATASET_VERSION_MISMATCH"] += 1
     if manifest.get("test_data_used") is not False:
         errors["TEST_DATA_PROHIBITED"] += 1
     return {

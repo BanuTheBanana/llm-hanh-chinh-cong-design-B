@@ -22,7 +22,9 @@ from app.schemas import IntentContextModelOutput, IntentContextRequest
 
 
 def request_body(*, classification="D0_SYSTEM_SMOKE"):
-    message = "Đăng ký khai sinh có mất phí không?"
+    # Keep this transport fixture outside deterministic field fast paths so tests
+    # below exercise model request/response validation rather than routing policy.
+    message = "Tôi muốn hỏi thông tin về đăng ký khai sinh."
     return {
         "request_id": str(uuid4()),
         "current_message_id": str(uuid4()),
@@ -41,17 +43,15 @@ def request_body(*, classification="D0_SYSTEM_SMOKE"):
 
 
 def model_output(body, *, procedure="p_birth"):
-    message = body["current_user_message"]
-    evidence = [{"message_id": body["current_message_id"], "quote": message}]
     return {
-        "schema_version": "g5-intent-context-v2",
+        "schema_version": "g5-intent-context-compact-v1",
         "dialogue_act": "ASK_INFORMATION",
         "topic_action": "SWITCH",
         "patch": {
-            "procedure_id": {"op": "SET", "value": procedure, "evidence": evidence},
-            "field_intents": {"op": "SET", "value": ["fees"], "evidence": evidence},
-            "jurisdiction": {"op": "KEEP", "value": None, "evidence": []},
-            "as_of": {"op": "KEEP", "value": None, "evidence": []},
+            "procedure_id": {"op": "SET", "value": procedure},
+            "field_intents": {"op": "SET", "value": ["fees"]},
+            "jurisdiction": {"op": "KEEP", "value": None},
+            "as_of": {"op": "KEEP", "value": None},
         },
     }
 
@@ -97,7 +97,11 @@ async def test_local_provider_sends_deterministic_constrained_request(provider_f
         assert payload["top_k"] == 1
         assert payload["seed"] == 42
         assert payload["chat_template_kwargs"] == {"enable_thinking": False}
-        assert payload["json_schema"] == INTENT_OUTPUT_JSON_SCHEMA
+        assert payload["response_format"] == {
+            "type": "json_object",
+            "schema": INTENT_OUTPUT_JSON_SCHEMA,
+        }
+        assert "json_schema" not in payload
         return httpx.Response(200, json=completion(model_output(body)))
 
     result = await provider_factory(handler).analyze(IntentContextRequest.model_validate(body))
@@ -124,6 +128,57 @@ async def test_high_confidence_route_skips_the_model(provider_factory):
     assert result.output_tokens == 0
     assert result.policy_actions == ("DETERMINISTIC_HIGH_CONFIDENCE_ROUTE",)
     assert calls == 0
+
+
+async def test_realistic_multifield_story_skips_model_and_returns_all_fields(provider_factory):
+    body = request_body()
+    body["current_user_message"] = (
+        "Tôi đang ở phường Tăng Nhơn Phú, vừa có con và muốn đăng ký khai sinh. "
+        "Tôi muốn biết cần chuẩn bị giấy tờ gì, có nộp trực tuyến được không, "
+        "nộp ở đâu, mất bao lâu và có phải đóng lệ phí không?"
+    )
+    calls = 0
+
+    def handler(_request):
+        nonlocal calls
+        calls += 1
+        return httpx.Response(500)
+
+    result = await provider_factory(handler).analyze(IntentContextRequest.model_validate(body))
+
+    assert result.output.patch.procedure_id.value == "p_birth"
+    assert result.output.patch.field_intents.value == [
+        "fees",
+        "processing_times",
+        "receiving_authority",
+        "required_documents",
+        "submission_methods",
+    ]
+    assert result.output.patch.jurisdiction.op == "KEEP"
+    assert result.input_tokens == 0
+    assert result.output_tokens == 0
+    assert result.policy_actions == (
+        "DETERMINISTIC_HIGH_CONFIDENCE_ROUTE",
+        "INCIDENTAL_LOCATION_NOT_USED_AS_LEGAL_FILTER",
+    )
+    assert calls == 0
+
+
+async def test_model_path_hydrates_bounded_literal_evidence_for_long_message(provider_factory):
+    body = request_body()
+    body["current_user_message"] = (
+        "Tôi xin trình bày thêm hoàn cảnh để cơ quan có thể hiểu đúng yêu cầu. " * 7
+        + "Liệu việc này có phát sinh khoản nào không?"
+    )
+
+    def handler(_request):
+        return httpx.Response(200, json=completion(model_output(body)))
+
+    result = await provider_factory(handler).analyze(IntentContextRequest.model_validate(body))
+
+    for slot in (result.output.patch.procedure_id, result.output.patch.field_intents):
+        assert len(slot.evidence[0].quote) <= 300
+        assert slot.evidence[0].quote in body["current_user_message"]
 
 
 async def test_unknown_procedure_is_retried_once_then_rejected(provider_factory):
@@ -207,9 +262,20 @@ class StubIntentProvider(IntentContextProvider):
     allowed_data_classifications = frozenset({"D0_SYSTEM_SMOKE"})
 
     async def analyze(self, payload):
-        output = IntentContextModelOutput.model_validate(
-            model_output(payload.model_dump(mode="json"))
-        )
+        raw = model_output(payload.model_dump(mode="json"))
+        raw["schema_version"] = "g5-intent-context-v2"
+        for operation in raw["patch"].values():
+            operation["evidence"] = (
+                []
+                if operation["op"] == "KEEP"
+                else [
+                    {
+                        "message_id": payload.current_message_id,
+                        "quote": payload.current_user_message,
+                    }
+                ]
+            )
+        output = IntentContextModelOutput.model_validate(raw)
         return IntentContextGenerationResult(output, self.name, self.model_name, 10, 5)
 
 

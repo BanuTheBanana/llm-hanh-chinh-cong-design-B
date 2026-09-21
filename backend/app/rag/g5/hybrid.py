@@ -9,6 +9,7 @@ from urllib.parse import urlsplit
 
 import httpx
 
+from app.rag.catalog_policy import is_serving_candidate
 from app.rag.g3.retrieval import bm25, procedure_names, routing_query
 from app.rag.retrieval import normalize
 
@@ -113,7 +114,11 @@ class HybridProcedureRouter:
         return sum(a * b for a, b in zip(left, right)) / denominator if denominator else 0.0
 
     async def _documents(self, data) -> tuple[list[str], list[str], list[list[float]]]:
-        procedure_ids = sorted(data.procedures)
+        procedure_ids = sorted(
+            procedure_id
+            for procedure_id in data.procedures
+            if is_serving_candidate(procedure_id)
+        )
         texts = [
             " | ".join(
                 [

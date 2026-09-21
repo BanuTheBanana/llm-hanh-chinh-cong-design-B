@@ -2,14 +2,46 @@
 
 from __future__ import annotations
 
+import re
 from datetime import date
 from typing import Literal
 
 from pydantic import Field, model_validator
 
-from app.rag.g3.retrieval import retrieve
+from app.rag.catalog_policy import is_serving_candidate, preferred_procedure_id
+from app.rag.g3.retrieval import fields_for_query, normalize, retrieve
 from app.rag.g4.context import ConversationContext
+from app.rag.g5.topic_gate import TopicDecision
 from app.rag.schemas import ID, Filters, RetrievalInput, Scope, Strict, Text
+
+ALL_FIELDS_REQUEST = re.compile(
+    r"\b(?:tat ca moi thu|tat ca cac muc|toan bo thong tin|cho (?:toi|minh) xem het|hoi het)\b"
+)
+CONFIRMATION_REQUEST = re.compile(
+    r"\b(?:vay la|co dung (?:khong|ko)|dung (?:khong|ko)|phai (?:khong|ko)|"
+    r"thoi (?:ha|a)|chinh xac (?:khong|ko))\b"
+)
+REMAINING_REQUEST = re.compile(
+    r"\b(?:con gi nua|con thieu gi|can bo sung gi|nhung gi con lai|muc con lai)\b"
+)
+POSSESSION_SIGNAL = re.compile(r"\b(?:(?:toi|minh|em|anh|chi) (?:da )?co|da chuan bi|co san)\b")
+DOCUMENT_FACTS = {
+    "identity_document": ("cccd", "can cuoc cong dan", "cmnd", "chung minh nhan dan"),
+    "passport": ("ho chieu",),
+    "birth_certificate": ("giay chung sinh",),
+    "marriage_certificate": ("giay chung nhan ket hon",),
+    "residence_proof": ("giay to cu tru", "thong bao dang ky tam tru"),
+}
+FIELD_ORDER = (
+    "receiving_authority",
+    "required_documents",
+    "fees",
+    "processing_times",
+    "submission_methods",
+    "steps",
+    "legal_bases",
+    "applicant_scope",
+)
 
 FieldIntent = Literal[
     "receiving_authority",
@@ -109,7 +141,82 @@ class IntentContextState(Strict):
     ) = None
     source_message_ids: dict[str, ID] = Field(default_factory=dict)
     applied_message_ids: list[ID] = Field(default_factory=list, max_length=64)
+    # Backend-owned episodic memory. These fields are never trusted model output.
+    # They are derived from successful grounded answers and explicit user statements.
+    last_answered_fields: list[FieldIntent] = Field(default_factory=list, max_length=8)
+    last_answered_fragment_ids: list[ID] = Field(default_factory=list, max_length=8)
+    known_documents: list[ID] = Field(default_factory=list, max_length=16)
+    last_turn_mode: Literal["STANDARD", "CONFIRM_CLAIM", "ASK_REMAINING", "DOCUMENT_INVENTORY"] = (
+        "STANDARD"
+    )
     revision: int = Field(default=0, ge=0, strict=True)
+
+
+def _contains_phrase(text: str, phrase: str) -> bool:
+    return f" {phrase} " in f" {text} "
+
+
+def _document_facts_from_user(query: str) -> list[str]:
+    """Extract only explicitly possessed documents; questions never establish facts."""
+
+    normalized = normalize(query)
+    if not POSSESSION_SIGNAL.search(normalized):
+        return []
+    return [
+        canonical
+        for canonical, phrases in DOCUMENT_FACTS.items()
+        if any(_contains_phrase(normalized, phrase) for phrase in phrases)
+    ]
+
+
+def _turn_mode(query: str, *, document_facts: list[str]) -> str:
+    normalized = normalize(query)
+    if CONFIRMATION_REQUEST.search(normalized):
+        return "CONFIRM_CLAIM"
+    if REMAINING_REQUEST.search(normalized):
+        return "DOCUMENT_INVENTORY" if document_facts else "ASK_REMAINING"
+    return "STANDARD"
+
+
+def record_grounded_turn(
+    state: IntentContextState,
+    *,
+    user_query: str,
+    message_id: str,
+    grounding: dict | None,
+) -> IntentContextState:
+    """Persist bounded user facts and the fields of a successful grounded answer.
+
+    Assistant prose is deliberately ignored. Answer memory is accepted only from the
+    Backend-owned grounding/checklist contract, preventing hallucinated text from
+    becoming conversation state.
+    """
+
+    updated = state.model_copy(deep=True)
+    facts = _document_facts_from_user(user_query)
+    if facts:
+        updated.known_documents = list(dict.fromkeys([*updated.known_documents, *facts]))[-16:]
+        for fact in facts:
+            updated.source_message_ids[f"known_document:{fact}"] = message_id
+    updated.last_turn_mode = _turn_mode(user_query, document_facts=facts)
+    if not grounding or grounding.get("status") != "ANSWER":
+        return updated
+    checklist = grounding.get("checklist") or []
+    fields = [
+        item.get("field")
+        for item in checklist
+        if isinstance(item, dict) and item.get("field") in FIELD_ORDER
+    ]
+    if fields:
+        updated.last_answered_fields = list(dict.fromkeys(fields))
+        updated.source_message_ids["last_answered_fields"] = message_id
+    fragment_ids = [
+        item.get("fragment_id")
+        for item in grounding.get("sources") or []
+        if isinstance(item, dict) and item.get("fragment_id")
+    ]
+    updated.last_answered_fragment_ids = list(dict.fromkeys(fragment_ids))[-8:]
+    return updated
 
 
 def load_context(raw: dict | None, *, corpus_version: str) -> IntentContextState:
@@ -185,6 +292,7 @@ def procedure_candidates(data) -> list[dict[str, str]]:
     return [
         {"id": procedure_id, "name": data.procedures[procedure_id]["title"]}
         for procedure_id in sorted(data.accepted)
+        if is_serving_candidate(procedure_id)
     ]
 
 
@@ -277,6 +385,10 @@ def reduce_context(
         state.jurisdiction = None
         state.as_of = None
         state.pending_clarification = None
+        state.last_answered_fields = []
+        state.last_answered_fragment_ids = []
+        state.known_documents = []
+        state.last_turn_mode = "STANDARD"
         state.source_message_ids.clear()
     elif (
         output.topic_action == "SWITCH"
@@ -287,8 +399,15 @@ def reduce_context(
         state.jurisdiction = None
         state.as_of = None
         state.pending_clarification = None
+        state.last_answered_fields = []
+        state.last_answered_fragment_ids = []
+        state.known_documents = []
+        state.last_turn_mode = "STANDARD"
         for slot in ("field_intents", "jurisdiction", "as_of", "pending_clarification"):
             state.source_message_ids.pop(slot, None)
+        for slot in tuple(state.source_message_ids):
+            if slot == "last_answered_fields" or slot.startswith("known_document:"):
+                state.source_message_ids.pop(slot, None)
 
     for slot in CONTEXT_SLOTS:
         operation = getattr(output.patch, slot)
@@ -311,6 +430,32 @@ def reduce_context(
     return state
 
 
+_PROCEDURE_FAMILY_STOPWORDS = {
+    "thu",
+    "tuc",
+    "dang",
+    "ky",
+    "co",
+    "yeu",
+    "to",
+    "doi",
+    "voi",
+}
+
+
+def _same_procedure_family(data, first_id: str | None, second_id: str | None) -> bool:
+    """Recognize catalog variants without carrying fields across unrelated topics."""
+
+    if not first_id or not second_id or first_id == second_id:
+        return False
+    first = data.procedures.get(first_id) or {}
+    second = data.procedures.get(second_id) or {}
+    first_tokens = set(normalize(str(first.get("title") or "")).split())
+    second_tokens = set(normalize(str(second.get("title") or "")).split())
+    shared = (first_tokens & second_tokens) - _PROCEDURE_FAMILY_STOPWORDS
+    return len(shared) >= 2
+
+
 def prepare_model_turn(
     data,
     query: RetrievalInput,
@@ -318,8 +463,82 @@ def prepare_model_turn(
     output: IntentContextOutput,
     *,
     message_id: str,
+    topic_decision: TopicDecision | None = None,
+    evidence_mode: Literal[
+        "hybrid_retrieval", "direct_catalog", "guarded_direct"
+    ] = "hybrid_retrieval",
 ) -> tuple[RetrievalInput | None, IntentContextState, str | None]:
     """Apply model intent, derive retrieval input and select Backend-owned policy replies."""
+
+    previous = previous.model_copy(deep=True)
+    previous.procedure_id = preferred_procedure_id(previous.procedure_id)
+
+    if (
+        topic_decision is not None
+        and topic_decision.action == "CLARIFY"
+        and query.filters.procedure_id is None
+        and output.dialogue_act not in {"RESET_CONTEXT", "GREET", "OUT_OF_SCOPE"}
+    ):
+        # A newly requested, unidentified topic must not reuse the previous
+        # procedure's documents, jurisdiction, or episodic evidence.
+        state = previous.model_copy(deep=True)
+        state.corpus_version = data.version
+        state.procedure_id = None
+        state.field_intents = []
+        state.jurisdiction = None
+        state.as_of = None
+        state.last_answered_fields = []
+        state.last_answered_fragment_ids = []
+        state.known_documents = []
+        state.last_turn_mode = "STANDARD"
+        state.pending_clarification = "procedure_id"
+        state.source_message_ids.clear()
+        state.source_message_ids["pending_clarification"] = message_id
+        if message_id not in state.applied_message_ids:
+            state.applied_message_ids = [*state.applied_message_ids, message_id][-64:]
+            state.revision += 1
+        return (
+            None,
+            state,
+            "Mình chưa xác định chắc thủ tục bạn muốn hỏi trong nguồn đã duyệt. "
+            "Bạn cho biết tên thủ tục hoặc mô tả rõ giấy tờ muốn xin cấp nhé.",
+        )
+
+    if (
+        topic_decision is not None
+        and topic_decision.action == "SWITCH"
+        and topic_decision.procedure_id in data.accepted
+        and query.filters.procedure_id is None
+        and output.dialogue_act not in {"RESET_CONTEXT", "GREET", "OUT_OF_SCOPE"}
+        and topic_decision.procedure_id != previous.procedure_id
+    ):
+        # The catalog-bound current-turn route may recover a missed model
+        # switch. The quote remains the actual user text, never a rewrite.
+        output = output.model_copy(deep=True)
+        output.topic_action = "SWITCH"
+        output.dialogue_act = "CORRECT_CONTEXT" if previous.procedure_id else "ASK_INFORMATION"
+        output.patch.procedure_id = StringPatch(
+            op="SET",
+            value=topic_decision.procedure_id,
+            evidence=[PatchEvidence(message_id=message_id, quote=query.query[:300])],
+        )
+    elif (
+        topic_decision is not None
+        and topic_decision.action == "KEEP"
+        and (
+            topic_decision.reason in {"document_inventory", "current_procedure_explicit"}
+            or evidence_mode == "guarded_direct"
+        )
+        and previous.procedure_id is not None
+        and output.topic_action == "SWITCH"
+        and query.filters.procedure_id is None
+    ):
+        # A document owned by the current case is not an instruction to start
+        # the similarly named procedure.
+        output = output.model_copy(deep=True)
+        output.topic_action = "KEEP"
+        output.dialogue_act = "ASK_INFORMATION"
+        output.patch.procedure_id = StringPatch(op="KEEP")
 
     state = reduce_context(previous, output, message_id=message_id)
     state.corpus_version = data.version
@@ -333,13 +552,14 @@ def prepare_model_turn(
 
     explicit = query.filters
     if explicit.procedure_id is not None:
-        if explicit.procedure_id not in data.accepted:
+        explicit_procedure_id = preferred_procedure_id(explicit.procedure_id)
+        if explicit_procedure_id not in data.accepted:
             raise ValueError("UNKNOWN_EXPLICIT_PROCEDURE")
-        if explicit.procedure_id != state.procedure_id:
+        if explicit_procedure_id != state.procedure_id:
             state.field_intents = []
             state.jurisdiction = None
             state.as_of = None
-        state.procedure_id = explicit.procedure_id
+        state.procedure_id = explicit_procedure_id
         state.source_message_ids["procedure_id"] = message_id
     if explicit.jurisdiction is not None:
         state.jurisdiction = explicit.jurisdiction
@@ -347,6 +567,69 @@ def prepare_model_turn(
     if explicit.as_of is not None:
         state.as_of = explicit.as_of
         state.source_message_ids["as_of"] = message_id
+
+    if state.procedure_id and ALL_FIELDS_REQUEST.search(normalize(query.query)):
+        field_evidence = data.procedures[state.procedure_id].get("field_evidence", {})
+        state.field_intents = [field for field in FIELD_ORDER if field_evidence.get(field)]
+        state.source_message_ids["field_intents"] = message_id
+
+    # High-precision current-turn field cues outrank a model patch. This prevents
+    # a generic word such as "hồ sơ" from carrying a stale or unrelated field.
+    detected_fields = sorted(fields_for_query(data, query.query))
+    if detected_fields:
+        state.field_intents = detected_fields
+        state.source_message_ids["field_intents"] = message_id
+    elif (
+        evidence_mode == "guarded_direct"
+        and output.patch.field_intents.op == "SET"
+        and len(state.field_intents) > 1
+    ):
+        # Multiple unsupported guesses are not safe enough for a direct catalog
+        # read. Clearing the slot makes the policy ask which information is wanted.
+        state.field_intents = []
+        state.source_message_ids.pop("field_intents", None)
+
+    normalized_query = normalize(query.query)
+    contextual_followup = bool(
+        CONFIRMATION_REQUEST.search(normalized_query) or REMAINING_REQUEST.search(normalized_query)
+    )
+    variant_correction = (
+        output.dialogue_act == "CORRECT_CONTEXT"
+        and output.topic_action == "SWITCH"
+        and _same_procedure_family(data, previous.procedure_id, state.procedure_id)
+    )
+    if (
+        state.procedure_id
+        and (contextual_followup or variant_correction)
+        and not state.field_intents
+        and previous.last_answered_fields
+    ):
+        # Slot carryover is bounded to fields proven by the last grounded answer.
+        state.field_intents = list(previous.last_answered_fields)
+        state.source_message_ids["field_intents"] = message_id
+
+    trusted_procedure = bool(
+        state.procedure_id
+        and (
+            explicit.procedure_id is not None
+            or (
+                topic_decision is not None
+                and topic_decision.action == "SWITCH"
+                and topic_decision.procedure_id == state.procedure_id
+                and topic_decision.reason in {"explicit_catalog_name", "hybrid_high_confidence"}
+            )
+            or (
+                topic_decision is not None
+                and topic_decision.action == "KEEP"
+                and previous.procedure_id == state.procedure_id
+            )
+        )
+    )
+    acquisition_mode = "hybrid_retrieval"
+    if evidence_mode == "direct_catalog":
+        acquisition_mode = "direct_catalog"
+    elif evidence_mode == "guarded_direct" and trusted_procedure and state.field_intents:
+        acquisition_mode = "direct_catalog"
 
     prepared = RetrievalInput(
         query=query.query,
@@ -357,17 +640,25 @@ def prepare_model_turn(
             jurisdiction=state.jurisdiction,
             as_of=state.as_of,
         ),
+        acquisition_mode=acquisition_mode,
     )
-    found = retrieve(
-        data,
-        prepared.query,
-        prepared.top_k,
-        procedure_id=prepared.filters.procedure_id,
-        jurisdiction=prepared.filters.jurisdiction,
-        field_intents=prepared.field_intents,
-        as_of=prepared.filters.as_of.isoformat() if prepared.filters.as_of else None,
-    )
-    resolved = found["procedure_id"]
+    if acquisition_mode == "direct_catalog" and state.procedure_id is not None:
+        # Procedure and fields are already resolved. Evidence projection later
+        # reads field_evidence directly and therefore performs no ranking here.
+        resolved = state.procedure_id
+        found_reason = "DIRECT_CATALOG"
+    else:
+        found = retrieve(
+            data,
+            prepared.query,
+            prepared.top_k,
+            procedure_id=prepared.filters.procedure_id,
+            jurisdiction=prepared.filters.jurisdiction,
+            field_intents=prepared.field_intents,
+            as_of=prepared.filters.as_of.isoformat() if prepared.filters.as_of else None,
+        )
+        resolved = found["procedure_id"]
+        found_reason = found["reason"]
     if state.procedure_id is None and resolved is not None:
         state.procedure_id = resolved
         state.source_message_ids["procedure_id"] = message_id
@@ -376,7 +667,7 @@ def prepare_model_turn(
         state.pending_clarification = "procedure_id"
     elif not state.field_intents:
         state.pending_clarification = "field_intents"
-    elif found["reason"] == "JURISDICTION_UNVERIFIED":
+    elif found_reason == "JURISDICTION_UNVERIFIED":
         state.pending_clarification = "jurisdiction"
     else:
         state.pending_clarification = None

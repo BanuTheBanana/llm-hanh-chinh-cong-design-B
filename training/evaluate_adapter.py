@@ -1,12 +1,11 @@
 """Compare base and optional G5 adapter on the private validation split."""
 
-# ruff: noqa: E402 -- the private ai-service package is added to sys.path below.
-
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import math
 import re
 import sys
 import time
@@ -29,6 +28,18 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 def normalized(text):
     return re.sub(r"\s+", " ", text).strip().casefold()
+
+
+def mean_metric(rows: list[dict], key: str) -> float | None:
+    return sum(row[key] for row in rows) / len(rows) if rows else None
+
+
+def percentile(values: list[float], percentile_value: float) -> float | None:
+    if not values:
+        return None
+    ordered = sorted(values)
+    index = max(0, math.ceil(percentile_value * len(ordered)) - 1)
+    return ordered[index]
 
 
 def _sha256(path: Path) -> str:
@@ -57,6 +68,12 @@ def main() -> int:
         help="Evaluate one distractor-order variant for each independent scenario.",
     )
     args = parser.parse_args()
+    if not torch.cuda.is_available() or not torch.cuda.is_bf16_supported():
+        raise SystemExit("G5_EVAL_REQUIRES_BF16_CUDA")
+    torch.cuda.empty_cache()
+    torch.cuda.reset_peak_memory_stats()
+    gpu_baseline_allocated = torch.cuda.memory_allocated()
+    gpu_baseline_reserved = torch.cuda.memory_reserved()
     output_path = _private_output(args.output)
     if output_path.exists():
         raise SystemExit("G5_EVAL_OUTPUT_ALREADY_EXISTS")
@@ -76,6 +93,15 @@ def main() -> int:
     ]
     if not rows or any(row.get("split") != "VALIDATION" for row in rows):
         raise SystemExit("G5_EVAL_VALIDATION_SPLIT_INVALID")
+    for row in rows:
+        target = row.get("target", {})
+        cited = target.get("cited_fragment_ids", [])
+        if target.get("status") not in {"ANSWER", "INSUFFICIENT_DATA"}:
+            raise SystemExit("G5_EVAL_TARGET_STATUS_INVALID")
+        if target.get("status") == "ANSWER" and not cited:
+            raise SystemExit("G5_EVAL_ANSWER_TARGET_INVALID")
+        if target.get("status") == "INSUFFICIENT_DATA" and cited:
+            raise SystemExit("G5_EVAL_ABSTENTION_TARGET_INVALID")
     if args.one_variant_per_base:
         unique_rows: dict[str, dict] = {}
         for row in rows:
@@ -95,11 +121,35 @@ def main() -> int:
         args.model,
         revision=args.revision,
         quantization_config=quantization,
-        torch_dtype=torch.bfloat16,
+        dtype=torch.bfloat16,
         device_map={"": 0},
         trust_remote_code=False,
     )
     if args.adapter:
+        adapter_manifest_path = args.adapter.resolve() / "training_manifest.json"
+        if not adapter_manifest_path.is_file():
+            raise SystemExit("G5_EVAL_ADAPTER_MANIFEST_REQUIRED")
+        adapter_manifest = json.loads(adapter_manifest_path.read_text(encoding="utf-8"))
+        manifest_schema = adapter_manifest.get("schema_version")
+        expected_source_sha = _sha256(bundle / "manifest.json")
+        if manifest_schema == "g5-qlora-run-v1":
+            source_bound = (
+                adapter_manifest.get("source_manifest_sha256") == expected_source_sha
+            )
+        elif manifest_schema == "g6-single-qwen-multitask-qlora-v1":
+            source_bound = (
+                adapter_manifest.get("sources", {}).get("answer_manifest_sha256")
+                == expected_source_sha
+            )
+        else:
+            source_bound = False
+        if (
+            adapter_manifest.get("base_model") != args.model
+            or adapter_manifest.get("base_revision") != args.revision
+            or not source_bound
+            or adapter_manifest.get("test_data_used") is not False
+        ):
+            raise SystemExit("G5_EVAL_ADAPTER_BINDING_INVALID")
         model = PeftModel.from_pretrained(model, args.adapter)
     model.eval()
     results = []
@@ -129,33 +179,59 @@ def main() -> int:
         raw = tokenizer.decode(output[0, input_ids.shape[1] :], skip_special_tokens=True)
         allowed = {item.fragment_id for item in evidence}
         valid = False
-        citation_recall = 0.0
-        claim_coverage = 0.0
+        status_correct = False
+        expected_status = row["target"]["status"]
+        is_answer = expected_status == "ANSWER"
+        citation_recall = 0.0 if is_answer else None
+        claim_coverage = 0.0 if is_answer else None
+        abstention_correct = None if is_answer else False
+        missing_information_recall = None if is_answer else 0.0
         try:
             parsed = parse_and_validate_grounded_output(raw_text=raw, allowed_fragment_ids=allowed)
             valid = True
+            status_correct = parsed.status == expected_status
             gold_ids = set(row["target"]["cited_fragment_ids"])
-            citation_recall = len(set(parsed.cited_fragment_ids) & gold_ids) / len(gold_ids)
-            gold_texts = [item.text for item in evidence if item.fragment_id in gold_ids]
-            claim_coverage = sum(
-                normalized(text) in normalized(parsed.answer) for text in gold_texts
-            ) / len(gold_texts)
+            if is_answer:
+                citation_recall = len(set(parsed.cited_fragment_ids) & gold_ids) / len(gold_ids)
+                gold_texts = [item.text for item in evidence if item.fragment_id in gold_ids]
+                claim_coverage = sum(
+                    normalized(text) in normalized(parsed.answer) for text in gold_texts
+                ) / len(gold_texts)
+            else:
+                expected_missing = set(row["target"].get("missing_information", []))
+                predicted_missing = set(parsed.missing_information)
+                abstention_correct = status_correct and not parsed.cited_fragment_ids
+                missing_information_recall = (
+                    len(predicted_missing & expected_missing) / len(expected_missing)
+                    if expected_missing
+                    else float(not predicted_missing)
+                )
         except ProviderResponseError:
             pass
         results.append(
             {
                 "example_id": row["example_id"],
                 "contract_valid": valid,
+                "expected_status": expected_status,
+                "status_correct": status_correct,
                 "citation_recall": citation_recall,
                 "claim_coverage": claim_coverage,
+                "abstention_correct": abstention_correct,
+                "missing_information_recall": missing_information_recall,
                 "latency_ms": round((time.perf_counter() - started) * 1000, 2),
             }
         )
         if len(results) % 5 == 0 or len(results) == len(rows):
             print(f"evaluated={len(results)}/{len(rows)}", flush=True)
     denominator = len(results)
+    torch.cuda.synchronize()
+    latencies = [item["latency_ms"] for item in results]
+    answer_results = [item for item in results if item["expected_status"] == "ANSWER"]
+    abstention_results = [
+        item for item in results if item["expected_status"] == "INSUFFICIENT_DATA"
+    ]
     summary = {
-        "schema_version": "g5-model-evaluation-v1",
+        "schema_version": "g5-model-evaluation-v2",
         "model": args.model,
         "model_revision": args.revision,
         "adapter_used": args.adapter is not None,
@@ -170,9 +246,26 @@ def main() -> int:
         "max_new_tokens": args.max_new_tokens,
         "one_variant_per_base": args.one_variant_per_base,
         "contract_accuracy": sum(item["contract_valid"] for item in results) / denominator,
-        "citation_recall": sum(item["citation_recall"] for item in results) / denominator,
-        "verbatim_claim_coverage": sum(item["claim_coverage"] for item in results) / denominator,
-        "mean_latency_ms": sum(item["latency_ms"] for item in results) / denominator,
+        "status_accuracy": sum(item["status_correct"] for item in results) / denominator,
+        "answer_count": len(answer_results),
+        "citation_recall": mean_metric(answer_results, "citation_recall"),
+        "verbatim_claim_coverage": mean_metric(answer_results, "claim_coverage"),
+        "abstention_count": len(abstention_results),
+        "abstention_accuracy": mean_metric(abstention_results, "abstention_correct"),
+        "missing_information_recall": mean_metric(
+            abstention_results, "missing_information_recall"
+        ),
+        "mean_latency_ms": sum(latencies) / denominator,
+        "p50_latency_ms": percentile(latencies, 0.50),
+        "p95_latency_ms": percentile(latencies, 0.95),
+        "resource_metrics": {
+            "gpu_name": torch.cuda.get_device_name(0),
+            "gpu_total_memory_bytes": torch.cuda.get_device_properties(0).total_memory,
+            "process_baseline_allocated_bytes": gpu_baseline_allocated,
+            "process_baseline_reserved_bytes": gpu_baseline_reserved,
+            "process_peak_allocated_bytes": torch.cuda.max_memory_allocated(),
+            "process_peak_reserved_bytes": torch.cuda.max_memory_reserved(),
+        },
         "results": results,
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)

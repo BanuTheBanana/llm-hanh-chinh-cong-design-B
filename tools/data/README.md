@@ -81,6 +81,29 @@ uv run --project tools/data hcc-build-g5-sft validate `
   --bundle evaluation/reports/g5/sft-local
 ```
 
+### Full corpus đã phân loại theo field
+
+Lệnh mới chỉ nhận release `READY_FOR_CONTROLLED_RAG`, kiểm toàn bộ hash và ma trận
+field decision. Nó tạo TRAIN/VALIDATION trong vùng Git-ignore và khóa TEST ở một thư
+mục private riêng. Ba tập tách theo `procedure_id`; trainer không đọc TEST.
+
+```powershell
+uv run --project tools/data hcc-build-full-corpus-sft build `
+  --release 'D:\duong-dan-rieng\company-controlled-v1' `
+  --training-output training/output/full-corpus-sft-v1-bundle `
+  --test-output 'D:\duong-dan-rieng\Full_Corpus_SFT_V1_TEST_private' `
+  --train-variants 2 --validation-procedures 5 --test-procedures 5 --seed 42
+
+uv run --project tools/data hcc-build-full-corpus-sft validate `
+  --release 'D:\duong-dan-rieng\company-controlled-v1' `
+  --training training/output/full-corpus-sft-v1-bundle `
+  --test 'D:\duong-dan-rieng\Full_Corpus_SFT_V1_TEST_private'
+```
+
+Generator tạo ca `ANSWER` chỉ từ fragment được allowlist. Field thiếu hoặc mơ hồ trở
+thành `INSUFFICIENT_DATA`, không được biến thành đáp án giả. Dataset version của scenario
+phải khớp tuyệt đối với release; mismatch chặn build và chặn trainer.
+
 Khi kiểm tra dữ liệu D0, phải truyền rõ:
 
 ```text

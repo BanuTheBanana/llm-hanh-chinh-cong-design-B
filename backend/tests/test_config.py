@@ -165,3 +165,36 @@ def test_g5_intent_context_requires_answer_plan():
         g5_intent_context_enabled=True,
     )
     assert settings.g5_intent_context_enabled is True
+
+
+def test_guarded_direct_requires_complete_grounded_stack():
+    with pytest.raises(ValueError, match="direct evidence modes"):
+        Settings(_env_file=None, g8_evidence_mode="guarded_direct")
+
+    with pytest.raises(ValueError, match="global hybrid procedure verifier"):
+        Settings(
+            _env_file=None,
+            rag_enabled=True,
+            rag_corpus_version="fixture-v1",
+            g3_d2_enabled=True,
+            g3_private_dataset_path="private",
+            g3_corpus_sha256="a" * 64,
+            g4_answer_plan_enabled=True,
+            g5_intent_context_enabled=True,
+            g5_hybrid_enabled=False,
+            g8_evidence_mode="guarded_direct",
+        )
+
+    settings = Settings(
+        _env_file=None,
+        rag_enabled=True,
+        rag_corpus_version="fixture-v1",
+        g3_d2_enabled=True,
+        g3_private_dataset_path="private",
+        g3_corpus_sha256="a" * 64,
+        g4_answer_plan_enabled=True,
+        g5_intent_context_enabled=True,
+        g5_hybrid_enabled=True,
+        g8_evidence_mode="guarded_direct",
+    )
+    assert settings.g8_evidence_mode == "guarded_direct"

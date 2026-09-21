@@ -195,6 +195,27 @@ async def test_malformed_model_json_uses_extractive_fallback(provider_factory):
     assert "Hồ sơ cần nộp Phiếu A." in result.answer
 
 
+async def test_malformed_output_without_evidence_falls_back_to_safe_abstention(
+    provider_factory,
+):
+    payloads: list[dict[str, object]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        payloads.append(json.loads(request.content))
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": "not valid json"}}]},
+        )
+
+    result = await generate(provider_factory(handler), evidence=[])
+
+    assert len(payloads) == 2
+    assert "INSUFFICIENT_DATA" in payloads[1]["messages"][-1]["content"]  # type: ignore[index]
+    assert result.status == "INSUFFICIENT_DATA"
+    assert result.cited_fragment_ids == ()
+    assert "Chưa có đủ nguồn" in result.answer
+
+
 @pytest.mark.parametrize(
     "body",
     [

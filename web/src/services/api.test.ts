@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, getCurrentUser, login, putMessageFeedback } from './api'
+import { ApiError, getCurrentUser, login, putMessageFeedback, resolveApiBaseUrl } from './api'
 
 describe('Core API client', () => {
   const fetchMock = vi.fn()
@@ -11,6 +11,15 @@ describe('Core API client', () => {
 
   afterEach(() => {
     fetchMock.mockReset()
+  })
+
+  it('keeps the API cookie on the same loopback hostname as the opened page', () => {
+    expect(
+      resolveApiBaseUrl('http://localhost:8005/api/v1/', 'http://127.0.0.1:3005/'),
+    ).toBe('http://127.0.0.1:8005/api/v1')
+    expect(
+      resolveApiBaseUrl('https://api.example.vn/api/v1/', 'https://portal.example.vn/'),
+    ).toBe('https://api.example.vn/api/v1')
   })
 
   it('always sends cookies but does not force a JSON preflight header on GET', async () => {

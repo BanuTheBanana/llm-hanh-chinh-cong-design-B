@@ -1,83 +1,70 @@
-# Runbook Docker và demo G5
+# Runbook Docker và demo G5 full corpus
 
-## 1. Khởi động
+## 1. Phạm vi runtime
 
-Yêu cầu: Docker Desktop có GPU, corpus demo10 đã duyệt, ba model GGUF và adapter intent
-nằm ngoài Git.
+Stack `hanh-chinh-g5` chạy độc lập với G3 và dùng:
+
+- corpus đã kiểm duyệt: 34 thủ tục, 34 nguồn, 139 fragment;
+- grounded answer: Qwen3-1.7B Q8_0 + LoRA full-corpus r16;
+- intent/context: Qwen3-4B Q8_0 + LoRA hard-v2 r16;
+- retrieval: Exact/BM25, embedding 0.6B và MCP source registry;
+- Backend, PostgreSQL, Web và feedback hai trục.
+
+TEST kín không được mở khi start hoặc smoke runtime.
+
+## 2. Khởi động
+
+Trên máy dự án hiện tại, các đường dẫn mặc định đã trỏ tới artifact private nên chỉ cần:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
   -Action Start `
-  -DatasetPath 'D:\duong-dan-rieng\company-demo10' `
-  -GenerationModelPath 'D:\duong-dan-rieng\Qwen3-1.7B-Q8_0.gguf' `
-  -EmbeddingModelPath 'D:\duong-dan-rieng\Qwen3-Embedding-0.6B-Q8_0.gguf' `
-  -IntentModelPath 'D:\duong-dan-rieng\qwen3-4b-instruct-2507-q8_0.gguf' `
-  -IntentAdapterPath 'D:\duong-dan-rieng\intent-hard-v2-r16.gguf' `
-  -GenerationModelSha256 '061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a' `
-  -EmbeddingModelSha256 '06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439' `
-  -IntentModelSha256 'ae916ede1c010a26955ee8ae2e908bf8815a3f135ec860439ab924701c69d5f1' `
-  -IntentAdapterSha256 '71f22b1c48ade4c09378bda87c5f5e6bfbe93ad89a89453b823221295537f1c0' `
   -ReviewToken '<token-local-it-nhat-12-ky-tu>'
 ```
 
+Khi chạy trên máy khác, truyền thêm `DatasetPath`, `GenerationModelPath`,
+`GenerationAdapterPath`, `EmbeddingModelPath`, `IntentModelPath` và
+`IntentAdapterPath`. Nên truyền đủ năm SHA-256 theo biên bản tích hợp để phát hiện artifact bị đổi.
+
 - Web: `http://localhost:3005`
 - Backend: `http://localhost:8005`
-- Source MCP: `http://localhost:8096/mcp`
+- Grounded model: `http://localhost:8085/health`
 - Intent model: `http://localhost:8087/health`
+- Source MCP: `http://localhost:8096/mcp`
 
-Script kiểm tra loại đường dẫn, đuôi `.gguf`, SHA-256 khi được cung cấp và bắt buộc nhận
-token local ít nhất 12 ký tự. Không commit token hoặc truyền nó qua giao diện người dùng.
-Generation Qwen3-1.7B, intent Qwen3-4B+LoRA và embedding 0.6B chạy thành ba service riêng;
-đây là cấu hình tích hợp để đo, chưa phải cấu hình tài nguyên cuối.
+Script chặn corpus không có manifest `READY_FOR_CONTROLLED_RAG`, sai version, sai số thủ tục,
+sai hash hoặc model/adapter không phải GGUF.
 
-## 2. Kịch bản demo ngắn
+## 3. Smoke toàn luồng
 
-1. Đăng nhập, tạo conversation và hỏi hồ sơ của một thủ tục thuộc demo10.
-2. Hỏi tiếp về thời gian, phí hoặc nơi nộp mà không lặp lại tên thủ tục.
-3. Sửa tên thủ tục, sau đó gửi “Bắt đầu lại” để kiểm tra switch/reset context.
-4. Chỉ ra checklist, citation và phiên bản tri thức dưới câu trả lời.
-5. Chọn đủ hai trục phản hồi dưới câu trả lời, lưu, sửa rồi xóa để kiểm tra ownership và persistence.
-6. Với phần quản trị, dùng `scripts/g5-source-update.py` để stage một bản kiểm thử, duyệt,
-   publish, hỏi lại trên Web, sau đó rollback. Không dùng PII hoặc nội dung chưa được phép.
-
-Smoke tự động cho vòng đời MCP:
+Chọn một thủ tục và hai field có dữ liệu trong corpus, sau đó chạy:
 
 ```powershell
-$env:G5_SOURCE_REVIEW_TOKEN = '<cùng-token-khi-start>'
-uv run --project backend python scripts/smoke-g5.py `
-  --dev 'D:\duong-dan-rieng\g4_eval\scenario_dev.jsonl' `
-  --output evaluation/reports/g5/live-smoke-local.json
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\smoke-g5-runtime.ps1 `
+  -DirectQuestion '<cau-hoi-co-ten-thu-tuc>' `
+  -FollowUpQuestion '<cau-hoi-tiep-noi-khong-lap-ten-thu-tuc>'
 ```
 
-Smoke trực tiếp model intent bằng fixture D0, không cần dữ liệu công ty:
+Smoke kiểm tra: đăng nhập, conversation, intent/context, retrieval, generation, verifier,
+citation, reset context và vòng đời lưu/đọc/xóa feedback. Báo cáo không in nội dung nguồn hoặc
+đáp án TEST.
 
-```powershell
-uv run --project ai-service python scripts/smoke-g5-intent-context.py `
-  --base-url http://127.0.0.1:8087/v1 `
-  --model Qwen3-4B-Intent-hard-v2-r16
-```
+## 4. Demo thủ công
 
-## 3. Kiểm tra và dừng
+1. Đăng nhập và hỏi một field của thủ tục đã duyệt.
+2. Hỏi tiếp field khác mà không nhắc lại tên thủ tục để chứng minh context.
+3. Gửi “Bắt đầu lại” để chứng minh reset.
+4. Chỉ ra nguồn, checklist, phiên bản tri thức và tên model dưới câu trả lời.
+5. Lưu, sửa và xóa đánh giá phù hợp/hài lòng.
+
+## 5. Kiểm tra và dừng
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
-  -Action Status `
-  -DatasetPath 'D:\duong-dan-rieng\company-demo10' `
-  -GenerationModelPath 'D:\duong-dan-rieng\Qwen3-1.7B-Q8_0.gguf' `
-  -EmbeddingModelPath 'D:\duong-dan-rieng\Qwen3-Embedding-0.6B-Q8_0.gguf' `
-  -IntentModelPath 'D:\duong-dan-rieng\qwen3-4b-instruct-2507-q8_0.gguf' `
-  -IntentAdapterPath 'D:\duong-dan-rieng\intent-hard-v2-r16.gguf' `
-  -ReviewToken '<cùng-token-khi-start>'
+  -Action Status -ReviewToken '<cung-token-khi-start>'
 
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\demo-g5.ps1 `
-  -Action Stop `
-  -DatasetPath 'D:\duong-dan-rieng\company-demo10' `
-  -GenerationModelPath 'D:\duong-dan-rieng\Qwen3-1.7B-Q8_0.gguf' `
-  -EmbeddingModelPath 'D:\duong-dan-rieng\Qwen3-Embedding-0.6B-Q8_0.gguf' `
-  -IntentModelPath 'D:\duong-dan-rieng\qwen3-4b-instruct-2507-q8_0.gguf' `
-  -IntentAdapterPath 'D:\duong-dan-rieng\intent-hard-v2-r16.gguf' `
-  -ReviewToken '<cùng-token-khi-start>'
+  -Action Stop -ReviewToken '<cung-token-khi-start>'
 ```
 
-`Stop` giữ volume PostgreSQL và registry MCP. Chỉ xóa volume khi đã xác định rõ dữ liệu
-có thể bỏ; runbook này không tự xóa dữ liệu.
+`Stop` không xóa volume PostgreSQL hoặc source registry.

@@ -84,7 +84,10 @@ tổng hợp.
 
 ## Công cụ G5
 
-- `demo-g5.ps1`: start/stop/status stack G5 riêng; kiểm tra kiểu đường dẫn và tùy chọn
+- `demo-g5.ps1`: start/stop/status stack G5 riêng trên full corpus đã kiểm duyệt; khóa
+  version/fingerprint và hash model, đồng thời nạp LoRA grounded-answer 1.7B và adapter
+  intent full-38. Backend mặc định dùng `guarded_direct`: direct catalog khi procedure/field
+  đã xác minh, hybrid khi còn chưa chắc.
   hash cho generation, embedding, intent model và intent adapter trước khi gọi Compose.
 - `smoke-g5-intent-context.py`: gửi một câu D0 hư cấu qua provider intent local và kiểm
   procedure/field/evidence của output có đúng contract.
