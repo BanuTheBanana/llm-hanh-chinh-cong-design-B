@@ -1,0 +1,45 @@
+# Local environment secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+*.xls
+*.xlsx
+*.xlsm
+
+# JavaScript
+node_modules/
+dist/
+test-results/
+
+# Local runtime data. Public demo corpus is intentionally versioned for G2.
+data/*
+!data/demo_public/
+!data/demo_public/**
+!data/demo_synthetic/
+!data/demo_synthetic/**
+data/company_private/
+# Company-provided source data. Keep raw files outside Git until governance,
+# licensing, PII handling and an approved storage location are documented.
+dataset/
+uploads/
+models/
+training/.venv/
+training/output/
+logs/
+
+# Generated evaluation reports; keep only the directory placeholder in Git.
+evaluation/reports/*
+!evaluation/reports/.gitkeep
+
+# G4 local data and evaluations
+company_private/
+**/company_private/
+**/g4_eval/
+*.rar
+*.xlsx

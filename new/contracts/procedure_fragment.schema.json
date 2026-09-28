@@ -1,0 +1,18 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"procedure_fragment.schema.json",
+  "title":"ProcedureFragment",
+  "type":"object",
+  "properties":{
+    "fragment_id":{"type":"string"},
+    "procedure_id":{"type":"string"},
+    "section_type":{"type":"string","enum":["fee","processing_time","required_documents","eligibility","submission_location","legal_basis","validity_period","other"]},
+    "text":{"type":"string"},
+    "source_id":{"type":"string"},
+    "ordinal":{"type":"integer","minimum":0},
+    "content_hash":{"type":"string"},
+    "source_locator":{"type":"string"}
+  },
+  "required":["fragment_id","procedure_id","section_type","text","source_id","ordinal","content_hash","source_locator"],
+  "additionalProperties":false
+}

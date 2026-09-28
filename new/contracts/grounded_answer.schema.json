@@ -1,0 +1,16 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"grounded_answer.schema.json",
+  "title":"GroundedAnswer",
+  "type":"object",
+  "properties":{
+    "status":{"type":"string","enum":["answered","clarification_needed","insufficient_data"]},
+    "answer_text":{"type":"string"},
+    "clarification_prompt":{"type":["string","null"],"default":null},
+    "citations":{"type":"array","items":{"$ref":"citation.schema.json"},"default":[]},
+    "evidence_bundle_id":{"type":"string"},
+    "created_at":{"type":"string","format":"date-time"}
+  },
+  "required":["status","answer_text","citations","evidence_bundle_id","created_at"],
+  "additionalProperties":false
+}

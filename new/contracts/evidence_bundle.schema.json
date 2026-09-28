@@ -1,0 +1,21 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"evidence_bundle.schema.json",
+  "title":"EvidenceBundle",
+  "type":"object",
+  "properties":{
+    "bundle_id":{"type":"string"},
+    "query_text_segmented":{"type":"string"},
+    "resolved_procedure_id":{"type":["string","null"],"default":null},
+    "top_score":{"type":["number","null"],"default":null},
+    "second_score":{"type":["number","null"],"default":null},
+    "margin":{"type":["number","null"],"default":null},
+    "confidence_status":{"type":"string","enum":["resolved","ambiguous","low_confidence"]},
+    "ambiguous_candidates":{"type":"array","items":{"type":"object","properties":{"procedure_id":{"type":"string"},"canonical_name":{"type":"string"},"score":{"type":"number"}},"required":["procedure_id","canonical_name","score"],"additionalProperties":false},"default":[]},
+    "evidence":{"type":"array","items":{"$ref":"evidence.schema.json"}},
+    "fusion_method":{"type":"string"},
+    "created_at":{"type":"string","format":"date-time"}
+  },
+  "required":["bundle_id","query_text_segmented","resolved_procedure_id","confidence_status","evidence","fusion_method","created_at"],
+  "additionalProperties":false
+}

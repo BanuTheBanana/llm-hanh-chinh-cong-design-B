@@ -1,0 +1,12 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"filters.schema.json",
+  "title":"Filters",
+  "type":"object",
+  "properties":{
+    "jurisdiction":{"type":["string","null"],"default":null},
+    "effective_date":{"type":["string","null"],"format":"date","default":null},
+    "scope":{"type":["string","null"],"default":null}
+  },
+  "additionalProperties":false
+}

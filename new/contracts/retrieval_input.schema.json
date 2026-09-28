@@ -1,0 +1,15 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"retrieval_input.schema.json",
+  "title":"RetrievalInput",
+  "type":"object",
+  "properties":{
+    "query_text_raw":{"type":"string"},
+    "query_text_segmented":{"type":"string"},
+    "filters":{"$ref":"filters.schema.json"},
+    "conversation_session_id":{"type":["string","null"],"default":null},
+    "top_k":{"type":"integer","minimum":1,"default":5}
+  },
+  "required":["query_text_raw","query_text_segmented","filters"],
+  "additionalProperties":false
+}

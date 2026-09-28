@@ -1,0 +1,19 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"evidence.schema.json",
+  "title":"Evidence",
+  "type":"object",
+  "properties":{
+    "fragment_id":{"type":"string"},
+    "procedure_id":{"type":"string"},
+    "text":{"type":"string"},
+    "score":{"type":"number"},
+    "method":{"type":"string","enum":["exact_match","lexical","dense","fused"]},
+    "source_id":{"type":"string"},
+    "source_version":{"type":"string"},
+    "effective_date":{"type":"string","format":"date"},
+    "source_locator":{"type":"string"}
+  },
+  "required":["fragment_id","procedure_id","text","score","method","source_id","source_version","effective_date","source_locator"],
+  "additionalProperties":false
+}

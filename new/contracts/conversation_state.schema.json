@@ -1,0 +1,16 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"conversation_state.schema.json",
+  "title":"ConversationState",
+  "type":"object",
+  "properties":{
+    "session_id":{"type":"string"},
+    "last_resolved_procedure_id":{"type":["string","null"],"default":null},
+    "last_requested_section_types":{"type":"array","items":{"type":"string","enum":["fee","processing_time","required_documents","eligibility","submission_location","legal_basis","validity_period","other"]},"default":[]},
+    "active_filters":{"$ref":"filters.schema.json"},
+    "unresolved_references":{"type":"array","items":{"type":"string"},"default":[]},
+    "updated_at":{"type":"string","format":"date-time"}
+  },
+  "required":["session_id","active_filters","updated_at"],
+  "additionalProperties":false
+}
