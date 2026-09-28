@@ -1,20 +1,64 @@
 {
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "$id":"source_manifest.schema.json",
-  "title":"SourceManifest",
-  "type":"object",
-  "properties":{
-    "source_id":{"type":"string"},
-    "title":{"type":"string"},
-    "publishing_authority":{"type":"string"},
-    "reference_url":{"type":"string","format":"uri"},
-    "review_status":{"type":"string","enum":["draft","reviewed","published","deprecated"]},
-    "effective_date":{"type":"string","format":"date"},
-    "superseded_by":{"type":["string","null"],"default":null},
-    "version":{"type":"string"},
-    "content_hash":{"type":"string"},
-    "ingested_at":{"type":"string","format":"date-time"}
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "source_manifest.schema.json",
+  "title": "SourceManifest",
+  "type": "object",
+  "properties": {
+    "source_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "publishing_authority": {
+      "type": "string"
+    },
+    "reference_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "reviewed",
+        "published",
+        "deprecated"
+      ]
+    },
+    "effective_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "superseded_by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "version": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": "string"
+    },
+    "ingested_at": {
+      "type": "string",
+      "format": "date-time"
+    }
   },
-  "required":["source_id","title","review_status","effective_date","version","content_hash","ingested_at"],
-  "additionalProperties":false
+  "required": [
+    "source_id",
+    "title",
+    "review_status",
+    "effective_date",
+    "version",
+    "content_hash",
+    "ingested_at"
+  ],
+  "additionalProperties": false
 }

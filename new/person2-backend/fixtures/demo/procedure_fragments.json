@@ -1,0 +1,92 @@
+[
+  {
+    "fragment_id": "DEMO-A-fee",
+    "procedure_id": "DEMO-A",
+    "section_type": "fee",
+    "text": "Lệ phí giả lập Thủ tục thử nghiệm Alpha: 10 đơn vị thử nghiệm.",
+    "source_id": "DEMO-SOURCE",
+    "ordinal": 0,
+    "content_hash": "224e98e8e0a224c45ff99f30c9f64515a295ee79b4cf7dd19be1c140a06f66c5",
+    "source_locator": "synthetic://DEMO-A/fee"
+  },
+  {
+    "fragment_id": "DEMO-A-processing_time",
+    "procedure_id": "DEMO-A",
+    "section_type": "processing_time",
+    "text": "Thời gian giả lập Thủ tục thử nghiệm Alpha: 3 ngày thử nghiệm.",
+    "source_id": "DEMO-SOURCE",
+    "ordinal": 1,
+    "content_hash": "5743b6c08ac5780f9028ccd88df8f204920e3c377980cf291f3bc837428bab86",
+    "source_locator": "synthetic://DEMO-A/processing_time"
+  },
+  {
+    "fragment_id": "DEMO-A-required_documents",
+    "procedure_id": "DEMO-A",
+    "section_type": "required_documents",
+    "text": "Hồ sơ giả lập Thủ tục thử nghiệm Alpha: biểu mẫu minh họa, không phải giấy tờ thật.",
+    "source_id": "DEMO-SOURCE",
+    "ordinal": 2,
+    "content_hash": "a477f67094ec3caca530082de39fc250e1e3bf07d13242742a4b8a07caa66f6a",
+    "source_locator": "synthetic://DEMO-A/required_documents"
+  },
+  {
+    "fragment_id": "DEMO-B-fee",
+    "procedure_id": "DEMO-B",
+    "section_type": "fee",
+    "text": "Lệ phí giả lập Thủ tục thử nghiệm Beta: 10 đơn vị thử nghiệm.",
+    "source_id": "DEMO-SOURCE",
+    "ordinal": 0,
+    "content_hash": "989ccbd39fa5997be24c04177d55d797ae8e848766dd65ee20251862e4900d2d",
+    "source_locator": "synthetic://DEMO-B/fee"
+  },
+  {
+    "fragment_id": "DEMO-B-processing_time",
+    "procedure_id": "DEMO-B",
+    "section_type": "processing_time",
+    "text": "Thời gian giả lập Thủ tục thử nghiệm Beta: 3 ngày thử nghiệm.",
+    "source_id": "DEMO-SOURCE",
+    "ordinal": 1,
+    "content_hash": "ca94e0eef056251a27f578aacaf2f77409f30e326225173901a2754bf6ace3e5",
+    "source_locator": "synthetic://DEMO-B/processing_time"
+  },
+  {
+    "fragment_id": "DEMO-B-required_documents",
+    "procedure_id": "DEMO-B",
+    "section_type": "required_documents",
+    "text": "Hồ sơ giả lập Thủ tục thử nghiệm Beta: biểu mẫu minh họa, không phải giấy tờ thật.",
+    "source_id": "DEMO-SOURCE",
+    "ordinal": 2,
+    "content_hash": "b8b902c19c7f1d6fe7c59ccd3b0871005b6ec8caf73d6744e6c5ced4e4b013da",
+    "source_locator": "synthetic://DEMO-B/required_documents"
+  },
+  {
+    "fragment_id": "DEMO-C-fee",
+    "procedure_id": "DEMO-C",
+    "section_type": "fee",
+    "text": "Lệ phí giả lập Thủ tục thử nghiệm Gamma: 10 đơn vị thử nghiệm.",
+    "source_id": "DEMO-SOURCE",
+    "ordinal": 0,
+    "content_hash": "2ae49aaac980d83e7bf729585429ff000d431012321c774df2fbea96fae5d62a",
+    "source_locator": "synthetic://DEMO-C/fee"
+  },
+  {
+    "fragment_id": "DEMO-C-processing_time",
+    "procedure_id": "DEMO-C",
+    "section_type": "processing_time",
+    "text": "Thời gian giả lập Thủ tục thử nghiệm Gamma: 3 ngày thử nghiệm.",
+    "source_id": "DEMO-SOURCE",
+    "ordinal": 1,
+    "content_hash": "8b4692653477483d5d9dfbf7d494d922d2fc7f3496b8c61009bdb5d1cba0b2e5",
+    "source_locator": "synthetic://DEMO-C/processing_time"
+  },
+  {
+    "fragment_id": "DEMO-C-required_documents",
+    "procedure_id": "DEMO-C",
+    "section_type": "required_documents",
+    "text": "Hồ sơ giả lập Thủ tục thử nghiệm Gamma: biểu mẫu minh họa, không phải giấy tờ thật.",
+    "source_id": "DEMO-SOURCE",
+    "ordinal": 2,
+    "content_hash": "1deb52a29695c4fd1dc1b27ce14eac7995baba53a7dfa500af0c9c0deebc30a9",
+    "source_locator": "synthetic://DEMO-C/required_documents"
+  }
+]

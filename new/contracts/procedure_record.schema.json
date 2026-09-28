@@ -1,17 +1,51 @@
 {
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "$id":"procedure_record.schema.json",
-  "title":"ProcedureRecord",
-  "type":"object",
-  "properties":{
-    "procedure_id":{"type":"string"},
-    "canonical_name":{"type":"string"},
-    "aliases":{"type":"array","items":{"type":"string"},"default":[]},
-    "official_codes":{"type":"array","items":{"type":"string"},"default":[]},
-    "jurisdiction":{"type":"string"},
-    "fragment_ids":{"type":"array","items":{"type":"string"}},
-    "source_id":{"type":"string"}
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "procedure_record.schema.json",
+  "title": "ProcedureRecord",
+  "type": "object",
+  "properties": {
+    "procedure_id": {
+      "type": "string"
+    },
+    "canonical_name": {
+      "type": "string"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "official_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "jurisdiction": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "fragment_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_id": {
+      "type": "string"
+    }
   },
-  "required":["procedure_id","canonical_name","jurisdiction","fragment_ids","source_id"],
-  "additionalProperties":false
+  "required": [
+    "procedure_id",
+    "canonical_name",
+    "jurisdiction",
+    "fragment_ids",
+    "source_id"
+  ],
+  "additionalProperties": false
 }

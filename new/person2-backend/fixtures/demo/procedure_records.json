@@ -1,0 +1,50 @@
+[
+  {
+    "procedure_id": "DEMO-A",
+    "canonical_name": "Thủ tục thử nghiệm Alpha",
+    "aliases": [
+      "demo alpha",
+      "demo chung"
+    ],
+    "official_codes": [],
+    "jurisdiction": "demo",
+    "fragment_ids": [
+      "DEMO-A-fee",
+      "DEMO-A-processing_time",
+      "DEMO-A-required_documents"
+    ],
+    "source_id": "DEMO-SOURCE"
+  },
+  {
+    "procedure_id": "DEMO-B",
+    "canonical_name": "Thủ tục thử nghiệm Beta",
+    "aliases": [
+      "demo beta",
+      "demo chung"
+    ],
+    "official_codes": [],
+    "jurisdiction": "demo",
+    "fragment_ids": [
+      "DEMO-B-fee",
+      "DEMO-B-processing_time",
+      "DEMO-B-required_documents"
+    ],
+    "source_id": "DEMO-SOURCE"
+  },
+  {
+    "procedure_id": "DEMO-C",
+    "canonical_name": "Thủ tục thử nghiệm Gamma",
+    "aliases": [
+      "demo gamma",
+      "demo chung"
+    ],
+    "official_codes": [],
+    "jurisdiction": "demo",
+    "fragment_ids": [
+      "DEMO-C-fee",
+      "DEMO-C-processing_time",
+      "DEMO-C-required_documents"
+    ],
+    "source_id": "DEMO-SOURCE"
+  }
+]

@@ -1,21 +1,27 @@
 from functools import lru_cache
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine import URL
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
-    database_url: str = ""
-    db_host: str = "localhost"
+    model_config = SettingsConfigDict(env_file='.env', extra='ignore')
+    database_url: str = ''
+    db_host: str = '127.0.0.1'
     db_port: int = 5432
-    db_name: str = "hanh_chinh_new"
-    db_user: str = "app_user"
-    db_password: str = "change-me-local-only"
+    db_name: str = 'hanh_chinh_mvp'
+    db_user: str = 'app_user'
+    db_password: str = 'change-me-local-only'
+    segmenter_backend: str = 'underthesea'
+    allow_draft: bool = True  # explicit DEMO configuration
+    bootstrap_demo: bool = True
+    bm25_score_floor: float = 0.5  # UNCALIBRATED demo values
+    bm25_margin: float = 0.15
+    api_token: str = ''  # optional for loopback; set before remote exposure
 
     @property
-    def connection_url(self) -> str:
-        if self.database_url:
-            return self.database_url
-        return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+    def connection_url(self):
+        return self.database_url or URL.create('postgresql+asyncpg', username=self.db_user,
+            password=self.db_password,host=self.db_host,port=self.db_port,database=self.db_name)
 
 @lru_cache
-def get_settings() -> Settings:
-    return Settings()
+def get_settings(): return Settings()
