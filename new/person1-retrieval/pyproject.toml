@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "person1-retrieval"
+version = "0.1.0"
+description = "Person 1 Vietnamese segmentation spike"
+requires-python = ">=3.12,<3.13"
+dependencies = ["underthesea==9.5.0", "pyvi==0.1.1"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = ["integration: uses real installed segmenter models"]

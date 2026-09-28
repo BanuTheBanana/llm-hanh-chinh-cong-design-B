@@ -1,0 +1,4 @@
+# Empty deliberately. Add a phrase only after reviewing real segmentation errors.
+# One phrase per line, for example (uncomment only if justified):
+# hộ kinh doanh
+# người đại diện theo pháp luật
