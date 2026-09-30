@@ -1,5 +1,10 @@
 # Person 3 — Generation & Evaluation
 
+Giao diện benchmark độc lập dành cho Person 2 API nằm tại
+[`benchmark-frontend/`](benchmark-frontend/README.md). Thư mục này chỉ chứa
+React client; có thể copy sang máy thành viên khác và cấu hình
+`VITE_API_BASE_URL` theo backend local.
+
 Implementation track for the shared architecture. This folder consumes the repository-root
 `contracts/` as the authority and does not change RetrievalInput, EvidenceBundle,
 GroundedAnswer, or Citation shapes.
