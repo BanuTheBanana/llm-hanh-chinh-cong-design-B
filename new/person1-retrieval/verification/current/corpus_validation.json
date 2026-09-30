@@ -1,0 +1,14 @@
+{
+  "corpus_fingerprint": "6b61165a8ba68223573482bd29fabdd2f29f40d7ba976bbcec05e1fd9f8ae6fc",
+  "counts": {
+    "sources": 1,
+    "procedures": 3,
+    "fragments": 9
+  },
+  "review_status_counts": {
+    "draft": 1,
+    "reviewed": 0,
+    "published": 0,
+    "deprecated": 0
+  }
+}

@@ -1,0 +1,2892 @@
+[
+  {
+    "fragment_id": "PROC-S01-R0002-D",
+    "procedure_id": "PROC-S01-R0002",
+    "section_type": "other",
+    "text": "Hộ tịch",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 0,
+    "content_hash": "22b6a617b0bd531d1297ded488f53777f34343e785ad7b9c76dffa9696f57b61",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D2"
+  },
+  {
+    "fragment_id": "PROC-S01-R0002-E",
+    "procedure_id": "PROC-S01-R0002",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 1,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E2"
+  },
+  {
+    "fragment_id": "PROC-S01-R0002-F",
+    "procedure_id": "PROC-S01-R0002",
+    "section_type": "required_documents",
+    "text": "- Xuất trình giấy tờ chứng minh thông tin cư trú ( bản photo hộ khẩu bản chính nếu có, hoặc giấy xác nhận thông tin cư trú CT07 có mốc thời gian do Công an phường cấp)\n - Chứng minh nhân dân (hoặc căn cước công dân, hộ chiếu):\n 01 bản photo của người yêu cầu.\n Trường hợp chưa đăng ký kết hôn với ai và có hộ khẩu thường trú tại nhiều nơi: người yêu cầu phải về những nơi thường trú trước đây để xác nhận tình trạng hôn nhân giai đoạn nữ từ đủ 18 tuổi, nam từ đủ 20 tuổi. Nếu người yêu cầu không thể chứng minh tình trạng hôn nhân của mình thì UBND phường, xã nơi thường trú sẽ hỗ trợ xác minh. Sau thời hạn 20 ngày kể từ ngày gửi văn bản yêu cầu xác minh mà không nhận được văn bản trả lời, thì UBND phường, xã nơi thường trú cho phép người yêu cầu có văn bản cam đoan về tình trạng hôn nhân của mình và tiếp tục giải quyết hồ sơ theo quy định.\n Trường hợp đã ly hôn thì kèm Quyết định ly hôn.\n Trường hợp vợ hoặc chồng đã chết thì kèm trích lục khai tử",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 2,
+    "content_hash": "cdcb26cdb6e68701892be0a3917faf977bb1cfe7aeb62d290b00295e3a632e03",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F2"
+  },
+  {
+    "fragment_id": "PROC-S01-R0002-G",
+    "procedure_id": "PROC-S01-R0002",
+    "section_type": "processing_time",
+    "text": "Trong 03 ngày làm việc (nếu nhận hồ sơ sau 15 giờ thì trả kết quả vào ngày hôm sau)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 3,
+    "content_hash": "9eba28cfa0a895e63a026c4e827e985d122bee21e956bc163b769e45cc832e27",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G2"
+  },
+  {
+    "fragment_id": "PROC-S01-R0002-H",
+    "procedure_id": "PROC-S01-R0002",
+    "section_type": "fee",
+    "text": "Không thu phí",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 4,
+    "content_hash": "15f3fb53282afcbdcecc8b2e0ed4957e1a6fa0cc0f02cd05809578e67ffc756f",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H2"
+  },
+  {
+    "fragment_id": "PROC-S01-R0002-M",
+    "procedure_id": "PROC-S01-R0002",
+    "section_type": "legal_basis",
+    "text": "Luật 60/2014/QH13 (Luật Hộ tịch); Luật 52/2014/QH13 (Luật Hôn nhân và gia đình); Nghị quyết số 66.7/2025/NQ-CP; Nghị định số 123/2015/NĐ-CP; Nghị định số 87/2020/NĐ-CP; Nghị định số 104/2022/NĐ-CP; Nghị định số 07/2025/NĐ-CP; Nghị định số 120/2025/NĐ-CP; Nghị định số 18/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 04/2020/TT-BTP; Thông tư số 106/2021/TT-BTC; Thông tư số 01/2022/TT-BTP; Thông tư số 03/2023/TT-BTP; Thông tư số 04/2024/TT-BTP; Thông tư số 08/2025/TT-BTP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 5,
+    "content_hash": "d775dc8a89597b3dd8390b23aad324b1fbacc52efd27910bf2e56f9cdc52527e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M2"
+  },
+  {
+    "fragment_id": "PROC-S01-R0003-D",
+    "procedure_id": "PROC-S01-R0003",
+    "section_type": "other",
+    "text": "Hộ tịch",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 6,
+    "content_hash": "22b6a617b0bd531d1297ded488f53777f34343e785ad7b9c76dffa9696f57b61",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D3"
+  },
+  {
+    "fragment_id": "PROC-S01-R0003-E",
+    "procedure_id": "PROC-S01-R0003",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 7,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E3"
+  },
+  {
+    "fragment_id": "PROC-S01-R0003-F",
+    "procedure_id": "PROC-S01-R0003",
+    "section_type": "required_documents",
+    "text": "- Giấy chứng sinh (Bản chính)\n - Chứng minh nhân dân (hoặc căn cước công dân, hộ chiếu) của \n 2 vợ chồng (01 bản photo)\n - Giấy chứng nhận kết hôn (01 bản photo)\n (xuất trình bản chính để đối chiếu)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 8,
+    "content_hash": "d8e60ee948f0fa205663a0fd331253720bce382e8e1695d8a26ba21270f456d6",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F3"
+  },
+  {
+    "fragment_id": "PROC-S01-R0003-G",
+    "procedure_id": "PROC-S01-R0003",
+    "section_type": "processing_time",
+    "text": "1 ngày",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 9,
+    "content_hash": "c27b29af1990b0eea0167e31855669e51605f936c7fbbdaf620f12f08846885e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G3"
+  },
+  {
+    "fragment_id": "PROC-S01-R0003-H",
+    "procedure_id": "PROC-S01-R0003",
+    "section_type": "fee",
+    "text": "Bản chính: Không thu phí Bản sao: 8.000đ/bản",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 10,
+    "content_hash": "7915019fd2b2a633cae1504abb0b72d40a858c6050a28bfa8bfcd1d81074e5c3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H3"
+  },
+  {
+    "fragment_id": "PROC-S01-R0003-I",
+    "procedure_id": "PROC-S01-R0003",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 11,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I3"
+  },
+  {
+    "fragment_id": "PROC-S01-R0003-M",
+    "procedure_id": "PROC-S01-R0003",
+    "section_type": "legal_basis",
+    "text": "Luật 60/2014/QH13 (Luật Hộ tịch); Nghị quyết số 66.7/2025/NQ-CP; Nghị định số 123/2015/NĐ-CP; Nghị định số 87/2020/NĐ-CP; Nghị định số 104/2022/NĐ-CP; Nghị định số 07/2025/NĐ-CP; Nghị định số 120/2025/NĐ-CP; Nghị định số 18/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 04/2020/TT-BTP; Thông tư số 106/2021/TT-BTC; Thông tư số 01/2022/TT-BTP; Thông tư số 03/2023/TT-BTP; Thông tư số 04/2024/TT-BTP; Thông tư số 08/2025/TT-BTP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 12,
+    "content_hash": "51e024ff98f2e3002ad620872940c54e018dbb01d3e4143a5bca2cafd2f6ab67",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M3"
+  },
+  {
+    "fragment_id": "PROC-S01-R0004-D",
+    "procedure_id": "PROC-S01-R0004",
+    "section_type": "other",
+    "text": "Hộ tịch",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 13,
+    "content_hash": "22b6a617b0bd531d1297ded488f53777f34343e785ad7b9c76dffa9696f57b61",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D4"
+  },
+  {
+    "fragment_id": "PROC-S01-R0004-E",
+    "procedure_id": "PROC-S01-R0004",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 14,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E4"
+  },
+  {
+    "fragment_id": "PROC-S01-R0004-F",
+    "procedure_id": "PROC-S01-R0004",
+    "section_type": "required_documents",
+    "text": "- Chứng minh nhân dân hoặc căn cước công dân, hộ chiếu của người chết và người yêu cầu: 01 bản photo (có mối quan hệ nhân thân với người đã chết).\n - Chứng minh nhân dân (hoặc căn cước công dân, hộ chiếu) 01 bản photo của hai người làm chứng (Lưu ý: vợ; chồng; con không được làm chứng trong đơn)\n Trường hợp: người đã chết có hộ khẩu thường trú tại địa phương nhưng đã chết và được tổ chức tang lễ ở nơi khác thì phải đăng ký giấy báo tử tại UBND phường, xã nơi tổ chức tang lễ. Nộp giấy báo tử (bản chính) để đăng ký khai tử tại UBND phường, xã nơi thường trú.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 15,
+    "content_hash": "ef881f9f02b52a5fb36865e91ad85256c415cb9139b3040e5b947bb131c5e4d4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F4"
+  },
+  {
+    "fragment_id": "PROC-S01-R0004-G",
+    "procedure_id": "PROC-S01-R0004",
+    "section_type": "processing_time",
+    "text": "trong ngày làm việc (nếu nhận hồ sơ sau 15 giờ thì trả kết quả vào hôm sau)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 16,
+    "content_hash": "495381bd7064435c9d3796da476bb5291f8fe546231b959617582986dbbed048",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G4"
+  },
+  {
+    "fragment_id": "PROC-S01-R0004-H",
+    "procedure_id": "PROC-S01-R0004",
+    "section_type": "fee",
+    "text": "Bản chính: Không thu phí Bản sao: 8.000đ/bản",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 17,
+    "content_hash": "7915019fd2b2a633cae1504abb0b72d40a858c6050a28bfa8bfcd1d81074e5c3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H4"
+  },
+  {
+    "fragment_id": "PROC-S01-R0004-I",
+    "procedure_id": "PROC-S01-R0004",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 18,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I4"
+  },
+  {
+    "fragment_id": "PROC-S01-R0004-M",
+    "procedure_id": "PROC-S01-R0004",
+    "section_type": "legal_basis",
+    "text": "Luật 60/2014/QH13 (Luật Hộ tịch); Nghị quyết số 66.7/2025/NQ-CP; Nghị định số 123/2015/NĐ-CP; Nghị định số 87/2020/NĐ-CP; Nghị định số 104/2022/NĐ-CP; Nghị định số 07/2025/NĐ-CP; Nghị định số 120/2025/NĐ-CP; Nghị định số 18/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 04/2020/TT-BTP; Thông tư số 106/2021/TT-BTC; Thông tư số 01/2022/TT-BTP; Thông tư số 03/2023/TT-BTP; Thông tư số 04/2024/TT-BTP; Thông tư số 08/2025/TT-BTP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 19,
+    "content_hash": "51e024ff98f2e3002ad620872940c54e018dbb01d3e4143a5bca2cafd2f6ab67",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M4"
+  },
+  {
+    "fragment_id": "PROC-S01-R0005-D",
+    "procedure_id": "PROC-S01-R0005",
+    "section_type": "other",
+    "text": "Hộ tịch",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 20,
+    "content_hash": "22b6a617b0bd531d1297ded488f53777f34343e785ad7b9c76dffa9696f57b61",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D5"
+  },
+  {
+    "fragment_id": "PROC-S01-R0005-E",
+    "procedure_id": "PROC-S01-R0005",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 21,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E5"
+  },
+  {
+    "fragment_id": "PROC-S01-R0005-F",
+    "procedure_id": "PROC-S01-R0005",
+    "section_type": "required_documents",
+    "text": "Chứng minh nhân dân (hoặc căn cước công dân, hộ chiếu) của bên nam và bên nữ 01 bản photo (Xuất trình bản chính).\n Trường hợp bên nam hoặc bên nữ thường trú tại địa phương (nếu đã ly hôn thì kèm bản photo của quyết định ly hôn, nếu có chồng/vợ đã chết thì cung cấp đăng ký khai tử của chồng/vợ) không cần xác nhận tình trạng hôn nhân để đăng ký kết hôn.\n Giấy tờ chứng minh thông tin cư trú: thông báo đăng ký tạm trú (do công an phường cấp).",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 22,
+    "content_hash": "8d7529d5adbba281c2ecaacc0207032921f61223e26014eb1b0fb993f9ff7057",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F5"
+  },
+  {
+    "fragment_id": "PROC-S01-R0005-G",
+    "procedure_id": "PROC-S01-R0005",
+    "section_type": "processing_time",
+    "text": "Trong ngày làm việc (nếu nhận hồ sơ sau 15 giờ thì trả kết quả vào ngày hôm sau).",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 23,
+    "content_hash": "7e20a1c88e56609e592f9996de929b92b12345f5ab407342b86249223f622279",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G5"
+  },
+  {
+    "fragment_id": "PROC-S01-R0005-H",
+    "procedure_id": "PROC-S01-R0005",
+    "section_type": "fee",
+    "text": "Bản chính: Không thu phí Bản sao: 8.000đ/bản",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 24,
+    "content_hash": "7915019fd2b2a633cae1504abb0b72d40a858c6050a28bfa8bfcd1d81074e5c3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H5"
+  },
+  {
+    "fragment_id": "PROC-S01-R0005-I",
+    "procedure_id": "PROC-S01-R0005",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 25,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I5"
+  },
+  {
+    "fragment_id": "PROC-S01-R0005-M",
+    "procedure_id": "PROC-S01-R0005",
+    "section_type": "legal_basis",
+    "text": "Luật 60/2014/QH13 (Luật Hộ tịch); Luật 52/2014/QH13 (Luật Hôn nhân và gia đình); Nghị quyết số 66.7/2025/NQ-CP; Nghị định số 123/2015/NĐ-CP; Nghị định số 87/2020/NĐ-CP; Nghị định số 104/2022/NĐ-CP; Nghị định số 07/2025/NĐ-CP; Nghị định số 120/2025/NĐ-CP; Nghị định số 18/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 04/2020/TT-BTP; Thông tư số 106/2021/TT-BTC; Thông tư số 01/2022/TT-BTP; Thông tư số 03/2023/TT-BTP; Thông tư số 04/2024/TT-BTP; Thông tư số 08/2025/TT-BTP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 26,
+    "content_hash": "d775dc8a89597b3dd8390b23aad324b1fbacc52efd27910bf2e56f9cdc52527e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M5"
+  },
+  {
+    "fragment_id": "PROC-S01-R0006-D",
+    "procedure_id": "PROC-S01-R0006",
+    "section_type": "other",
+    "text": "Hộ tịch",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 27,
+    "content_hash": "22b6a617b0bd531d1297ded488f53777f34343e785ad7b9c76dffa9696f57b61",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D6"
+  },
+  {
+    "fragment_id": "PROC-S01-R0006-E",
+    "procedure_id": "PROC-S01-R0006",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 28,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E6"
+  },
+  {
+    "fragment_id": "PROC-S01-R0006-F",
+    "procedure_id": "PROC-S01-R0006",
+    "section_type": "required_documents",
+    "text": "- Giấy xác nhận thông tin cư trú của Công an cấp (thay thế Hộ khẩu): 01 Bản photo (Xuất trình bản chính)\n - Chứng minh nhân dân (hoặc căn cước công dân, hộ chiếu): 01 bản photo của người yêu cầu.\n - Tờ khai nhận cha, mẹ con (phải ghi ý kiến của người hiện đang là mẹ hoặc cha); “Tôi đồng ý cho Ông/Bà………..nhận bé………..là con.” Ký ghi rõ họ và tên.\n - Văn bản của cơ quan y tế, cơ quan giám định xác nhận quan hệ, cha, mẹ, con (bản chính) nếu có.\n - Cam kết con chung có ít nhất 02 người làm chứng về mối quan hệ cha, mẹ, con khi không có chứng cứ chứng minh quan hệ cha, mẹ, con theo quy định.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 29,
+    "content_hash": "c3d779db4e70dd66d47ccface30db7985c9c35f2bed87a7c11c5a3b122e21de9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F6"
+  },
+  {
+    "fragment_id": "PROC-S01-R0006-G",
+    "procedure_id": "PROC-S01-R0006",
+    "section_type": "processing_time",
+    "text": "Trong 07 ngày làm việc.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 30,
+    "content_hash": "3b506cbd98a3efdc4e34c99a4e8a11d6f7c387327036caecd24f9a6c2cb65001",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G6"
+  },
+  {
+    "fragment_id": "PROC-S01-R0006-H",
+    "procedure_id": "PROC-S01-R0006",
+    "section_type": "fee",
+    "text": "Bản chính: Không thu phí Bản sao: 8.000đ/bản",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 31,
+    "content_hash": "7915019fd2b2a633cae1504abb0b72d40a858c6050a28bfa8bfcd1d81074e5c3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H6"
+  },
+  {
+    "fragment_id": "PROC-S01-R0006-I",
+    "procedure_id": "PROC-S01-R0006",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 32,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I6"
+  },
+  {
+    "fragment_id": "PROC-S01-R0006-M",
+    "procedure_id": "PROC-S01-R0006",
+    "section_type": "legal_basis",
+    "text": "Luật 60/2014/QH13 (Luật Hộ tịch); Luật 52/2014/QH13 (Luật Hôn nhân và gia đình); Nghị quyết số 66.7/2025/NQ-CP; Nghị định số 123/2015/NĐ-CP; Nghị định số 87/2020/NĐ-CP; Nghị định số 104/2022/NĐ-CP; Nghị định số 07/2025/NĐ-CP; Nghị định số 120/2025/NĐ-CP; Nghị định số 18/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 04/2020/TT-BTP; Thông tư số 106/2021/TT-BTC; Thông tư số 01/2022/TT-BTP; Thông tư số 03/2023/TT-BTP; Thông tư số 04/2024/TT-BTP; Thông tư số 08/2025/TT-BTP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 33,
+    "content_hash": "d775dc8a89597b3dd8390b23aad324b1fbacc52efd27910bf2e56f9cdc52527e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M6"
+  },
+  {
+    "fragment_id": "PROC-S01-R0007-D",
+    "procedure_id": "PROC-S01-R0007",
+    "section_type": "other",
+    "text": "Hộ tịch",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 34,
+    "content_hash": "22b6a617b0bd531d1297ded488f53777f34343e785ad7b9c76dffa9696f57b61",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D7"
+  },
+  {
+    "fragment_id": "PROC-S01-R0007-E",
+    "procedure_id": "PROC-S01-R0007",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 35,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E7"
+  },
+  {
+    "fragment_id": "PROC-S01-R0007-F",
+    "procedure_id": "PROC-S01-R0007",
+    "section_type": "required_documents",
+    "text": "1. Tờ khai theo quy định (có mẫu sẵn)\n 2. Giấy tờ tùy thân (CMND, CCCD, Hộ chiếu, thẻ ID ....). Phải dịch thuật sang tiếng Việt Nam nếu các giấy tờ trên do cơ quan nước ngoài cấp.\n 3. Giấy tờ chứng minh nơi cư trú của người đăng ký kết hôn (Hộ khẩu, sổ tạm trú, Đơn xin xác nhận tạm trú, thẻ ID, bằng lái xe chứng minh nơi cư trú bên nước ngoài...) tại phường Tăng Nhơn Phú.\n Phải dịch thuật sang tiếng Việt Nam nếu các giấy tờ trên do cơ quan nước ngoài cấp.\n 4. Giấy xác nhận của tổ chức y tế có thẩm quyền xác nhận các bên không mắc bệnh tâm thần (Khám ở Bệnh viện Tâm thần. Địa chỉ: 766 Võ Văn Kiệt, (Phường 1, Quận 5) nay là phường Chợ Quán, TP.HCM)\n 5. Giấy tờ xác nhận tình trạng hôn nhân của vợ và chồng\n + Nếu có ly hôn phải nộp thêm bản quyết định ly hôn của Tòa án cấp\n + Tuyên thệ độc thân hoặc văn bản chứng minh độc thân của vợ hoặc chồng bên nước ngoài cấp. Khi về sử dụng tại Việt Nam phải được hợp pháp hóa lãnh sự văn bản đó và dịch thuật sang tiếng Việt Nam và được công chứng.\n 6. Bản sao trích lục hộ tịch về việc đã ghi vào sổ ly hôn hoặc hủy việc kết hôn (nếu có)\n - Nếu là công dân nước ngoài (đã bỏ quốc tịch Việt Nam) thì không cẩn làm thủ tục ghi chú ly hôn\n - Nếu là công dân Việt Nam khi ly hôn ở nước ngoài thì phải làm thủ tục ghi chú ly hôn tại nơi đăng ký ly hôn hoặc nơi trước khi xuất cảnh\n 7. Văn bản của cơ quan đơn vị quản lý xác nhận công chức viên chức đang phục vụ trong lực lượng vũ trang kết hôn",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 36,
+    "content_hash": "54fc4b82f0cb5a35311865ae3fd099a686771706b5ce7a35fa8d0d0d5c88c514",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F7"
+  },
+  {
+    "fragment_id": "PROC-S01-R0007-G",
+    "procedure_id": "PROC-S01-R0007",
+    "section_type": "processing_time",
+    "text": "5 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 37,
+    "content_hash": "b97dd4e7da01acc10e879dd98e430f56488cfc7b8955b77efe25dbe032cda230",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G7"
+  },
+  {
+    "fragment_id": "PROC-S01-R0007-H",
+    "procedure_id": "PROC-S01-R0007",
+    "section_type": "fee",
+    "text": "Bản chính: Không thu phí Bản sao: 8.000đ/bản sao",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 38,
+    "content_hash": "8ffb0f08bcc12f5485a02bf49983812257eb6c5a06d8130c369224289e195dff",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H7"
+  },
+  {
+    "fragment_id": "PROC-S01-R0007-I",
+    "procedure_id": "PROC-S01-R0007",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 39,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I7"
+  },
+  {
+    "fragment_id": "PROC-S01-R0007-M",
+    "procedure_id": "PROC-S01-R0007",
+    "section_type": "legal_basis",
+    "text": "Luật 60/2014/QH13 (Luật Hộ tịch); Luật 52/2014/QH13 (Luật Hôn nhân và gia đình); Nghị quyết số 66.7/2025/NQ-CP; Nghị định số 123/2015/NĐ-CP; Nghị định số 87/2020/NĐ-CP; Nghị định số 104/2022/NĐ-CP; Nghị định số 07/2025/NĐ-CP; Nghị định số 120/2025/NĐ-CP; Nghị định số 18/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 04/2020/TT-BTP; Thông tư số 106/2021/TT-BTC; Thông tư số 01/2022/TT-BTP; Thông tư số 03/2023/TT-BTP; Thông tư số 04/2024/TT-BTP; Thông tư số 08/2025/TT-BTP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 40,
+    "content_hash": "d775dc8a89597b3dd8390b23aad324b1fbacc52efd27910bf2e56f9cdc52527e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M7"
+  },
+  {
+    "fragment_id": "PROC-S01-R0008-D",
+    "procedure_id": "PROC-S01-R0008",
+    "section_type": "other",
+    "text": "Lao động - Tiền lương",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 41,
+    "content_hash": "e13c814617b87d2a8b8431ce16c5084e1a95b4b8af7f7077eb96a2f1f4337f4b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D8"
+  },
+  {
+    "fragment_id": "PROC-S01-R0008-E",
+    "procedure_id": "PROC-S01-R0008",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 42,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E8"
+  },
+  {
+    "fragment_id": "PROC-S01-R0008-F",
+    "procedure_id": "PROC-S01-R0008",
+    "section_type": "required_documents",
+    "text": "Công văn đăng ký; Biên bản họp thông qua nội quy lao động; Nội quy lao động",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 43,
+    "content_hash": "57423e8ed4a355223c7eee4ced80e3a43a46b5165780a49ef4b6289bafe64e50",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F8"
+  },
+  {
+    "fragment_id": "PROC-S01-R0008-G",
+    "procedure_id": "PROC-S01-R0008",
+    "section_type": "processing_time",
+    "text": "7 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 44,
+    "content_hash": "bfb2f4bf6c94e8c71c2d31dbb447e7b4d0a8739632b58102b285cf495b03c57e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G8"
+  },
+  {
+    "fragment_id": "PROC-S01-R0008-H",
+    "procedure_id": "PROC-S01-R0008",
+    "section_type": "fee",
+    "text": "Không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 45,
+    "content_hash": "5b3c9ba441e5afddc3ff22debcee6838fad74cf319b1c1af904c22b8a34cc0a4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H8"
+  },
+  {
+    "fragment_id": "PROC-S01-R0008-M",
+    "procedure_id": "PROC-S01-R0008",
+    "section_type": "legal_basis",
+    "text": "Bộ luật 45/2019/QH14 (Bộ luật Lao động); Nghị quyết số 190/2025/NQ-QH15; Nghị định số 145/2020/NĐ-CP; Nghị định số 25/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP; Nghị định số 129/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 46,
+    "content_hash": "92bfb42cb679ee2d5e4534e93b93f523d392aced5034c3d17546d9cf932a6ef0",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M8"
+  },
+  {
+    "fragment_id": "PROC-S01-R0009-D",
+    "procedure_id": "PROC-S01-R0009",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 47,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D9"
+  },
+  {
+    "fragment_id": "PROC-S01-R0009-E",
+    "procedure_id": "PROC-S01-R0009",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 48,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E9"
+  },
+  {
+    "fragment_id": "PROC-S01-R0009-F",
+    "procedure_id": "PROC-S01-R0009",
+    "section_type": "required_documents",
+    "text": "(Mẫu 01) Văn bản đề nghị hưởng trợ cấp hưu trí xã hội, căn cước công dân",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 49,
+    "content_hash": "8e63bf02c0e8ac3739287c5f8f03ed3360aee5fee9c8c85f31793340bbc61636",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F9"
+  },
+  {
+    "fragment_id": "PROC-S01-R0009-G",
+    "procedure_id": "PROC-S01-R0009",
+    "section_type": "processing_time",
+    "text": "10 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 50,
+    "content_hash": "7fbce2885c39ecedeba4d5acb14c844a3b4e30735233374408b681875f4616c4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G9"
+  },
+  {
+    "fragment_id": "PROC-S01-R0009-H",
+    "procedure_id": "PROC-S01-R0009",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 51,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H9"
+  },
+  {
+    "fragment_id": "PROC-S01-R0009-I",
+    "procedure_id": "PROC-S01-R0009",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 52,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I9"
+  },
+  {
+    "fragment_id": "PROC-S01-R0009-M",
+    "procedure_id": "PROC-S01-R0009",
+    "section_type": "legal_basis",
+    "text": "Luật 41/2024/QH15 (Luật Bảo hiểm xã hội); Nghị định số 42/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 53,
+    "content_hash": "d5fa6212e754f9a0b1f3462309d747a4edfb8d459b87794ce7e1f131734e2855",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M9"
+  },
+  {
+    "fragment_id": "PROC-S01-R0010-D",
+    "procedure_id": "PROC-S01-R0010",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 54,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D10"
+  },
+  {
+    "fragment_id": "PROC-S01-R0010-E",
+    "procedure_id": "PROC-S01-R0010",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 55,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E10"
+  },
+  {
+    "fragment_id": "PROC-S01-R0010-F",
+    "procedure_id": "PROC-S01-R0010",
+    "section_type": "required_documents",
+    "text": "(Mẫu 01) Đơn đề nghị xác định, xác định lại mức độ khuyết tật và cấp, cấp đổi, cấp lại giấy xác nhận khuyết tật, Bản sao các giấy tờ liên quan đến khuyết tật (nếu có) như: bệnh án, giấy tờ khám, điều trị, phẫu thuật hoặc các giấy tờ liên quan khác. Căn cước công dân.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 56,
+    "content_hash": "b8fc3081ccf24f501dbd300b7f93cf874c97e98fb0ae16cd59a9a109ce0e520b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F10"
+  },
+  {
+    "fragment_id": "PROC-S01-R0010-G",
+    "procedure_id": "PROC-S01-R0010",
+    "section_type": "processing_time",
+    "text": "25 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 57,
+    "content_hash": "25aab2e14cacdd180ca583ac49db663dd12b58f5d151161e6c01c772edae2763",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G10"
+  },
+  {
+    "fragment_id": "PROC-S01-R0010-H",
+    "procedure_id": "PROC-S01-R0010",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 58,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H10"
+  },
+  {
+    "fragment_id": "PROC-S01-R0010-I",
+    "procedure_id": "PROC-S01-R0010",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 59,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I10"
+  },
+  {
+    "fragment_id": "PROC-S01-R0010-M",
+    "procedure_id": "PROC-S01-R0010",
+    "section_type": "legal_basis",
+    "text": "Luật 51/2010/QH12 (Luật Người khuyết tật); Nghị định số 28/2012/NĐ-CP; Nghị định số 42/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP; Thông tư số 01/2019/TT-BLĐTBXH; Thông tư số 08/2023/TT-BLĐTBXH",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 60,
+    "content_hash": "fe248deec2793d002c1f33200fa4b5d0c8f6c0e90580f0a71cde5346221f93cd",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M10"
+  },
+  {
+    "fragment_id": "PROC-S01-R0011-D",
+    "procedure_id": "PROC-S01-R0011",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 61,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D11"
+  },
+  {
+    "fragment_id": "PROC-S01-R0011-E",
+    "procedure_id": "PROC-S01-R0011",
+    "section_type": "other",
+    "text": "Trực tiếp",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 62,
+    "content_hash": "e7f189bf00343e07d0713da74aab19b2d9b56f6c22db76ff627f62c2db443ae5",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E11"
+  },
+  {
+    "fragment_id": "PROC-S01-R0011-F",
+    "procedure_id": "PROC-S01-R0011",
+    "section_type": "required_documents",
+    "text": "Tờ khai thông tin hộ gia đình, cá nhân, tổ chức nhận chi phí hỗ trợ khuyến khích hỏa táng, hóa đơn VAT của đơn vị cung cấp dịch vụ hỏa táng (bản chính). Căn cước công dân của người đứng đơn.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 63,
+    "content_hash": "ce18f3d163b4ded9f210d3b41a15a3fdc9561a219d43212474be3dab79fe6acb",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F11"
+  },
+  {
+    "fragment_id": "PROC-S01-R0011-G",
+    "procedure_id": "PROC-S01-R0011",
+    "section_type": "processing_time",
+    "text": "12 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 64,
+    "content_hash": "3540bd43cf8e0bc23a474005fadc4cee3e1855adbd4328ac2b60ae1fd5d87fd1",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G11"
+  },
+  {
+    "fragment_id": "PROC-S01-R0011-H",
+    "procedure_id": "PROC-S01-R0011",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 65,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H11"
+  },
+  {
+    "fragment_id": "PROC-S01-R0011-I",
+    "procedure_id": "PROC-S01-R0011",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 66,
+    "content_hash": "f32ca4a0f78847c4ce57afe0a83aef8b84a4b60c87b06c96aa9a72762c7147bf",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I11"
+  },
+  {
+    "fragment_id": "PROC-S01-R0011-M",
+    "procedure_id": "PROC-S01-R0011",
+    "section_type": "legal_basis",
+    "text": "Quyết định số 14/2015/QĐ-UBND",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 67,
+    "content_hash": "d0c9e8464384b07bd25e86e51789eb64bc28dd277d0b233ca7eb38e32d17ba37",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M11"
+  },
+  {
+    "fragment_id": "PROC-S01-R0012-D",
+    "procedure_id": "PROC-S01-R0012",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 68,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D12"
+  },
+  {
+    "fragment_id": "PROC-S01-R0012-E",
+    "procedure_id": "PROC-S01-R0012",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 69,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E12"
+  },
+  {
+    "fragment_id": "PROC-S01-R0012-F",
+    "procedure_id": "PROC-S01-R0012",
+    "section_type": "required_documents",
+    "text": "Cá nhân làm đơn đề nghị theo Mẫu số 18 Phụ lục I Nghị định số 131/2021/NĐ-CP,  văn bản ủy quyền của những người cùng hàng thừa kế (xác nhận chữ ký của cơ quan có thẩm quyền) và bản sao được chứng thực Bằng “Tổ quốc ghi công”. Tường trình thân nhân của liệt sĩ.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 70,
+    "content_hash": "de676af6a9b566376123a52052ea521e014194f1fd4f87e26fce4686c4bfe1a3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F12"
+  },
+  {
+    "fragment_id": "PROC-S01-R0012-G",
+    "procedure_id": "PROC-S01-R0012",
+    "section_type": "processing_time",
+    "text": "17 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 71,
+    "content_hash": "92b94c0a5eb2b48687c5bfe1f1bdddd5e2667f6dc47bfdb0e2386eb56dd5f438",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G12"
+  },
+  {
+    "fragment_id": "PROC-S01-R0012-H",
+    "procedure_id": "PROC-S01-R0012",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 72,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H12"
+  },
+  {
+    "fragment_id": "PROC-S01-R0012-I",
+    "procedure_id": "PROC-S01-R0012",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 73,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I12"
+  },
+  {
+    "fragment_id": "PROC-S01-R0012-M",
+    "procedure_id": "PROC-S01-R0012",
+    "section_type": "legal_basis",
+    "text": "Pháp lệnh số 02/2020/UBTVQH14 (Ưu đãi người có công với cách mạng); Nghị quyết số 190/2025/NQ-QH15; Nghị định số 131/2021/NĐ-CP; Nghị định số 25/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP; Nghị định số 129/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 74,
+    "content_hash": "0054bc61adb4d4b6d8e851bb29b2465e2c1e8075137a3ec085521f1c6d1e5223",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M12"
+  },
+  {
+    "fragment_id": "PROC-S01-R0013-D",
+    "procedure_id": "PROC-S01-R0013",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 75,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D13"
+  },
+  {
+    "fragment_id": "PROC-S01-R0013-E",
+    "procedure_id": "PROC-S01-R0013",
+    "section_type": "other",
+    "text": "Trực tiếp",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 76,
+    "content_hash": "e7f189bf00343e07d0713da74aab19b2d9b56f6c22db76ff627f62c2db443ae5",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E13"
+  },
+  {
+    "fragment_id": "PROC-S01-R0013-F",
+    "procedure_id": "PROC-S01-R0013",
+    "section_type": "required_documents",
+    "text": "Đơn đề nghị theo Mẫu số 16 Phụ lục I Nghị định số 131/2021/NĐ-CP; Bản gốc Bằng “Tổ quốc ghi công”; Một trong các giấy tờ chứng minh thân nhân đã được giải quyết chế độ ưu đãi: Quyết định hưởng trợ cấp; sổ nhận trợ cấp ưu đãi; danh sách chi trả trợ cấp hằng tháng hoặc trợ cấp một lần khi báo tử có ký nhận của người hưởng trợ cấp; giấy tờ khác do cơ quan có thẩm quyền ban hành, xác nhận được lập từ ngày 31 tháng 12 năm 1994 trở về trước.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 77,
+    "content_hash": "6d7528f5b0c178822b0cbcc71812dbde49596e67f9780dccadc1832b09f35aa8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F13"
+  },
+  {
+    "fragment_id": "PROC-S01-R0013-G",
+    "procedure_id": "PROC-S01-R0013",
+    "section_type": "processing_time",
+    "text": "129 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 78,
+    "content_hash": "1df9045f3e7d309e4c3de1901b6f9164e465f9b8f6c797a8a0a0760d87af68bd",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G13"
+  },
+  {
+    "fragment_id": "PROC-S01-R0013-H",
+    "procedure_id": "PROC-S01-R0013",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 79,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H13"
+  },
+  {
+    "fragment_id": "PROC-S01-R0013-I",
+    "procedure_id": "PROC-S01-R0013",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 80,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I13"
+  },
+  {
+    "fragment_id": "PROC-S01-R0013-M",
+    "procedure_id": "PROC-S01-R0013",
+    "section_type": "legal_basis",
+    "text": "Pháp lệnh số 02/2020/UBTVQH14 (Ưu đãi người có công với cách mạng); Nghị quyết số 190/2025/NQ-QH15; Nghị định số 131/2021/NĐ-CP; Nghị định số 25/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 81,
+    "content_hash": "9f12e1b4c3dccc2c714d106e23b6e532678ccebaedcd4b675cf86b43b9f7921a",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M13"
+  },
+  {
+    "fragment_id": "PROC-S01-R0014-D",
+    "procedure_id": "PROC-S01-R0014",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 82,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D14"
+  },
+  {
+    "fragment_id": "PROC-S01-R0014-E",
+    "procedure_id": "PROC-S01-R0014",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 83,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E14"
+  },
+  {
+    "fragment_id": "PROC-S01-R0014-F",
+    "procedure_id": "PROC-S01-R0014",
+    "section_type": "required_documents",
+    "text": "Đơn đề nghị cấp giấy xác nhận thân nhân của người có công. Bản sao được chứng thực từ một trong các giấy tờ sau: \n+ Giấy chứng nhận người có công hoặc Kỷ niệm chương người hoạt động cách mạng, kháng chiến, bảo vệ Tổ quốc, làm nghĩa vụ quốc tế bị địch bắt tù, đày; Huân chương, Huy chương kháng chiến; Huân chương, Huy chương chiến thắng; kỷ niệm chương “Tổ quốc ghi công”; bằng “Có công với nước”. \n+ Giấy tờ do cơ quan có thẩm quyền ban hành, xác nhận mối quan hệ với người có công gồm: căn cước công dân.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 84,
+    "content_hash": "a3ac60796bc5472ba41e03911e3319482bd1e8cae1df783ea531a5efce1fb7af",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F14"
+  },
+  {
+    "fragment_id": "PROC-S01-R0014-G",
+    "procedure_id": "PROC-S01-R0014",
+    "section_type": "processing_time",
+    "text": "05 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 85,
+    "content_hash": "22dde015e1d447c1405b83ca5f956b9e66845c8298c1379eaa48d04f9dff9677",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G14"
+  },
+  {
+    "fragment_id": "PROC-S01-R0014-H",
+    "procedure_id": "PROC-S01-R0014",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 86,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H14"
+  },
+  {
+    "fragment_id": "PROC-S01-R0014-I",
+    "procedure_id": "PROC-S01-R0014",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành ch1inh công",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 87,
+    "content_hash": "a8b0de505e6e69a219cecf4bf880ea9e98f79049baf2304466b7bc98a71a019d",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I14"
+  },
+  {
+    "fragment_id": "PROC-S01-R0014-M",
+    "procedure_id": "PROC-S01-R0014",
+    "section_type": "legal_basis",
+    "text": "Pháp lệnh số 02/2020/UBTVQH14 (Ưu đãi người có công với cách mạng); Nghị quyết số 190/2025/NQ-QH15; Nghị định số 131/2021/NĐ-CP; Nghị định số 104/2022/NĐ-CP; Nghị định số 25/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 88,
+    "content_hash": "e4f268c620e670e954817493bdb6c469494eb5ff2e0214a995b555b161b1b3a0",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M14"
+  },
+  {
+    "fragment_id": "PROC-S01-R0015-D",
+    "procedure_id": "PROC-S01-R0015",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 89,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D15"
+  },
+  {
+    "fragment_id": "PROC-S01-R0015-E",
+    "procedure_id": "PROC-S01-R0015",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 90,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E15"
+  },
+  {
+    "fragment_id": "PROC-S01-R0015-F",
+    "procedure_id": "PROC-S01-R0015",
+    "section_type": "required_documents",
+    "text": "Bản khai theo Mẫu số 12 Phụ lục I Nghị định số 131/2021/NĐ-CP. Bản sao được chứng thực từ giấy báo tử hoặc trích lục khai tử. Văn bản Ủy quyền làm hồ sơ mai táng phí và nhận tiền trợ cấp 1 lần (nếu có nhiều người cùng hàng thừa kế); Tường trình quan hệ thân nhân Căn cước công dân của người đứng đơn",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 91,
+    "content_hash": "51091a37d91e1c4b6d273348577c5722a71b44157c8f52702e5427afeff6a578",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F15"
+  },
+  {
+    "fragment_id": "PROC-S01-R0015-G",
+    "procedure_id": "PROC-S01-R0015",
+    "section_type": "processing_time",
+    "text": "24 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 92,
+    "content_hash": "39309fb312d0b0456419a332f9c31e0107552584dc9709f7d7521179baca1bfa",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G15"
+  },
+  {
+    "fragment_id": "PROC-S01-R0015-H",
+    "procedure_id": "PROC-S01-R0015",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 93,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H15"
+  },
+  {
+    "fragment_id": "PROC-S01-R0015-I",
+    "procedure_id": "PROC-S01-R0015",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 94,
+    "content_hash": "4b13db85e2f50cfd1a01b53327f74551246424865a0e397b8cc76df03d0c7022",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I15"
+  },
+  {
+    "fragment_id": "PROC-S01-R0015-J",
+    "procedure_id": "PROC-S01-R0015",
+    "section_type": "other",
+    "text": "đã có",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 95,
+    "content_hash": "db720f697321b806e40f53935aed762030513f4c73a3d3b965aedfe4cd94158d",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!J15"
+  },
+  {
+    "fragment_id": "PROC-S01-R0015-M",
+    "procedure_id": "PROC-S01-R0015",
+    "section_type": "legal_basis",
+    "text": "Pháp lệnh số 02/2020/UBTVQH14 (Ưu đãi người có công với cách mạng); Nghị quyết số 190/2025/NQ-QH15; Nghị định số 131/2021/NĐ-CP; Nghị định số 25/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP; Nghị định số 129/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 96,
+    "content_hash": "0054bc61adb4d4b6d8e851bb29b2465e2c1e8075137a3ec085521f1c6d1e5223",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M15"
+  },
+  {
+    "fragment_id": "PROC-S01-R0016-D",
+    "procedure_id": "PROC-S01-R0016",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 97,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D16"
+  },
+  {
+    "fragment_id": "PROC-S01-R0016-E",
+    "procedure_id": "PROC-S01-R0016",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 98,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E16"
+  },
+  {
+    "fragment_id": "PROC-S01-R0016-F",
+    "procedure_id": "PROC-S01-R0016",
+    "section_type": "required_documents",
+    "text": "Đơn đề nghị Mẫu số 18 Phụ lục I Nghị định số 131/2021/NĐ-CP (Bản chính)\nBằng Tổ quốc ghi công (bản sao được chứng thực)\nVăn bản ủy quyền (Bản chính)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 99,
+    "content_hash": "be1a69bd75c4459a7cb6af62a1966cc51544c88c54a48c4c3e7226e302fcc419",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F16"
+  },
+  {
+    "fragment_id": "PROC-S01-R0016-G",
+    "procedure_id": "PROC-S01-R0016",
+    "section_type": "processing_time",
+    "text": "05 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 100,
+    "content_hash": "22dde015e1d447c1405b83ca5f956b9e66845c8298c1379eaa48d04f9dff9677",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G16"
+  },
+  {
+    "fragment_id": "PROC-S01-R0016-H",
+    "procedure_id": "PROC-S01-R0016",
+    "section_type": "fee",
+    "text": "không đồng ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 101,
+    "content_hash": "f5f5eee35ceb71ecfbeead3a4c8612018f1c899447340f16410145e8ee044ce2",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H16"
+  },
+  {
+    "fragment_id": "PROC-S01-R0016-I",
+    "procedure_id": "PROC-S01-R0016",
+    "section_type": "submission_location",
+    "text": "Tổ Nội vụ - Phòng Văn hóa - Xã hội phường Tăng Nhơn Phú ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 102,
+    "content_hash": "d8cf322a58c42a985e68c97e4191a126e8ec24404284dd2a6323eb458939a988",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I16"
+  },
+  {
+    "fragment_id": "PROC-S01-R0016-M",
+    "procedure_id": "PROC-S01-R0016",
+    "section_type": "legal_basis",
+    "text": "Pháp lệnh số 02/2020/UBTVQH14 (Ưu đãi người có công với cách mạng); Nghị quyết số 190/2025/NQ-QH15; Nghị định số 131/2021/NĐ-CP; Nghị định số 25/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP; Nghị định số 129/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 103,
+    "content_hash": "0054bc61adb4d4b6d8e851bb29b2465e2c1e8075137a3ec085521f1c6d1e5223",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M16"
+  },
+  {
+    "fragment_id": "PROC-S01-R0017-D",
+    "procedure_id": "PROC-S01-R0017",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 104,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D17"
+  },
+  {
+    "fragment_id": "PROC-S01-R0017-E",
+    "procedure_id": "PROC-S01-R0017",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 105,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E17"
+  },
+  {
+    "fragment_id": "PROC-S01-R0017-F",
+    "procedure_id": "PROC-S01-R0017",
+    "section_type": "required_documents",
+    "text": "1/ Bản chính tờ khai thông tin gia đình, cá nhân, tổ chức nhận chi phí hỗ trợ khuyến khích hỏa táng; 2/ Bản photo (kèm bản chính để đố chiếu) hoặc bản sao giấy chứng từ của người được hỏa táng; 3/Bản chính hóa đơn đã được thanh toán của cơ sở hỏa táng theo quy định của Bộ Tài chính; 4/ Đối với cá nhân thực hiện thủ tục thông qua ủy quyền hoặc đại diện tổ chức, đoàn thể thực hiện thủ tục: xuất trình văn bản ủy quyền hoặc giấy giới thiệu theo quy định.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 106,
+    "content_hash": "8e8f79fd4d799a8851fa428d0662698a1061ef483dcf1847ca90b925bb35ce80",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F17"
+  },
+  {
+    "fragment_id": "PROC-S01-R0017-G",
+    "procedure_id": "PROC-S01-R0017",
+    "section_type": "processing_time",
+    "text": "12 (muời hai) ngày làm việc, kể từ ngày nhận được hồ sơ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 107,
+    "content_hash": "46178355f9115a65d2b3bc16f567d882e747122482271781b34f2ccfdfbda2bc",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G17"
+  },
+  {
+    "fragment_id": "PROC-S01-R0017-H",
+    "procedure_id": "PROC-S01-R0017",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 108,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H17"
+  },
+  {
+    "fragment_id": "PROC-S01-R0017-I",
+    "procedure_id": "PROC-S01-R0017",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ Hành chính công phường Tăng Nhơn Phú, số 29 Lê Văn Việt, phường Tăng Nhơn Phú, TP.HCM",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 109,
+    "content_hash": "bc6baef742d4b6d3b6d7f69f681b7a57fdba9ab2c18a3160f546871d744c8da3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I17"
+  },
+  {
+    "fragment_id": "PROC-S01-R0017-M",
+    "procedure_id": "PROC-S01-R0017",
+    "section_type": "legal_basis",
+    "text": "Quyết định số 14/2015/QĐ-UBND",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 110,
+    "content_hash": "d0c9e8464384b07bd25e86e51789eb64bc28dd277d0b233ca7eb38e32d17ba37",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M17"
+  },
+  {
+    "fragment_id": "PROC-S01-R0018-D",
+    "procedure_id": "PROC-S01-R0018",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 111,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D18"
+  },
+  {
+    "fragment_id": "PROC-S01-R0018-E",
+    "procedure_id": "PROC-S01-R0018",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 112,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E18"
+  },
+  {
+    "fragment_id": "PROC-S01-R0018-F",
+    "procedure_id": "PROC-S01-R0018",
+    "section_type": "required_documents",
+    "text": "1/ Bản chínhTờ khai đề nghị hỗ trợ chi phí mai táng (theo mẫu số 04 ban hành kèm theo Phụ lục tại Nghị định số 20/2021/NĐ-CP ngày 15/3/2021); 2/ Bản sao Giấy chứng tử của đối tượng; 3/ Bản sao Quyết định đối với trường hợp người từ đủ 80 tuổi đang hưởng trợ cấp tuất bảo hiểm xã hội hàng tháng.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 113,
+    "content_hash": "6cecd4bfe4d2263ff80f8f1c18315bfdc267c27f260e7b9aa4d3f2019b5896e6",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F18"
+  },
+  {
+    "fragment_id": "PROC-S01-R0018-G",
+    "procedure_id": "PROC-S01-R0018",
+    "section_type": "processing_time",
+    "text": "Ba (03) ngày làm việc, kể từ ngày nhận đủ hồ sơ và hợp lệ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 114,
+    "content_hash": "5409735639ca60973c5db360791356e43eefc7397e29b28d0936b7d58640d81c",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G18"
+  },
+  {
+    "fragment_id": "PROC-S01-R0018-H",
+    "procedure_id": "PROC-S01-R0018",
+    "section_type": "fee",
+    "text": "Không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 115,
+    "content_hash": "5b3c9ba441e5afddc3ff22debcee6838fad74cf319b1c1af904c22b8a34cc0a4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H18"
+  },
+  {
+    "fragment_id": "PROC-S01-R0018-I",
+    "procedure_id": "PROC-S01-R0018",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công phường Tăng Nhơn Phú, số 29 Lê Văn Việt, phường Tăng Nhơn Phú, TP.HCM",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 116,
+    "content_hash": "dfe98710e48b693311b3f98a3a2732a19ba550a4e2ae2ab64e10d8e63dda9bc4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I18"
+  },
+  {
+    "fragment_id": "PROC-S01-R0018-M",
+    "procedure_id": "PROC-S01-R0018",
+    "section_type": "legal_basis",
+    "text": "Nghị định số 20/2021/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 117,
+    "content_hash": "16baaefb5859338dc8cea4401a61451af38920c75406cbcd86521b82c216df2b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M18"
+  },
+  {
+    "fragment_id": "PROC-S01-R0019-D",
+    "procedure_id": "PROC-S01-R0019",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 118,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D19"
+  },
+  {
+    "fragment_id": "PROC-S01-R0019-E",
+    "procedure_id": "PROC-S01-R0019",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 119,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E19"
+  },
+  {
+    "fragment_id": "PROC-S01-R0019-F",
+    "procedure_id": "PROC-S01-R0019",
+    "section_type": "required_documents",
+    "text": "I. Trường hợp đề nghị trợ cấp xã hội hàng tháng: \nBản chính Tờ khai của đối tượng (theo Mẫu số 1a, 1b, 1c, 1d, 1đ ban hành kèm theo Nghị định số 20/2021/NĐ-CP).\nII. Trường hợp đề nghị hỗ trợ kinh phí chăm sóc, nuôi dưỡng hàng tháng:\n1/ Bản chính Tờ khai nhận chăm sóc, nuôi dưỡng đối tượng bảo trợ xã hội (theo Mẫu số 2b ban hành kèm theo Nghị định số 20/2021/NĐ-CP)\n2/ Bản chính Tờ khai của đối tượng được nhận chăm sóc, nuôi dưỡng trong trường hợp đối tượng không hưởng trợ cấp xã hội hàng tháng (theo Mẫu số 03 ban hành kèm theo Nghị định số 20/2021/NĐ-CP)\n3/ Bản chính Tờ khai nhận chăm sóc, nuôi dưỡng đối tượng bảo trợ xã hội (theo Mẫu số 2b ban hành kèm theo Nghị định số 20/2021/NĐ-CP)\nIII. Các giấy tờ khác kèm theo (đối với trường hợp nộp trực tiếp):\n1/ Giấy xác nhận thông tin về cư trú hoặc Giấy thông báo số định danh cá nhân và thông tin trong Cơ sở dữ liệu quốc gia về dân cư; chứng minh thư nhân dân hoặc thẻ căn cước công dân (Dùng để đối chiếu thông tin trên Tờ khai)\n2/ Giấy khai sinh của trẻ em đối với trường hợp xét trợ cấp xã hội đối với trẻ em, người đơn thân nghèo đang nuôi con, người khuyết tật đang nuôi con;\n3/ Giấy tờ xác nhận bị nhiễm HIV của cơ quan y tế có thẩm quyền đối với trường hợp bị nhiễm HIV;\n4/ Giấy tờ xác nhận đang mang thai của cơ quan y tế có thẩm quyền đối với trường hợp người khuyết tật đang mang thai;\n5/ Giấy xác nhận khuyết tật đối với trường hợp người khuyết tật.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 120,
+    "content_hash": "b9b1cafb4c2cc6b4cc39a72544382e436fc965f7fe61869998b300efbea5f8f0",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F19"
+  },
+  {
+    "fragment_id": "PROC-S01-R0019-G",
+    "procedure_id": "PROC-S01-R0019",
+    "section_type": "processing_time",
+    "text": "Mười (10) ngày làm việc, kể từ ngày nhận đủ hồ sơ và hợp lệ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 121,
+    "content_hash": "497bb033ec9a3a054598f71cb77a96ca918be6cb646c6c56a43d962e9b7c4641",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G19"
+  },
+  {
+    "fragment_id": "PROC-S01-R0019-H",
+    "procedure_id": "PROC-S01-R0019",
+    "section_type": "fee",
+    "text": "Không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 122,
+    "content_hash": "5b3c9ba441e5afddc3ff22debcee6838fad74cf319b1c1af904c22b8a34cc0a4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H19"
+  },
+  {
+    "fragment_id": "PROC-S01-R0019-I",
+    "procedure_id": "PROC-S01-R0019",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ Hành chính công phường Tăng Nhơn Phú, số 29 Lê Văn Việt, phường Tăng Nhơn Phú, TP.HCM",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 123,
+    "content_hash": "bc6baef742d4b6d3b6d7f69f681b7a57fdba9ab2c18a3160f546871d744c8da3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I19"
+  },
+  {
+    "fragment_id": "PROC-S01-R0019-M",
+    "procedure_id": "PROC-S01-R0019",
+    "section_type": "legal_basis",
+    "text": "Nghị định số 20/2021/NĐ-CP; Nghị định số 104/2022/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 124,
+    "content_hash": "1e747a5eeb6f3a8960a5866ff3cf53fa5abc5ba4de350d041aede34d2ad0fd3a",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M19"
+  },
+  {
+    "fragment_id": "PROC-S01-R0020-D",
+    "procedure_id": "PROC-S01-R0020",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 125,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D20"
+  },
+  {
+    "fragment_id": "PROC-S01-R0020-E",
+    "procedure_id": "PROC-S01-R0020",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 126,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E20"
+  },
+  {
+    "fragment_id": "PROC-S01-R0020-F",
+    "procedure_id": "PROC-S01-R0020",
+    "section_type": "required_documents",
+    "text": "1. Đối với trợ cấp một lần và trợ cấp mai táng:\nBản khai theo Mẫu số 12 Phụ lục I Nghị định số 131/2021/NĐ-CP (01bản chính)\nGiấy báo tử hoặc trích lục khai tử ( 01 bản sao)\nGiấy ủy quyền ( 01 bản sao)\n2. Đối với trợ cấp tuất hàng tháng, trợ cấp tuất nuôi dưỡng hàng tháng\nBản khai theo Mẫu số 12 Phụ lục I Nghị định số 131/2021/NĐ-CP (01bản chính)\nGiấy báo tử hoặc trích lục khai tử ( 01 bản sao)\nGiấy khai sinh hoặc trích lục khai sinh đối với trường hợp thân nhân là con chưa đủ 18 tuổi (01 bản sao)\nGiấy xác nhận của cơ sở giáo dục nơi đang theo học đối với trường hợp thân nhân là con từ đủ 18 tuổi trở lên đang đi học; nếu đnà theo học tại cơ sở giáo dục nghề nghiệp hoặc giáo dục đại học thì phải có thêm bản sao được chứng thực từ Bằng tốt nghiệp trung học phổ thông hoặc giấy xác nhân của cơ sở giáo dục trung học phổ thông về thời điểm kết thúc học (01 bản chính)\nGiấy ủy quyền (nếu có) ( 01 bản sao)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 127,
+    "content_hash": "abf67f412092a6b2c21609a5cce8f37cf9f225ad57e0e638cfa1d4b2cb1992ae",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F20"
+  },
+  {
+    "fragment_id": "PROC-S01-R0020-G",
+    "procedure_id": "PROC-S01-R0020",
+    "section_type": "processing_time",
+    "text": "Đ/v trợ cấp 1 lần và trợ cấp mai táng: 16 ngày, Đ/v trợ cấp tuất hàng tháng: 12 ngày",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 128,
+    "content_hash": "8d2b3488e806ed5fc3cd4bb9fcbedc5286b51b086133b41517b68d67bad3640e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G20"
+  },
+  {
+    "fragment_id": "PROC-S01-R0020-H",
+    "procedure_id": "PROC-S01-R0020",
+    "section_type": "fee",
+    "text": "không đồng ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 129,
+    "content_hash": "f5f5eee35ceb71ecfbeead3a4c8612018f1c899447340f16410145e8ee044ce2",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H20"
+  },
+  {
+    "fragment_id": "PROC-S01-R0020-I",
+    "procedure_id": "PROC-S01-R0020",
+    "section_type": "submission_location",
+    "text": "Tổ Nội vụ - Phòng Văn hóa - xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 130,
+    "content_hash": "0e1b8b0f7d26d76d25dbe63d5ba540ba671fd35cf724ba97f28614593661f99b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I20"
+  },
+  {
+    "fragment_id": "PROC-S01-R0020-M",
+    "procedure_id": "PROC-S01-R0020",
+    "section_type": "legal_basis",
+    "text": "Pháp lệnh số 02/2020/UBTVQH14 (Ưu đãi người có công với cách mạng); Nghị quyết số 190/2025/NQ-QH15; Nghị định số 131/2021/NĐ-CP; Nghị định số 25/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP; Nghị định số 129/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 131,
+    "content_hash": "0054bc61adb4d4b6d8e851bb29b2465e2c1e8075137a3ec085521f1c6d1e5223",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M20"
+  },
+  {
+    "fragment_id": "PROC-S01-R0021-D",
+    "procedure_id": "PROC-S01-R0021",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 132,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D21"
+  },
+  {
+    "fragment_id": "PROC-S01-R0021-E",
+    "procedure_id": "PROC-S01-R0021",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 133,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E21"
+  },
+  {
+    "fragment_id": "PROC-S01-R0021-F",
+    "procedure_id": "PROC-S01-R0021",
+    "section_type": "required_documents",
+    "text": "Bản chính Văn bản đề nghị hưởng trợ cấp hưu trí xã hội (theo Mẫu số 01 ban hành kèm theo Nghị định số 176/2025/NĐ-CP)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 134,
+    "content_hash": "937db5a9e737d5428828c04b194ca742f0e1a1dd037ab73d70acd44718b642a7",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F21"
+  },
+  {
+    "fragment_id": "PROC-S01-R0021-G",
+    "procedure_id": "PROC-S01-R0021",
+    "section_type": "processing_time",
+    "text": "Mười (10) ngày làm việc, kể từ ngày nhận đủ hồ sơ và hợp lệ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 135,
+    "content_hash": "497bb033ec9a3a054598f71cb77a96ca918be6cb646c6c56a43d962e9b7c4641",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G21"
+  },
+  {
+    "fragment_id": "PROC-S01-R0021-H",
+    "procedure_id": "PROC-S01-R0021",
+    "section_type": "fee",
+    "text": "Không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 136,
+    "content_hash": "5b3c9ba441e5afddc3ff22debcee6838fad74cf319b1c1af904c22b8a34cc0a4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H21"
+  },
+  {
+    "fragment_id": "PROC-S01-R0021-I",
+    "procedure_id": "PROC-S01-R0021",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ Hành chính công phường Tăng Nhơn Phú, 29 Lê Văn Việt, phường Tăng Nhơn Phú, TP.HCM",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 137,
+    "content_hash": "007e2690239894b614ce881856cd99aee62d0078277573c2d4d41959a1fca946",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I21"
+  },
+  {
+    "fragment_id": "PROC-S01-R0021-M",
+    "procedure_id": "PROC-S01-R0021",
+    "section_type": "legal_basis",
+    "text": "Nghị định số 176/2025/NĐ-CP; Luật 41/2024/QH15 (Luật Bảo hiểm xã hội)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 138,
+    "content_hash": "5b3822432b0ae2c390d16f982d95503fc8687e6852648d6acfea2dda7fce2f6e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M21"
+  },
+  {
+    "fragment_id": "PROC-S01-R0022-D",
+    "procedure_id": "PROC-S01-R0022",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 139,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D22"
+  },
+  {
+    "fragment_id": "PROC-S01-R0022-E",
+    "procedure_id": "PROC-S01-R0022",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 140,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E22"
+  },
+  {
+    "fragment_id": "PROC-S01-R0022-F",
+    "procedure_id": "PROC-S01-R0022",
+    "section_type": "required_documents",
+    "text": "Bản chính Tờ khai đề nghị hỗ trợ chi phí mai táng (theo Mẫu số 02 ban hành kèm theo Nghị định số 176/2025/NĐ-CP)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 141,
+    "content_hash": "527cac169e6cd56990a75b1c665a1f24bc07a8407279c00b6eb046b96d86218f",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F22"
+  },
+  {
+    "fragment_id": "PROC-S01-R0022-G",
+    "procedure_id": "PROC-S01-R0022",
+    "section_type": "processing_time",
+    "text": "Ba (3) ngày làm việc, kể từ ngày nhận đủ hồ sơ và hợp lệ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 142,
+    "content_hash": "fab71ca07fc057e95014f85e5dbd3c6b12cd5dfc08460232750abe955d6dfd31",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G22"
+  },
+  {
+    "fragment_id": "PROC-S01-R0022-H",
+    "procedure_id": "PROC-S01-R0022",
+    "section_type": "fee",
+    "text": "Không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 143,
+    "content_hash": "5b3c9ba441e5afddc3ff22debcee6838fad74cf319b1c1af904c22b8a34cc0a4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H22"
+  },
+  {
+    "fragment_id": "PROC-S01-R0022-I",
+    "procedure_id": "PROC-S01-R0022",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ Hành chính công phường Tăng Nhơn Phú, 29 Lê Văn Việt, phường Tăng Nhơn Phú, TP.HCM",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 144,
+    "content_hash": "007e2690239894b614ce881856cd99aee62d0078277573c2d4d41959a1fca946",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I22"
+  },
+  {
+    "fragment_id": "PROC-S01-R0022-M",
+    "procedure_id": "PROC-S01-R0022",
+    "section_type": "legal_basis",
+    "text": "Luật 41/2024/QH15 (Luật Bảo hiểm xã hội); Nghị định số 176/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 145,
+    "content_hash": "05cacd2d3e37bfc614b06d998ed0e06cbf661bd07b418a7190ae35286b7a4028",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M22"
+  },
+  {
+    "fragment_id": "PROC-S01-R0023-D",
+    "procedure_id": "PROC-S01-R0023",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 146,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D23"
+  },
+  {
+    "fragment_id": "PROC-S01-R0023-E",
+    "procedure_id": "PROC-S01-R0023",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 147,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E23"
+  },
+  {
+    "fragment_id": "PROC-S01-R0023-F",
+    "procedure_id": "PROC-S01-R0023",
+    "section_type": "required_documents",
+    "text": "Đơn đề nghị theo Mẫu số 20 Phụ lục I Nghị định số 131/2021/NĐ-CP ( 01 bản chính)\nGiấy xác nhậ theo Mẫu số 41 Nghị định số 131/2021/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 148,
+    "content_hash": "a0e25cb73b951b640970940d6a3ac30a5e6aad8174d018b70fac6861ec6c97c1",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F23"
+  },
+  {
+    "fragment_id": "PROC-S01-R0023-G",
+    "procedure_id": "PROC-S01-R0023",
+    "section_type": "processing_time",
+    "text": "5 ngày ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 149,
+    "content_hash": "895570c8797721f9e4a69c830556428c23809c0a5a0a90e5d8932e3524afeaff",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G23"
+  },
+  {
+    "fragment_id": "PROC-S01-R0023-H",
+    "procedure_id": "PROC-S01-R0023",
+    "section_type": "fee",
+    "text": "không đồng",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 150,
+    "content_hash": "f3b8ccdf3741b30e3bc927c178295071cb3c4c9d85ce979a4b0e2ae734c1f25c",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H23"
+  },
+  {
+    "fragment_id": "PROC-S01-R0023-I",
+    "procedure_id": "PROC-S01-R0023",
+    "section_type": "submission_location",
+    "text": "Tổ nội vụ - Phòng Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 151,
+    "content_hash": "acc9d66d89f12852ab96bc9ce6e03601d567d4c3d0d5ce653126afaab1a8e66f",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I23"
+  },
+  {
+    "fragment_id": "PROC-S01-R0023-M",
+    "procedure_id": "PROC-S01-R0023",
+    "section_type": "legal_basis",
+    "text": "Pháp lệnh số 02/2020/UBTVQH14 (Ưu đãi người có công với cách mạng); Nghị quyết số 190/2025/NQ-QH15; Nghị định số 131/2021/NĐ-CP; Nghị định số 25/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP; Nghị định số 129/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 152,
+    "content_hash": "0054bc61adb4d4b6d8e851bb29b2465e2c1e8075137a3ec085521f1c6d1e5223",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M23"
+  },
+  {
+    "fragment_id": "PROC-S01-R0024-D",
+    "procedure_id": "PROC-S01-R0024",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 153,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D24"
+  },
+  {
+    "fragment_id": "PROC-S01-R0024-E",
+    "procedure_id": "PROC-S01-R0024",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 154,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E24"
+  },
+  {
+    "fragment_id": "PROC-S01-R0024-F",
+    "procedure_id": "PROC-S01-R0024",
+    "section_type": "required_documents",
+    "text": "I. Đơn đề nghị xác định, xác định lại mức độ khuyết tật và cấp, cấp đổi, cấp lại giáy xác nhận khuyết tật (theo mẫu số 01 ban hành kèm theo Thông tư 01/2019/TT-BLĐTBXH)\nII. Đối với trường hợp xác định mức độ khuyết tật:\n1/ Các giấy tờ y tế chứng minh về khuyết tật: bệnh án, giấy tờ khám, điều trị, phẫu thuật hoặc các giấy tờ liên quan khác (nếu có).\n2/ Kết luận của Hội đồng Giám định y khoa về khả năng tự phục vụ, mức độ suy giảm khả năng lao động đối với trường hợp người khuyết tật đã có kết luận của Hội đồng giám định y khoa trước ngày 01/6/2012.\nIII. Đối với trường hợp xác định lại khuyết tật: Các giấy tờ y tế chứng minh về khuyết tật: bệnh án, giấy tờ khám, điều trị, phẫu thuật, Giáy xác nhận khuyết tật cũ hoặc các giấy tờ liên quan khác (nếu có).\nIV. Các giấy tờ khác kèm theo (đối với trường hợp nộp trực tiếp) dùng đẻ đối chiếu các thông tin trên Tờ khai\n1/ Giấy xác nhận thông tin về cư trú hoặc Giấy thông báo số định danh cá nhân và thông tin trong Cơ sở dữ liệu quốc gia về dân cư; chứng minh thư nhân dân hoặc thẻ căn cước công dân của đối tượng, người đại diện hợp pháp.\n2/ Bản chính, bản sao hoặc bản chụp Giấy khai sinh đối với trẻ em.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 155,
+    "content_hash": "612ec91401ca52a3451a67e08e13dcef5e6cbe4937fec98168fda71387fc49b9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F24"
+  },
+  {
+    "fragment_id": "PROC-S01-R0024-G",
+    "procedure_id": "PROC-S01-R0024",
+    "section_type": "processing_time",
+    "text": "25 ngày làm việc, kể từ ngày nhận đủ hồ sơ và hợp lệ;",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 156,
+    "content_hash": "70bde760d4517cc99e9afa086b50421e7da0453411de6dcf58f03f37d22bec16",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G24"
+  },
+  {
+    "fragment_id": "PROC-S01-R0024-H",
+    "procedure_id": "PROC-S01-R0024",
+    "section_type": "fee",
+    "text": "Không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 157,
+    "content_hash": "5b3c9ba441e5afddc3ff22debcee6838fad74cf319b1c1af904c22b8a34cc0a4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H24"
+  },
+  {
+    "fragment_id": "PROC-S01-R0024-I",
+    "procedure_id": "PROC-S01-R0024",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ Hành chính công phường Tăng Nhơn Phú, 29 Lê Văn Việt, phường Tăng Nhơn Phú, TP.HCM",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 158,
+    "content_hash": "007e2690239894b614ce881856cd99aee62d0078277573c2d4d41959a1fca946",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I24"
+  },
+  {
+    "fragment_id": "PROC-S01-R0024-M",
+    "procedure_id": "PROC-S01-R0024",
+    "section_type": "legal_basis",
+    "text": "Luật 51/2010/QH12 (Luật Người khuyết tật); Nghị định số 28/2012/NĐ-CP; Nghị định số 42/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP; Thông tư số 01/2019/TT-BLĐTBXH; Thông tư số 08/2023/TT-BLĐTBXH",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 159,
+    "content_hash": "fe248deec2793d002c1f33200fa4b5d0c8f6c0e90580f0a71cde5346221f93cd",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M24"
+  },
+  {
+    "fragment_id": "PROC-S01-R0025-D",
+    "procedure_id": "PROC-S01-R0025",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 160,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D25"
+  },
+  {
+    "fragment_id": "PROC-S01-R0025-E",
+    "procedure_id": "PROC-S01-R0025",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 161,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E25"
+  },
+  {
+    "fragment_id": "PROC-S01-R0025-F",
+    "procedure_id": "PROC-S01-R0025",
+    "section_type": "required_documents",
+    "text": "Bản khai theo mẫu số 11 Phục lục I Nghi định số 131/2021/NĐ-CP (01 bản chính)\nGiấy báo tử hoặc trích lục khai tử ( đối với trường hợp chết mà chưa được hưởng chế độ ưu đãi) (01 bản chính)\nHuân chương Kháng chiến, Huân chương Chiến thắng, Huy chương kháng chiến, Huy chương Chiến thắng hoặc giấy chứng nhận đeo huân chương, huy chương.( 01 bản sao được chứng thực)\nQuyết định tặng thưởng Huân chương Kháng chiến, Huân chương chiến thắng, Huy chương kháng chiến, Huy chương chiến thắng ( 01 bản sao được chứng thực)\nGiấy xác nhận về khen thưởng tổng kết thành tích kháng chiến và thời gian hoạt động kháng chiến thực tế của cơ quan Thi đua - Khen thưởng cấp tỉnh trở lên ( 01 bản sao được chứng thực)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 162,
+    "content_hash": "25eeeac2b4f4c5b3495e0dc35767df662daa6456215032b8415bbd7cb5c89208",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F25"
+  },
+  {
+    "fragment_id": "PROC-S01-R0025-G",
+    "procedure_id": "PROC-S01-R0025",
+    "section_type": "processing_time",
+    "text": "5 ngày ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 163,
+    "content_hash": "895570c8797721f9e4a69c830556428c23809c0a5a0a90e5d8932e3524afeaff",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G25"
+  },
+  {
+    "fragment_id": "PROC-S01-R0025-H",
+    "procedure_id": "PROC-S01-R0025",
+    "section_type": "fee",
+    "text": "không ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 164,
+    "content_hash": "fb9ee9e907137c05d362970e478c175e05d55cd84e4373720bab8c20443aa710",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H25"
+  },
+  {
+    "fragment_id": "PROC-S01-R0025-I",
+    "procedure_id": "PROC-S01-R0025",
+    "section_type": "submission_location",
+    "text": "Tổ Nội vụ - Phòng Văn hóa - xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 165,
+    "content_hash": "0e1b8b0f7d26d76d25dbe63d5ba540ba671fd35cf724ba97f28614593661f99b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I25"
+  },
+  {
+    "fragment_id": "PROC-S01-R0025-M",
+    "procedure_id": "PROC-S01-R0025",
+    "section_type": "legal_basis",
+    "text": "Pháp lệnh số 02/2020/UBTVQH14 (Ưu đãi người có công với cách mạng); Nghị quyết số 190/2025/NQ-QH15; Nghị định số 131/2021/NĐ-CP; Nghị định số 25/2025/NĐ-CP; Nghị định số 45/2025/NĐ-CP; Nghị định số 129/2025/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 166,
+    "content_hash": "0054bc61adb4d4b6d8e851bb29b2465e2c1e8075137a3ec085521f1c6d1e5223",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M25"
+  },
+  {
+    "fragment_id": "PROC-S01-R0026-D",
+    "procedure_id": "PROC-S01-R0026",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 167,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D26"
+  },
+  {
+    "fragment_id": "PROC-S01-R0026-E",
+    "procedure_id": "PROC-S01-R0026",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 168,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E26"
+  },
+  {
+    "fragment_id": "PROC-S01-R0026-F",
+    "procedure_id": "PROC-S01-R0026",
+    "section_type": "required_documents",
+    "text": "THÀNH PHẦN HỒ SƠ CẤP GIẤY PHÉP XÂY DỰNG: \nNỘP TRỰC TUYẾN QUA CỔNG DỊCH VỤ CÔNG QUỐC GIA\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 169,
+    "content_hash": "18ecb818fdca66179d65366af93533e16f36c0031d670bdb5d250b707d5a6310",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F26"
+  },
+  {
+    "fragment_id": "PROC-S01-R0026-G",
+    "procedure_id": "PROC-S01-R0026",
+    "section_type": "processing_time",
+    "text": "20",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 170,
+    "content_hash": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G26"
+  },
+  {
+    "fragment_id": "PROC-S01-R0026-H",
+    "procedure_id": "PROC-S01-R0026",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 171,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H26"
+  },
+  {
+    "fragment_id": "PROC-S01-R0026-M",
+    "procedure_id": "PROC-S01-R0026",
+    "section_type": "legal_basis",
+    "text": "Luật 50/2014/QH13 (Luật Xây dựng); Luật 62/2020/QH14 (Luật sửa đổi, bổ sung một số điều của Luật Xây dựng); Nghị định số 15/2021/NĐ-CP; Nghị định số 35/2023/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 172,
+    "content_hash": "c856b106fd7a44e95ab26f92aa5395cafab0fbb9cefef696ec3602a6cf2007db",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M26"
+  },
+  {
+    "fragment_id": "PROC-S01-R0027-D",
+    "procedure_id": "PROC-S01-R0027",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 173,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D27"
+  },
+  {
+    "fragment_id": "PROC-S01-R0027-E",
+    "procedure_id": "PROC-S01-R0027",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 174,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E27"
+  },
+  {
+    "fragment_id": "PROC-S01-R0027-F",
+    "procedure_id": "PROC-S01-R0027",
+    "section_type": "required_documents",
+    "text": "1.\tĐơn đề nghị cung cấp thông tin quy hoạch;\n2.\tGiấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở & tài sản gắn liền với đất hoặc giấy tờ pháp lý liên quan đến nhà đất;\n3.\t Trường hợp nộp thay (yêu cầu có giấy ủy quyền)\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 175,
+    "content_hash": "7b82dd1255710f804f2367b0f5a17bc255dc7c6179060f257f2604b8d7a007c9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F27"
+  },
+  {
+    "fragment_id": "PROC-S01-R0027-G",
+    "procedure_id": "PROC-S01-R0027",
+    "section_type": "processing_time",
+    "text": "10 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 176,
+    "content_hash": "7fbce2885c39ecedeba4d5acb14c844a3b4e30735233374408b681875f4616c4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G27"
+  },
+  {
+    "fragment_id": "PROC-S01-R0027-H",
+    "procedure_id": "PROC-S01-R0027",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 177,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H27"
+  },
+  {
+    "fragment_id": "PROC-S01-R0027-I",
+    "procedure_id": "PROC-S01-R0027",
+    "section_type": "submission_location",
+    "text": "TTPVHCC",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 178,
+    "content_hash": "664aac9a86c61cba2e7d1a6224964d414dae7653b8c8a751ed6c4c785d8e8b45",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I27"
+  },
+  {
+    "fragment_id": "PROC-S01-R0027-M",
+    "procedure_id": "PROC-S01-R0027",
+    "section_type": "legal_basis",
+    "text": "Luật 47/2024/QH15 (Luật Quy hoạch đô thị và nông thôn); Luật 144/2025/QH15 (Luật sửa đổi, bổ sung một số điều của Luật Quy hoạch đô thị và nông thôn); Nghị định số 178/2025/NĐ-CP; Nghị định số 34/2026/NĐ-CP; Thông tư số 16/2025/TT-BXD; Thông tư số 43/2025/TT-BXD",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 179,
+    "content_hash": "f81f74257cdd7fe058d76366a22c0b4d26d7a42a4a3017b0759918cafc4f5cab",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M27"
+  },
+  {
+    "fragment_id": "PROC-S01-R0028-D",
+    "procedure_id": "PROC-S01-R0028",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 180,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D28"
+  },
+  {
+    "fragment_id": "PROC-S01-R0028-E",
+    "procedure_id": "PROC-S01-R0028",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 181,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E28"
+  },
+  {
+    "fragment_id": "PROC-S01-R0028-F",
+    "procedure_id": "PROC-S01-R0028",
+    "section_type": "required_documents",
+    "text": "1. Thành phần hồ sơ cấp giấy phép xây dựng, giấp phép sửa chữa cải tạo nhà ở riêng lẻ (tất cả hồ sơ đều phải sao y điện tử trừ bản vẽ thiết kế xây dựng và đơn đề nghị cấp phép xây dựng) – Thời gian giải quyết 20 ngày đối với công trình và 15 ngày đối với nhà ở riêng lẻ.\n- Đơn đề nghị cấp giấy phép xây dựng, sửa chữa, cải tạo công trình theo Mẫu số 1 Phụ lục số II Nghị định số 175/2024/NĐ-CP ngày 30/12/2024 của Chính phủ.\n- Một trong những giấy tờ hợp pháp về đất đai chứng minh sự phù hợp mục đích sử dụng đất và sở hữu công trình để cấp phép xây dựng theo quy định tại Điều 53 của Nghị định số 175/2024/NĐ-CP. Trường hợp giấy chứng nhận cũ không có tọa độ theo tài liệu 02/CT-UB phải có bản vẽ hiện trạng có duyệt kiểm định kèm theo.\n- Bản vẽ thiết kế xây dựng.\n- Cam kết đảm bảo an toàn cho các công trình liền kề (có chứng thực chữ ký).\n- Cam kết tháo dỡ toàn bộ nhà cũ trước khi xây dựng công trình theo giấy phép xây dựng (có chứng thực chữ ký) – áp dụng đối với thửa đất có nhà hiện hữu.\n- Hồ sơ năng lực của đơn vị tư vấn thiết kế.\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 182,
+    "content_hash": "a5925c2761a470838c4ca4530cfb492863fa00cf8dc76eff7508d9c9a91302e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F28"
+  },
+  {
+    "fragment_id": "PROC-S01-R0028-G",
+    "procedure_id": "PROC-S01-R0028",
+    "section_type": "processing_time",
+    "text": "15",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 183,
+    "content_hash": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G28"
+  },
+  {
+    "fragment_id": "PROC-S01-R0028-H",
+    "procedure_id": "PROC-S01-R0028",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 184,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H28"
+  },
+  {
+    "fragment_id": "PROC-S01-R0028-I",
+    "procedure_id": "PROC-S01-R0028",
+    "section_type": "submission_location",
+    "text": "TTPVHCC",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 185,
+    "content_hash": "664aac9a86c61cba2e7d1a6224964d414dae7653b8c8a751ed6c4c785d8e8b45",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I28"
+  },
+  {
+    "fragment_id": "PROC-S01-R0028-M",
+    "procedure_id": "PROC-S01-R0028",
+    "section_type": "legal_basis",
+    "text": "Luật 50/2014/QH13 (Luật Xây dựng); Luật 62/2020/QH14 (Luật sửa đổi, bổ sung một số điều của Luật Xây dựng); Nghị định số 15/2021/NĐ-CP; Nghị định số 35/2023/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 186,
+    "content_hash": "c856b106fd7a44e95ab26f92aa5395cafab0fbb9cefef696ec3602a6cf2007db",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M28"
+  },
+  {
+    "fragment_id": "PROC-S01-R0029-D",
+    "procedure_id": "PROC-S01-R0029",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 187,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D29"
+  },
+  {
+    "fragment_id": "PROC-S01-R0029-E",
+    "procedure_id": "PROC-S01-R0029",
+    "section_type": "other",
+    "text": "Trực tiếp",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 188,
+    "content_hash": "e7f189bf00343e07d0713da74aab19b2d9b56f6c22db76ff627f62c2db443ae5",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E29"
+  },
+  {
+    "fragment_id": "PROC-S01-R0029-F",
+    "procedure_id": "PROC-S01-R0029",
+    "section_type": "required_documents",
+    "text": "Danh sách đề nghị vay vốn\nGiấy đề nghị vay vốn\nCCCD\nBiên bản họp",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 189,
+    "content_hash": "6d07ba3154c0d615a450eb4b04f867b8bdf0df235cf7902ed451f00d74763ab3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F29"
+  },
+  {
+    "fragment_id": "PROC-S01-R0029-G",
+    "procedure_id": "PROC-S01-R0029",
+    "section_type": "processing_time",
+    "text": "5 ngày",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 190,
+    "content_hash": "215a10157fc7dcbb746d91ad9077e12c99a53601e9a227a9c94eed5f53cc09f1",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G29"
+  },
+  {
+    "fragment_id": "PROC-S01-R0029-H",
+    "procedure_id": "PROC-S01-R0029",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 191,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H29"
+  },
+  {
+    "fragment_id": "PROC-S01-R0029-M",
+    "procedure_id": "PROC-S01-R0029",
+    "section_type": "legal_basis",
+    "text": "Luật 38/2013/QH13 (Luật Việc làm); Nghị định số 61/2015/NĐ-CP; Nghị định số 74/2019/NĐ-CP; Nghị định số 104/2022/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 192,
+    "content_hash": "41f48c9cc67fc388b64a4a51cedff1fcf8075d79d4614d5c0784a067bf72e9f9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M29"
+  },
+  {
+    "fragment_id": "PROC-S01-R0030-D",
+    "procedure_id": "PROC-S01-R0030",
+    "section_type": "other",
+    "text": "giáo dục và đào tạo",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 193,
+    "content_hash": "0b182562a1b152d8ee862f1f435743471cbae109b614056f4183e79d31a5fcc8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D30"
+  },
+  {
+    "fragment_id": "PROC-S01-R0030-E",
+    "procedure_id": "PROC-S01-R0030",
+    "section_type": "other",
+    "text": "Trực tiếp",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 194,
+    "content_hash": "e7f189bf00343e07d0713da74aab19b2d9b56f6c22db76ff627f62c2db443ae5",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E30"
+  },
+  {
+    "fragment_id": "PROC-S01-R0030-F",
+    "procedure_id": "PROC-S01-R0030",
+    "section_type": "required_documents",
+    "text": "1. Thành phần hồ sơ chuyển trường ĐẾN:\n- Đơn xin chuyển trường (có xác nhận của trường đi)\n- Giấy giới thiệu của phường đi\n- Giấy giới thiệu của trường đi \n- Giấy xác nhận nơi cư trú hoặc giấy xác nhận mã định danh (bản photo)\n- Bản sao khai sinh.\n- Học bạ (bản photo); khi đến nhận giấy giới thiệu thì mang bản chính.\n- Các giấy tờ khác liên quan (nếu có)\n\n2. Thành phần hồ sơ chuyển trường ĐI:\n- Đơn xin chuyển trường (có xác nhận của trường đến)\n- Giấy giới thiệu của trường đi \n- Giấy xác nhận nơi cư trú hoặc giấy xác nhận mã định danh (bản photo)\n- Bản sao khai sinh.\n- Học bạ (bản photo); khi đến nhận giấy giới thiệu thì mang bản chính\n- Các giấy tờ khác liên quan (nếu có)\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 195,
+    "content_hash": "5942cb0a3ba14b3ddbbf9d7ac40370e726453d843858cb9c6b1d2ab3d4db569f",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F30"
+  },
+  {
+    "fragment_id": "PROC-S01-R0030-G",
+    "procedure_id": "PROC-S01-R0030",
+    "section_type": "processing_time",
+    "text": "3–5 ngày làm việc kể từ khi nhận đủ hồ sơ hợp lệ.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 196,
+    "content_hash": "f8207ebb3d98e4dd6c26e0c36bbdc240f8e9d16e766bed60505ec8bb6c253e58",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G30"
+  },
+  {
+    "fragment_id": "PROC-S01-R0030-H",
+    "procedure_id": "PROC-S01-R0030",
+    "section_type": "fee",
+    "text": "không có",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 197,
+    "content_hash": "8d94a04eddbefbc3fcfd69b3ba0e0ee0c004d918753753854de47efdd85416f0",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H30"
+  },
+  {
+    "fragment_id": "PROC-S01-R0030-I",
+    "procedure_id": "PROC-S01-R0030",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ hành chính công Phường Tăng Nhơn Phú, Địa chỉ: 29 Lê Văn Việt, Phường Tăng Nhơn Phú, Thành phố Hồ Chí Minh ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 198,
+    "content_hash": "727f63992236ad9ed84c2febb36f210808f832d806b26ca66f1ede871b1cc47b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I30"
+  },
+  {
+    "fragment_id": "PROC-S01-R0030-M",
+    "procedure_id": "PROC-S01-R0030",
+    "section_type": "legal_basis",
+    "text": "Nghị định số 104/2022/NĐ-CP; Quyết định số 51/2002/QĐ-BGDĐT; Thông tư số 32/2020/TT-BGDĐT; Thông tư số 50/2021/TT-BGDĐT",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 199,
+    "content_hash": "5652821770f4eb981cd26cc2afb43553f9d534cb9779d59f355b8c2368a17d01",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M30"
+  },
+  {
+    "fragment_id": "PROC-S01-R0031-D",
+    "procedure_id": "PROC-S01-R0031",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 200,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D31"
+  },
+  {
+    "fragment_id": "PROC-S01-R0031-E",
+    "procedure_id": "PROC-S01-R0031",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 201,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E31"
+  },
+  {
+    "fragment_id": "PROC-S01-R0031-F",
+    "procedure_id": "PROC-S01-R0031",
+    "section_type": "required_documents",
+    "text": "1.\t Thông báo khởi công xây dựng nhà ở riêng lẻ (bản chính)\n2.\t Giấy phép xây dựng (kèm bản vẽ thiết kế) bản sao);\n3.\t Biên bản cắm mốc ranh (bản chính);\n4.\t Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất (bản sao);\n5.\tHợp đồng thi công công trình hoặc đơn vị thi công (bảo sao);\n6.\tCCCD (bản sao)\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 202,
+    "content_hash": "4353e050d68d7eef5872a5c576f91b90414454ccf5960841869fe856f5e8b543",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F31"
+  },
+  {
+    "fragment_id": "PROC-S01-R0031-G",
+    "procedure_id": "PROC-S01-R0031",
+    "section_type": "processing_time",
+    "text": "1",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 203,
+    "content_hash": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G31"
+  },
+  {
+    "fragment_id": "PROC-S01-R0031-H",
+    "procedure_id": "PROC-S01-R0031",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 204,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H31"
+  },
+  {
+    "fragment_id": "PROC-S01-R0031-M",
+    "procedure_id": "PROC-S01-R0031",
+    "section_type": "legal_basis",
+    "text": "Luật 50/2014/QH13 (Luật Xây dựng); Luật 62/2020/QH14 (Luật sửa đổi, bổ sung một số điều của Luật Xây dựng); Nghị định số 06/2021/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 205,
+    "content_hash": "b667043e843eab7bc8feca65db860ab1f9a5fab98e1e96efddaec352a31a6316",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M31"
+  },
+  {
+    "fragment_id": "PROC-S01-R0032-D",
+    "procedure_id": "PROC-S01-R0032",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 206,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D32"
+  },
+  {
+    "fragment_id": "PROC-S01-R0032-E",
+    "procedure_id": "PROC-S01-R0032",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 207,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E32"
+  },
+  {
+    "fragment_id": "PROC-S01-R0032-F",
+    "procedure_id": "PROC-S01-R0032",
+    "section_type": "required_documents",
+    "text": "1. Đối với người đang sử dụng đất, chủ sở hữu tài sản gắn liền với đất là tổ chức trong nước, tổ chức tôn giáo, tổ chức tôn giáo trực thuộc, tổ chức nước ngoài có chức năng ngoại giao, tổ chức kinh tế có vốn đầu tư nước ngoài (sau đây gọi chung là tổ chức), người gốc Việt Nam định cư ở nước ngoài nhận thừa kế quyền sử dụng đất theo quy định tại điểm h khoản 1 Điều 28 Luật Đất đai thì hồ sơ nộp gồm:\na) Đơn đăng ký đất đai, tài sản gắn liền với đất theo Mẫu số 15 ban hành kèm theo Nghị định này;\nb) Một trong các loại giấy tờ quy định tại Điều 137, khoản 4, khoản 5 Điều 148, khoản 4, khoản 5 Điều 149 Luật Đất đai (nếu có);\nc) Giấy tờ về việc nhận thừa kế quyền sử dụng đất theo quy định của pháp luật về dân sự đối với người gốc Việt Nam định cư ở nước ngoài;\nd) Sơ đồ hoặc bản trích lục bản đồ địa chính hoặc mảnh trích đo bản đồ địa chính thửa đất (nếu có); mảnh trích đo bản đồ địa chính thửa đất (nếu có) đối với người gốc Việt Nam định cư ở nước ngoài;\nd) Báo cáo kết quả rà soát hiện trạng sử dụng đất theo Mẫu số 15đ ban hành kèm theo Nghị định này đối với trường hợp tổ chức trong nước, tổ chức tôn giáo, tổ chức tôn giáo trực thuộc đang sử dụng đất;\ne) Quyết định vị trí đóng quân hoặc văn bản giao cơ sở nhà đất hoặc địa điểm công trình quốc phòng, an ninh được cấp có thẩm quyền phê duyệt cho đơn vị quân đội, đơn vị công an, đơn vị sự nghiệp công lập thuộc Quân đội nhân dân, Công an nhân dân; doanh nghiệp nhà nước do Bộ Quốc phòng, Bộ Công an được giao quản lý, sử dụng đất, công trình gắn liền với đất;\ng) Hồ sơ thiết kế xây dựng công trình đã được cơ quan chuyên môn về xây dựng thẩm định hoặc đã có văn bản chấp thuận kết quả nghiệm thu hoàn thành hạng mục công trình, công trình xây dựng theo quy định của pháp luật về xây dựng đối với trường hợp chứng nhận quyền sở hữu công trình xây dựng trên đất nông nghiệp mà chủ sở hữu công trình không có một trong các loại giấy tờ quy định tại Điều 149 Luật Đất đai hoặc công trình được miễn giấy phép xây dựng theo quy định của pháp luật về xây dựng;\nh) Chứng từ thực hiện nghĩa vụ tài chính, giấy tờ liên quan đến việc miễn, giảm nghĩa vụ tài chính về đất đai, tài sản gắn liền với đất (nếu có).\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 208,
+    "content_hash": "14e7302409b43517b9995f1c316077925d9b177ead68356017aee2e8af7e8288",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F32"
+  },
+  {
+    "fragment_id": "PROC-S01-R0032-G",
+    "procedure_id": "PROC-S01-R0032",
+    "section_type": "processing_time",
+    "text": "THEO QUY ĐỊNH",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 209,
+    "content_hash": "c48512d9821daabd4b6591910d2d7488cf74f655f8d06db5de4b6a5e08673392",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G32"
+  },
+  {
+    "fragment_id": "PROC-S01-R0032-H",
+    "procedure_id": "PROC-S01-R0032",
+    "section_type": "fee",
+    "text": "THEO QUY ĐỊNH",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 210,
+    "content_hash": "c48512d9821daabd4b6591910d2d7488cf74f655f8d06db5de4b6a5e08673392",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H32"
+  },
+  {
+    "fragment_id": "PROC-S01-R0032-M",
+    "procedure_id": "PROC-S01-R0032",
+    "section_type": "legal_basis",
+    "text": "Luật 16/2017/QH14 (Luật Lâm nghiệp); Luật 31/2024/QH15 (Luật Đất đai); Nghị quyết số 254/2025/QH15; Nghị định số 156/2018/NĐ-CP; Nghị định số 101/2024/NĐ-CP; Nghị định số 49/2026/NĐ-CP; Quyết định số 28/2026/QĐ-UBND",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 211,
+    "content_hash": "aebbe863c2de9406139630ede1102abc6766bf61dadbc0ac7929eeed164e8e31",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M32"
+  },
+  {
+    "fragment_id": "PROC-S01-R0033-D",
+    "procedure_id": "PROC-S01-R0033",
+    "section_type": "other",
+    "text": "Văn hóa - Xã hội",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 212,
+    "content_hash": "1b7c6f0ee91d6db7d3b3f2b3454c5cd14d2f55bc087fd3d23420333d21e71e17",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D33"
+  },
+  {
+    "fragment_id": "PROC-S01-R0033-E",
+    "procedure_id": "PROC-S01-R0033",
+    "section_type": "other",
+    "text": "Trực tiếp",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 213,
+    "content_hash": "e7f189bf00343e07d0713da74aab19b2d9b56f6c22db76ff627f62c2db443ae5",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E33"
+  },
+  {
+    "fragment_id": "PROC-S01-R0033-F",
+    "procedure_id": "PROC-S01-R0033",
+    "section_type": "required_documents",
+    "text": "Giấy đề nghị vay vốn\nDanh sách đề nghị vay vốn\nBiên bản họp",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 214,
+    "content_hash": "f5f9feb192bad924912cc7bc8b8f60ffca8fd4d2638669e804dc41ccc63612b7",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F33"
+  },
+  {
+    "fragment_id": "PROC-S01-R0033-G",
+    "procedure_id": "PROC-S01-R0033",
+    "section_type": "processing_time",
+    "text": "5 ngày",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 215,
+    "content_hash": "215a10157fc7dcbb746d91ad9077e12c99a53601e9a227a9c94eed5f53cc09f1",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G33"
+  },
+  {
+    "fragment_id": "PROC-S01-R0033-H",
+    "procedure_id": "PROC-S01-R0033",
+    "section_type": "fee",
+    "text": "không",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 216,
+    "content_hash": "0ec84c3fdadbdb8c0d842eda8c4103e81f0dca0053ab65d7ecaf464071d2bca3",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H33"
+  },
+  {
+    "fragment_id": "PROC-S01-R0033-M",
+    "procedure_id": "PROC-S01-R0033",
+    "section_type": "legal_basis",
+    "text": "Luật 38/2013/QH13 (Luật Việc làm); Nghị định số 61/2015/NĐ-CP; Nghị định số 74/2019/NĐ-CP; Nghị định số 104/2022/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 217,
+    "content_hash": "41f48c9cc67fc388b64a4a51cedff1fcf8075d79d4614d5c0784a067bf72e9f9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M33"
+  },
+  {
+    "fragment_id": "PROC-S01-R0034-D",
+    "procedure_id": "PROC-S01-R0034",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 218,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D34"
+  },
+  {
+    "fragment_id": "PROC-S01-R0034-E",
+    "procedure_id": "PROC-S01-R0034",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 219,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E34"
+  },
+  {
+    "fragment_id": "PROC-S01-R0034-F",
+    "procedure_id": "PROC-S01-R0034",
+    "section_type": "required_documents",
+    "text": "* Đối với nhà chưa hoàn công:\n1-        Đơn xin cấp số nhà;\n2-        Giấy chứng nhận Quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất;\n3-        Giấy phép Xây dựng (nếu có) và bản vẽ thiết kế;\n4-        Biên bản lần cuối của Thanh tra xây dựng;\n5-        Hình ảnh hiện trạng căn nhà;\n6-        Căn cước công dân;\n7-        Giấy uỷ quyền (Nếu đi nộp thay)./.\n* Đối với nhà đã hoàn công:\n1- Đơn xin cấp số nhà;\n2- Giấy chứng nhận Quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất;\n3- Hình ảnh hiện trạng căn nhà;\n4- Căn cước công dân;\n 5- Giấy uỷ quyền (Nếu đi nộp thay)\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 220,
+    "content_hash": "d9c1e1bcde1b7ccfcafef71f5aefaf057a6578109935ff4175d175118d0552db",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F34"
+  },
+  {
+    "fragment_id": "PROC-S01-R0034-G",
+    "procedure_id": "PROC-S01-R0034",
+    "section_type": "processing_time",
+    "text": "theo quy định",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 221,
+    "content_hash": "ff2c16c1ebda2e180dd78409bef5a6b0c8bf1a6ed07b404c54a8ec1bc6ba6393",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G34"
+  },
+  {
+    "fragment_id": "PROC-S01-R0034-H",
+    "procedure_id": "PROC-S01-R0034",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 222,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H34"
+  },
+  {
+    "fragment_id": "PROC-S01-R0034-M",
+    "procedure_id": "PROC-S01-R0034",
+    "section_type": "legal_basis",
+    "text": "Quyết định số 05/2006/QĐ-BXD; Quyết định số 22/2012/QĐ-UBND",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 223,
+    "content_hash": "b4f23c4eabda0189515d7be8fd055d74ef030aef1dacd6a02883b563e2092801",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M34"
+  },
+  {
+    "fragment_id": "PROC-S01-R0035-D",
+    "procedure_id": "PROC-S01-R0035",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 224,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D35"
+  },
+  {
+    "fragment_id": "PROC-S01-R0035-E",
+    "procedure_id": "PROC-S01-R0035",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 225,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E35"
+  },
+  {
+    "fragment_id": "PROC-S01-R0035-F",
+    "procedure_id": "PROC-S01-R0035",
+    "section_type": "required_documents",
+    "text": "* Hồ sơ xác nhận vị trí nhà - đất:\n1.         Đơn xin xác nhận vị trí nhà – đất;\n2.         Giấy chứng nhận quyền sử dụng đất, Sổ hộ khẩu tại địa chỉ mong muốn xác nhận (nếu có);\n3.        Các căn cứ tài liệu chứng minh khác;\n4.        Trường hợp người sử dụng đất, chủ sở hữu tài sản gắn liền với đất thực hiện thủ tục thông qua người đại diện theo quy định của pháp luật về dân sự thì phải có văn bản về việc ủy quyền theo quy định của pháp luật về dân sự;\n5.        CCCD (bản sao)\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 226,
+    "content_hash": "0ee2a3694ff07528dd1c7b7e4dd8cba19b5fbc56e69538d89371dda66d7d121d",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F35"
+  },
+  {
+    "fragment_id": "PROC-S01-R0035-G",
+    "procedure_id": "PROC-S01-R0035",
+    "section_type": "processing_time",
+    "text": "05",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 227,
+    "content_hash": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G35"
+  },
+  {
+    "fragment_id": "PROC-S01-R0035-H",
+    "procedure_id": "PROC-S01-R0035",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 228,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H35"
+  },
+  {
+    "fragment_id": "PROC-S01-R0035-M",
+    "procedure_id": "PROC-S01-R0035",
+    "section_type": "legal_basis",
+    "text": "Luật 31/2024/QH15 (Luật Đất đai); Nghị định số 101/2024/NĐ-CP",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 229,
+    "content_hash": "627fe3b48f5377f72855a278092202af4ea375a4fb13535d39bf764b33a2a738",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M35"
+  },
+  {
+    "fragment_id": "PROC-S01-R0036-D",
+    "procedure_id": "PROC-S01-R0036",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 230,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D36"
+  },
+  {
+    "fragment_id": "PROC-S01-R0036-E",
+    "procedure_id": "PROC-S01-R0036",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 231,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E36"
+  },
+  {
+    "fragment_id": "PROC-S01-R0036-F",
+    "procedure_id": "PROC-S01-R0036",
+    "section_type": "required_documents",
+    "text": "* Trường hợp có Giấy phép xây dựng\n1.        Đơn xác nhận tình trạng nhà ở;\n2.        Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất (bản sao kèm theo Bản chính để đối chiếu);\n3.         Giấy phép xây dựng và bản vẽ thiết kế (bản sao);\n4.         Quyết định hoặc Thông báo cấp số nhà;\n5.         CCCD (bản sao).\n6.        Giấy ủy quyền (nếu đi nộp thay).\n\n* Trường hợp không có Giấy phép xây dựng\n1. Đơn xác nhận tình trạng nhà ở;\n2. Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất (bản sao kèm theo Bản chính để đối chiếu); nếu có.\n3. Thông báo cấp số nhà; (nếu có)\n4. Bản vẽ sơ đồ nhà đất; (bản sao)\n5. CCCD (bản sao).\n6. Giấy ủy quyền (nếu đi nộp thay)\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 232,
+    "content_hash": "2f62981ac2ed5fc2c88c2a59e41c562c9b4b72d73a1124f356eba71c179b6a68",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F36"
+  },
+  {
+    "fragment_id": "PROC-S01-R0036-G",
+    "procedure_id": "PROC-S01-R0036",
+    "section_type": "processing_time",
+    "text": "05",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 233,
+    "content_hash": "c97550ce8213ef5cf6ed4ba48790c137df3ef6a5da20b48961001a634b6cead2",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G36"
+  },
+  {
+    "fragment_id": "PROC-S01-R0036-H",
+    "procedure_id": "PROC-S01-R0036",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 234,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H36"
+  },
+  {
+    "fragment_id": "PROC-S01-R0036-M",
+    "procedure_id": "PROC-S01-R0036",
+    "section_type": "legal_basis",
+    "text": "Luật 68/2020/QH14 (Luật Cư trú); Nghị định số 154/2024/NĐ-CP; Luật 31/2024/QH15 (Luật Đất Đai)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 235,
+    "content_hash": "4609a2fd3fdb40f1f377e18bf69d45e2467fb33219d7953dbc87806d1170206e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M36"
+  },
+  {
+    "fragment_id": "PROC-S01-R0037-D",
+    "procedure_id": "PROC-S01-R0037",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 236,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D37"
+  },
+  {
+    "fragment_id": "PROC-S01-R0037-E",
+    "procedure_id": "PROC-S01-R0037",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 237,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E37"
+  },
+  {
+    "fragment_id": "PROC-S01-R0037-F",
+    "procedure_id": "PROC-S01-R0037",
+    "section_type": "required_documents",
+    "text": "1. Giấy đề nghị đăng ký hộ kinh doanh\n2. Bản sao văn bản ủy quyền của thành viên hộ gia đình cho một thành viên làm chủ hộ kinh doanh đối với trường hợp hộ kinh doanh do các thành viên hộ gia đình đăng ký thành lập. Văn bản ủy quyền này phải được công chứng hoặc chứng thực theo quy định của pháp luật\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 238,
+    "content_hash": "c173f084ff422ce7238ccfc38cdde39e77e881952cd3686ecdf9aef0f1535cdb",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F37"
+  },
+  {
+    "fragment_id": "PROC-S01-R0037-G",
+    "procedure_id": "PROC-S01-R0037",
+    "section_type": "processing_time",
+    "text": "03 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 239,
+    "content_hash": "be17a314bf0bab51030934f15166dfc3419f5bd1e71f0ef695d0b32a2be87510",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G37"
+  },
+  {
+    "fragment_id": "PROC-S01-R0037-H",
+    "procedure_id": "PROC-S01-R0037",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 240,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H37"
+  },
+  {
+    "fragment_id": "PROC-S01-R0037-I",
+    "procedure_id": "PROC-S01-R0037",
+    "section_type": "submission_location",
+    "text": "Trung tâm Phục vụ Hành chính công phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 241,
+    "content_hash": "600d4d82a0ac48ece6b29776b35e5cd0b3d1ef10fe70a4c990060e8c28194476",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I37"
+  },
+  {
+    "fragment_id": "PROC-S01-R0037-M",
+    "procedure_id": "PROC-S01-R0037",
+    "section_type": "legal_basis",
+    "text": "Luật số 59/2020/QH14 (Luật Doanh nghiệp); Luật số 76/2025/QH15 (Luật sửa đổi, bổ sung một số điều của Luật Doanh nghiệp 2020); Nghị định số 168/2025/NĐ-CP; Nghị định số 296/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 68/2025/TT-BTC",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 242,
+    "content_hash": "dfccfbb1967ba7b8a2c82eb1454c631d0f70cd3c0e769b25c775cb36298d2627",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M37"
+  },
+  {
+    "fragment_id": "PROC-S01-R0038-D",
+    "procedure_id": "PROC-S01-R0038",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 243,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D38"
+  },
+  {
+    "fragment_id": "PROC-S01-R0038-E",
+    "procedure_id": "PROC-S01-R0038",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 244,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E38"
+  },
+  {
+    "fragment_id": "PROC-S01-R0038-F",
+    "procedure_id": "PROC-S01-R0038",
+    "section_type": "required_documents",
+    "text": "1. Giấy đề nghị đăng ký thay đổi nội dung đăng ký hộ kinh doanh;\n2. Bản sao văn bản ủy quyền của các thành viên hộ gia đình cho một thành viên làm chủ hộ kinh doanh. Văn bản ủy quyền này phải được công chứng hoặc chứng thực theo quy định của pháp luật (Trường hợp thay đổi chủ hộ kinh doanh do các thành viên hộ gia đình đăng ký hộ kinh doanh ủy quyền cho một trong các thành viên còn lại làm chủ hộ kinh doanh)\n3. Bản sao văn bản ủy quyền của thành viên mới cho chủ hộ kinh doanh trong trường hợp tiếp nhận thành viên mới. Văn bản ủy quyền này phải được công chứng hoặc chứng thực theo quy định của pháp luật (Trường hợp thay đổi thành viên hộ gia đình đăng ký hộ kinh doanh)\n",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 245,
+    "content_hash": "1a92bcc3e410a42e13fc55a91dc09622106fd6bcb6d27a2f8351572eac148ae4",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F38"
+  },
+  {
+    "fragment_id": "PROC-S01-R0038-G",
+    "procedure_id": "PROC-S01-R0038",
+    "section_type": "processing_time",
+    "text": "03 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 246,
+    "content_hash": "be17a314bf0bab51030934f15166dfc3419f5bd1e71f0ef695d0b32a2be87510",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G38"
+  },
+  {
+    "fragment_id": "PROC-S01-R0038-H",
+    "procedure_id": "PROC-S01-R0038",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 247,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H38"
+  },
+  {
+    "fragment_id": "PROC-S01-R0038-I",
+    "procedure_id": "PROC-S01-R0038",
+    "section_type": "submission_location",
+    "text": "TTPVHCC phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 248,
+    "content_hash": "e904484707eab5733e74ea9b3b785c577415fe3f39823cbf86ca1f0151b36928",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I38"
+  },
+  {
+    "fragment_id": "PROC-S01-R0038-M",
+    "procedure_id": "PROC-S01-R0038",
+    "section_type": "legal_basis",
+    "text": "Luật số 59/2020/QH14 (Luật Doanh nghiệp); Luật số 76/2025/QH15 (Luật sửa đổi, bổ sung một số điều của Luật Doanh nghiệp 2020); Nghị định số 168/2025/NĐ-CP; Nghị định số 296/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 68/2025/TT-BTC",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 249,
+    "content_hash": "dfccfbb1967ba7b8a2c82eb1454c631d0f70cd3c0e769b25c775cb36298d2627",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M38"
+  },
+  {
+    "fragment_id": "PROC-S01-R0039-D",
+    "procedure_id": "PROC-S01-R0039",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 250,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D39"
+  },
+  {
+    "fragment_id": "PROC-S01-R0039-E",
+    "procedure_id": "PROC-S01-R0039",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 251,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E39"
+  },
+  {
+    "fragment_id": "PROC-S01-R0039-F",
+    "procedure_id": "PROC-S01-R0039",
+    "section_type": "required_documents",
+    "text": "Giấy đề nghị đăng ký tạm ngừng kinh doanh/tiếp tục kinh doanh trước thời hạn đã đăng ký",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 252,
+    "content_hash": "7aab1ba29c049ec4521e3a4f8a6076e96f1a5d45d0e6322dff18e4e0c8507e3e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F39"
+  },
+  {
+    "fragment_id": "PROC-S01-R0039-G",
+    "procedure_id": "PROC-S01-R0039",
+    "section_type": "processing_time",
+    "text": "03 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 253,
+    "content_hash": "be17a314bf0bab51030934f15166dfc3419f5bd1e71f0ef695d0b32a2be87510",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G39"
+  },
+  {
+    "fragment_id": "PROC-S01-R0039-H",
+    "procedure_id": "PROC-S01-R0039",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 254,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H39"
+  },
+  {
+    "fragment_id": "PROC-S01-R0039-I",
+    "procedure_id": "PROC-S01-R0039",
+    "section_type": "submission_location",
+    "text": "TTPVHCC phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 255,
+    "content_hash": "e904484707eab5733e74ea9b3b785c577415fe3f39823cbf86ca1f0151b36928",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I39"
+  },
+  {
+    "fragment_id": "PROC-S01-R0039-K",
+    "procedure_id": "PROC-S01-R0039",
+    "section_type": "other",
+    "text": "https://drive.google.com/open?id=1yALHed_-Kvrmk5XWZY9vOJ9mWIVgNJqM",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 256,
+    "content_hash": "babe969f5d8e067ad9ec9d5126331956a1faae1ef2197b32500770cdca014ae6",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!K39"
+  },
+  {
+    "fragment_id": "PROC-S01-R0039-M",
+    "procedure_id": "PROC-S01-R0039",
+    "section_type": "legal_basis",
+    "text": "Luật số 59/2020/QH14 (Luật Doanh nghiệp); Luật số 76/2025/QH15 (Luật sửa đổi, bổ sung một số điều của Luật Doanh nghiệp 2020); Nghị định số 168/2025/NĐ-CP; Nghị định số 296/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 68/2025/TT-BTC",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 257,
+    "content_hash": "dfccfbb1967ba7b8a2c82eb1454c631d0f70cd3c0e769b25c775cb36298d2627",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M39"
+  },
+  {
+    "fragment_id": "PROC-S01-R0040-D",
+    "procedure_id": "PROC-S01-R0040",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 258,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D40"
+  },
+  {
+    "fragment_id": "PROC-S01-R0040-E",
+    "procedure_id": "PROC-S01-R0040",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 259,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E40"
+  },
+  {
+    "fragment_id": "PROC-S01-R0040-F",
+    "procedure_id": "PROC-S01-R0040",
+    "section_type": "required_documents",
+    "text": "Thông báo chấm dứt hoạt động hộ kinh doanh",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 260,
+    "content_hash": "84c3230f26a8c53fee96e90b1d1e4f18e34a094558e937aebf9a26839822291b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F40"
+  },
+  {
+    "fragment_id": "PROC-S01-R0040-G",
+    "procedure_id": "PROC-S01-R0040",
+    "section_type": "processing_time",
+    "text": "03 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 261,
+    "content_hash": "be17a314bf0bab51030934f15166dfc3419f5bd1e71f0ef695d0b32a2be87510",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G40"
+  },
+  {
+    "fragment_id": "PROC-S01-R0040-H",
+    "procedure_id": "PROC-S01-R0040",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 262,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H40"
+  },
+  {
+    "fragment_id": "PROC-S01-R0040-I",
+    "procedure_id": "PROC-S01-R0040",
+    "section_type": "submission_location",
+    "text": "TTPVHCC phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 263,
+    "content_hash": "e904484707eab5733e74ea9b3b785c577415fe3f39823cbf86ca1f0151b36928",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I40"
+  },
+  {
+    "fragment_id": "PROC-S01-R0040-K",
+    "procedure_id": "PROC-S01-R0040",
+    "section_type": "other",
+    "text": "https://drive.google.com/open?id=1D5HuFallALB74ElrQEVlLcU4s0zJYRsz",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 264,
+    "content_hash": "44e316b4217439b4b5281d146b9379552a16f8847fee9b78f36f80c445ace33b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!K40"
+  },
+  {
+    "fragment_id": "PROC-S01-R0040-M",
+    "procedure_id": "PROC-S01-R0040",
+    "section_type": "legal_basis",
+    "text": "Luật số 59/2020/QH14 (Luật Doanh nghiệp); Luật số 76/2025/QH15 (Luật sửa đổi, bổ sung một số điều của Luật Doanh nghiệp 2020); Nghị định số 168/2025/NĐ-CP; Nghị định số 296/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 68/2025/TT-BTC",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 265,
+    "content_hash": "dfccfbb1967ba7b8a2c82eb1454c631d0f70cd3c0e769b25c775cb36298d2627",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M40"
+  },
+  {
+    "fragment_id": "PROC-S01-R0041-D",
+    "procedure_id": "PROC-S01-R0041",
+    "section_type": "other",
+    "text": "Kinh tế - Hạ tầng và đô thị",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 266,
+    "content_hash": "7600b47a5945e733311b6d8fa287ff5f56b40910d976e39d74267d1835c7e21b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D41"
+  },
+  {
+    "fragment_id": "PROC-S01-R0041-E",
+    "procedure_id": "PROC-S01-R0041",
+    "section_type": "other",
+    "text": "Trực tuyến",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 267,
+    "content_hash": "2bc355c8ad4cfa62b678ec2e1e9e8599213a087ae6e1c7e1fc28a9e5a7be51c8",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E41"
+  },
+  {
+    "fragment_id": "PROC-S01-R0041-F",
+    "procedure_id": "PROC-S01-R0041",
+    "section_type": "required_documents",
+    "text": "Giấy đề nghị cấp lại Giấy chứng nhận đăng ký hộ kinh doanh",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 268,
+    "content_hash": "2b533c80ba453f1330d5271b96f7e199e054b75d9755abf432751e3f4d09819e",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F41"
+  },
+  {
+    "fragment_id": "PROC-S01-R0041-G",
+    "procedure_id": "PROC-S01-R0041",
+    "section_type": "processing_time",
+    "text": "03 ngày làm việc",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 269,
+    "content_hash": "be17a314bf0bab51030934f15166dfc3419f5bd1e71f0ef695d0b32a2be87510",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G41"
+  },
+  {
+    "fragment_id": "PROC-S01-R0041-H",
+    "procedure_id": "PROC-S01-R0041",
+    "section_type": "fee",
+    "text": "0",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 270,
+    "content_hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H41"
+  },
+  {
+    "fragment_id": "PROC-S01-R0041-I",
+    "procedure_id": "PROC-S01-R0041",
+    "section_type": "submission_location",
+    "text": "TTPVHCC phường Tăng Nhơn Phú",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 271,
+    "content_hash": "e904484707eab5733e74ea9b3b785c577415fe3f39823cbf86ca1f0151b36928",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I41"
+  },
+  {
+    "fragment_id": "PROC-S01-R0041-K",
+    "procedure_id": "PROC-S01-R0041",
+    "section_type": "other",
+    "text": "https://drive.google.com/open?id=1tbXFoH0R4TYAd5YYRNFVVIluwDQ8j0kR",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 272,
+    "content_hash": "85a83dfe90f15ba0bb147a34e702116f6a4e54c93263f1c76b7450f67e9178ed",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!K41"
+  },
+  {
+    "fragment_id": "PROC-S01-R0041-M",
+    "procedure_id": "PROC-S01-R0041",
+    "section_type": "legal_basis",
+    "text": "Luật số 59/2020/QH14 (Luật Doanh nghiệp); Luật số 76/2025/QH15 (Luật sửa đổi, bổ sung một số điều của Luật Doanh nghiệp 2020); Nghị định số 168/2025/NĐ-CP; Nghị định số 296/2026/NĐ-CP; Thông tư số 85/2019/TT-BTC; Thông tư số 68/2025/TT-BTC",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 273,
+    "content_hash": "dfccfbb1967ba7b8a2c82eb1454c631d0f70cd3c0e769b25c775cb36298d2627",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M41"
+  },
+  {
+    "fragment_id": "PROC-S01-R0042-D",
+    "procedure_id": "PROC-S01-R0042",
+    "section_type": "other",
+    "text": "Giáo dục và Đào tạo",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 274,
+    "content_hash": "d9bf43ed0e2934df5e50d1a86e0bf76a5d4945f98734787e2edf5ee937f6ca7b",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D42"
+  },
+  {
+    "fragment_id": "PROC-S01-R0042-E",
+    "procedure_id": "PROC-S01-R0042",
+    "section_type": "other",
+    "text": "Trực tiếp",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 275,
+    "content_hash": "e7f189bf00343e07d0713da74aab19b2d9b56f6c22db76ff627f62c2db443ae5",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E42"
+  },
+  {
+    "fragment_id": "PROC-S01-R0042-F",
+    "procedure_id": "PROC-S01-R0042",
+    "section_type": "required_documents",
+    "text": "- Đơn đề nghị miễn, giảm học phí dành cho học sinh, sinh viên đang học tại các cơ sở giáo dục nghề nghiệp, giáo dục đại học (theo Phụ lục IV của Nghị định 238/2025/NĐ-CP);\n- Giấy xác nhận và dự toán kinh phí của các cơ sở giáo dục nghề nghiệp, giáo dục đại học (theo Phụ lục V, VI của Nghị định 238/2025/NĐ-CP);\n- Bản sao chứng thực văn bằng tốt nghiệp hoặc xác nhận tốt nghiệp tạm thời hoặc xác nhận học bạ việc hoàn thành chương trình trung học cơ sở (quy định đối tượng tại điểm 1.1 mục 1 Thông báo này)/trung học phổ thông (quy định đối tượng tại điểm 1.3 mục 1 Thông báo này) của hiệu trưởng xác nhận;\n- Bản sao chứng thực của cơ quan quản lý trong các trường hợp thuộc nhóm đối tượng tại điểm 1.4 mục 1 Thông báo này;\n- Hóa đơn hoặc biên lai đóng tiền học phí;\n- Bản sao Căn cước công dân của sinh viên;\n- Bản sao Căn cước công dân của cha/mẹ, người có tên trong Đơn đề nghị chi trả tiền miễn, giảm học phí;\n- Thông tin chuyển khoản (ATM) của người học hoặc tài khoản của cha hoặc mẹ hoặc người giám hộ;\n- Giấy xác nhận nơi cư trú của công an hoặc bản chụp màn hình thể hiện thông tin nơi cư trú trên ứng dụng VNeID (in kèm hồ sơ).",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 276,
+    "content_hash": "6c59aeb53dc671cdd61feb83f069a194a36945017b5da63defd30be1492dd92f",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F42"
+  },
+  {
+    "fragment_id": "PROC-S01-R0042-G",
+    "procedure_id": "PROC-S01-R0042",
+    "section_type": "processing_time",
+    "text": "không quy định cụ thể (chi trả theo học kỳ)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 277,
+    "content_hash": "ad4cda586642afa4d14a7b7274f94a83bc0336381296e9bf258781fce3251d30",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G42"
+  },
+  {
+    "fragment_id": "PROC-S01-R0042-H",
+    "procedure_id": "PROC-S01-R0042",
+    "section_type": "fee",
+    "text": "không ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 278,
+    "content_hash": "fb9ee9e907137c05d362970e478c175e05d55cd84e4373720bab8c20443aa710",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H42"
+  },
+  {
+    "fragment_id": "PROC-S01-R0042-I",
+    "procedure_id": "PROC-S01-R0042",
+    "section_type": "submission_location",
+    "text": "Phòng Văn hóa - Xã hội thuộc Ủy ban nhân dân phường Tăng Nhơn Phú (Địa chỉ: Số 29, đường Lê Văn Việt, phường Tăng Nhơn Phú, Thành phố Hồ Chí Minh).",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 279,
+    "content_hash": "db988a72e68912f758117b8434ba6777cf3bb346b56e369b4e3aabcff22c3589",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I42"
+  },
+  {
+    "fragment_id": "PROC-S01-R0042-J",
+    "procedure_id": "PROC-S01-R0042",
+    "section_type": "other",
+    "text": "Không có biểu mẫu ",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 280,
+    "content_hash": "5e852e2dfaefd19e103a06679615791e55de4bbc08720c28a0f741a5eedf2458",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!J42"
+  },
+  {
+    "fragment_id": "PROC-S01-R0042-M",
+    "procedure_id": "PROC-S01-R0042",
+    "section_type": "legal_basis",
+    "text": "Nghị định số 84/2020/NĐ-CP; Quyết định số 152/2007/QĐ-TTg; Thông tư liên tịch số 53/2008/TTLT-BGDĐT-BTC-BLĐTBXH",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 281,
+    "content_hash": "92fb199a2188000e7223e2e48fa807b6bc8340d784b3ea054cd6ceeba87f8349",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M42"
+  },
+  {
+    "fragment_id": "PROC-S01-R0043-D",
+    "procedure_id": "PROC-S01-R0043",
+    "section_type": "other",
+    "text": "Chứng thực - sao y",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 282,
+    "content_hash": "c8a9fd65c020ef5431dd183668aaf525c12fcc60d0d37d29871afa9e7bb33f5a",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!D43"
+  },
+  {
+    "fragment_id": "PROC-S01-R0043-E",
+    "procedure_id": "PROC-S01-R0043",
+    "section_type": "other",
+    "text": "Cả hai",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 283,
+    "content_hash": "0df37728ad393b0c7f1f45827b5e582d035ee22bdf1329e6c4b8b3dbecd85213",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!E43"
+  },
+  {
+    "fragment_id": "PROC-S01-R0043-F",
+    "procedure_id": "PROC-S01-R0043",
+    "section_type": "required_documents",
+    "text": "1. Người yêu cầu chứng thực chữ ký của mình phải xuất trình các giấy tờ sau đây:\n- Người yêu cầu chứng thực xuất trình bản chính hoặc bản sao có chứng thực Giấy chứng minh nhân dân/Thẻ căn cước công dân/Thẻ căn cước/Giấy chứng nhận căn cước hoặc Hộ chiếu, giấy tờ xuất nhập cảnh/giấy tờ có giá trị đi lại quốc tế còn giá trị sử dụng hoặc xuất trình Căn cước điện tử.\n- Giấy tờ, văn bản mà mình sẽ ký.\n2. Tại thời điểm chứng thực, người yêu cầu chứng thực minh mẫn, nhận thức và làm chủ được hành vi của mình và yêu cầu người yêu cầu chứng thực ký trước mặt người tiếp nhận hồ sơ.\n3. Thủ tục chứng thực chữ ký trong giấy ủy quyền đối với trường hợp ủy quyền không có thù lao, không có nghĩa vụ bồi thường của bên được ủy quyền và không liên quan đến việc chuyển quyền sở hữu tài sản, quyền sử dụng bất động sản.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 284,
+    "content_hash": "52e0cc2a00cedcabbbc1febfcbfaf626121b2934811ba00bf2971546789f3c19",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!F43"
+  },
+  {
+    "fragment_id": "PROC-S01-R0043-G",
+    "procedure_id": "PROC-S01-R0043",
+    "section_type": "processing_time",
+    "text": "Trong ngày tiếp nhận yêu cầu hoặc trong ngày làm việc tiếp theo, nếu tiếp nhận yêu cầu sau 15 giờ hoặc có thể kéo dài hơn theo thỏa thuận bằng văn bản với người yêu cầu chứng thực.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 285,
+    "content_hash": "029bccd4c685284fc489add18b3adc54e1a2df854dde8a2c96b9c38ba9d64117",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!G43"
+  },
+  {
+    "fragment_id": "PROC-S01-R0043-H",
+    "procedure_id": "PROC-S01-R0043",
+    "section_type": "fee",
+    "text": "10.000 đồng/trường hợp (đối với chứng thực chữ ký) 50.000 đồng/trường hợp (đối với hợp đồng giao dịch/Di chúc)",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 286,
+    "content_hash": "d8eeb1236e53a554bb1610cd3d0df4b266de6a71d314ee0162f976b7cee9bd3a",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!H43"
+  },
+  {
+    "fragment_id": "PROC-S01-R0043-I",
+    "procedure_id": "PROC-S01-R0043",
+    "section_type": "submission_location",
+    "text": "Việc chứng thực được thực hiện tại Trung tâm Phục vụ hành chính công, trừ trường hợp người yêu cầu chứng thực thuộc diện già yếu, không thể đi lại được, đang bị tạm giữ, tạm giam, thi hành án phạt tù hoặc có lý do chính đáng khác.",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 287,
+    "content_hash": "a285d051d9c2ea581cadb69d2722dcbc56b5c791875a44ec0f0abdbf1acc7384",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!I43"
+  },
+  {
+    "fragment_id": "PROC-S01-R0043-M",
+    "procedure_id": "PROC-S01-R0043",
+    "section_type": "legal_basis",
+    "text": "Bộ luật số 91/2015/QH13 (Bộ luật Dân sự); Luật số 33/2009/QH12; Luật số 53/2014/QH13 (Luật Công chứng); Nghị định số 23/2015/NĐ-CP; Nghị định số 29/2015/NĐ-CP; Nghị định số 07/2025/NĐ-CP; Nghị định số 280/2025/NĐ-CP; Nghị định số 18/2026/NĐ-CP; Nghị quyết số 66.7/2025/NQ-CP; Thông tư số 01/2020/TT-BTP; Thông tư số 06/2015/TT-BTP; Thông tư số 226/2016/TT-BTC",
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "ordinal": 288,
+    "content_hash": "6eaacc7db1ed23b19e8842bdf0404e86b6455cb8230aeab07380ffa60b28ed53",
+    "source_locator": "Tổng hợp các thủ tục hành chính (22.12) (1).xlsx::'Câu trả lời biểu mẫu 1'!M43"
+  }
+]

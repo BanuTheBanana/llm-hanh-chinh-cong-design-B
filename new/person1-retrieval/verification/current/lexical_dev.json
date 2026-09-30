@@ -1,0 +1,149 @@
+{
+  "count": 16,
+  "corpus_fingerprint": "6b61165a8ba68223573482bd29fabdd2f29f40d7ba976bbcec05e1fd9f8ae6fc",
+  "fusion_method": "lexical_bm25_procedure_max",
+  "score_floor": 0.5,
+  "margin_floor": 0.15,
+  "procedure_and_status_accuracy": 1.0,
+  "status_accuracy": 1.0,
+  "resolved_precision": 1.0,
+  "resolved_coverage": 0.75,
+  "field_precision": 1.0,
+  "field_recall": 1.0,
+  "all_requested_fields_rate": 1.0,
+  "ambiguity_candidate_recall": 1.0,
+  "latency_ms": {
+    "p50": 0.6598814999847491,
+    "p95": 2.4208427500411744
+  },
+  "cases": [
+    {
+      "case_id": "A-fee",
+      "status": "resolved",
+      "procedure_id": "DEMO-A",
+      "top_score": 2.6053377053986178,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "A-required_documents",
+      "status": "resolved",
+      "procedure_id": "DEMO-A",
+      "top_score": 2.4450774189421653,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "A-processing_time",
+      "status": "resolved",
+      "procedure_id": "DEMO-A",
+      "top_score": 1.527807665590591,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "B-fee",
+      "status": "resolved",
+      "procedure_id": "DEMO-B",
+      "top_score": 2.6053377053986178,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "B-required_documents",
+      "status": "resolved",
+      "procedure_id": "DEMO-B",
+      "top_score": 2.4450774189421653,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "B-processing_time",
+      "status": "resolved",
+      "procedure_id": "DEMO-B",
+      "top_score": 1.527807665590591,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "C-fee",
+      "status": "resolved",
+      "procedure_id": "DEMO-C",
+      "top_score": 2.6053377053986178,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "C-required_documents",
+      "status": "resolved",
+      "procedure_id": "DEMO-C",
+      "top_score": 2.4450774189421653,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "C-processing_time",
+      "status": "resolved",
+      "procedure_id": "DEMO-C",
+      "top_score": 1.527807665590591,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "ambiguous",
+      "status": "ambiguous",
+      "procedure_id": null,
+      "top_score": 1.0775300398080268,
+      "second_score": 1.0775300398080268,
+      "margin": 0.0
+    },
+    {
+      "case_id": "absent",
+      "status": "low_confidence",
+      "procedure_id": null,
+      "top_score": null,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "scope",
+      "status": "low_confidence",
+      "procedure_id": null,
+      "top_score": null,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "choice",
+      "status": "resolved",
+      "procedure_id": "DEMO-B",
+      "top_score": 0.0,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "invalid-choice",
+      "status": "low_confidence",
+      "procedure_id": null,
+      "top_score": null,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "multi-field",
+      "status": "resolved",
+      "procedure_id": "DEMO-B",
+      "top_score": 2.6053377053986178,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "correction",
+      "status": "resolved",
+      "procedure_id": "DEMO-C",
+      "top_score": 1.0775300398080268,
+      "second_score": null,
+      "margin": null
+    }
+  ]
+}

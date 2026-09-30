@@ -1,0 +1,10 @@
+{
+  "corpus_fingerprint": "26eca8804426c22afb227fcbabc174a3e61d20907809561c90d00b965d91ecd9",
+  "counts": {
+    "sources": 1,
+    "procedures": 42,
+    "fragments": 289
+  },
+  "status": "built_with_underthesea",
+  "included_index_cache": false
+}

@@ -1,0 +1,147 @@
+{
+  "corpus_fingerprint": "6b61165a8ba68223573482bd29fabdd2f29f40d7ba976bbcec05e1fd9f8ae6fc",
+  "counts": {
+    "sources": 1,
+    "procedures": 3,
+    "fragments": 9
+  },
+  "review_status_counts": {
+    "draft": 1,
+    "reviewed": 0,
+    "published": 0,
+    "deprecated": 0
+  },
+  "segmenter": {
+    "wrapper_version": "1.0.0",
+    "backend": "underthesea",
+    "backend_version": "9.5.0",
+    "normalization": "NFC+whitespace; preserve-case",
+    "protected_terms": [],
+    "underthesea_use_token_normalize": false,
+    "config_fingerprint": "f5d40324d30b0015cefd1036459b8c486e3a2c6b7fb7875eb09bc4864f88d86b"
+  },
+  "lexical_docs": [
+    {
+      "thủ_tục": 2,
+      "thử_nghiệm": 3,
+      "alpha": 2,
+      "lệ_phí": 1,
+      "giả_lập": 1,
+      "10": 1,
+      "đơn_vị": 1
+    },
+    {
+      "thủ_tục": 2,
+      "thử_nghiệm": 3,
+      "alpha": 2,
+      "thời_gian": 1,
+      "giả_lập": 1,
+      "3": 1,
+      "ngày": 1
+    },
+    {
+      "thủ_tục": 2,
+      "thử_nghiệm": 2,
+      "alpha": 2,
+      "hồ_sơ": 1,
+      "giả_lập": 1,
+      "biểu_mẫu": 1,
+      "minh_họa": 1,
+      "phải": 1,
+      "giấy_tờ": 1,
+      "thật": 1
+    },
+    {
+      "thủ_tục": 2,
+      "thử_nghiệm": 3,
+      "beta": 2,
+      "lệ_phí": 1,
+      "giả_lập": 1,
+      "10": 1,
+      "đơn_vị": 1
+    },
+    {
+      "thủ_tục": 2,
+      "thử_nghiệm": 3,
+      "beta": 2,
+      "thời_gian": 1,
+      "giả_lập": 1,
+      "3": 1,
+      "ngày": 1
+    },
+    {
+      "thủ_tục": 2,
+      "thử_nghiệm": 2,
+      "beta": 2,
+      "hồ_sơ": 1,
+      "giả_lập": 1,
+      "biểu_mẫu": 1,
+      "minh_họa": 1,
+      "phải": 1,
+      "giấy_tờ": 1,
+      "thật": 1
+    },
+    {
+      "thủ_tục": 2,
+      "thử_nghiệm": 3,
+      "gamma": 2,
+      "lệ_phí": 1,
+      "giả_lập": 1,
+      "10": 1,
+      "đơn_vị": 1
+    },
+    {
+      "thủ_tục": 2,
+      "thử_nghiệm": 3,
+      "gamma": 2,
+      "thời_gian": 1,
+      "giả_lập": 1,
+      "3": 1,
+      "ngày": 1
+    },
+    {
+      "thủ_tục": 2,
+      "thử_nghiệm": 2,
+      "gamma": 2,
+      "hồ_sơ": 1,
+      "giả_lập": 1,
+      "biểu_mẫu": 1,
+      "minh_họa": 1,
+      "phải": 1,
+      "giấy_tờ": 1,
+      "thật": 1
+    }
+  ],
+  "fragment_ids": [
+    "DEMO-A-fee",
+    "DEMO-A-processing_time",
+    "DEMO-A-required_documents",
+    "DEMO-B-fee",
+    "DEMO-B-processing_time",
+    "DEMO-B-required_documents",
+    "DEMO-C-fee",
+    "DEMO-C-processing_time",
+    "DEMO-C-required_documents"
+  ],
+  "idf": {
+    "thủ_tục": 0.05129329438755048,
+    "thử_nghiệm": 0.05129329438755048,
+    "alpha": 1.0498221244986776,
+    "lệ_phí": 1.0498221244986776,
+    "giả_lập": 0.05129329438755048,
+    "10": 1.0498221244986776,
+    "đơn_vị": 1.0498221244986776,
+    "thời_gian": 1.0498221244986776,
+    "3": 1.0498221244986776,
+    "ngày": 1.0498221244986776,
+    "hồ_sơ": 1.0498221244986776,
+    "biểu_mẫu": 1.0498221244986776,
+    "minh_họa": 1.0498221244986776,
+    "phải": 1.0498221244986776,
+    "giấy_tờ": 1.0498221244986776,
+    "thật": 1.0498221244986776,
+    "beta": 1.0498221244986776,
+    "gamma": 1.0498221244986776
+  },
+  "avg_len": 11.666666666666666
+}

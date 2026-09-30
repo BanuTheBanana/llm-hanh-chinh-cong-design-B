@@ -26,10 +26,13 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:-change-me-local-only}
       SEGMENTER_BACKEND: ${SEGMENTER_BACKEND:-underthesea}
       ALLOW_DRAFT: ${ALLOW_DRAFT:-true}
-      BOOTSTRAP_DEMO: ${BOOTSTRAP_DEMO:-true}
+      BOOTSTRAP_DEMO: ${BOOTSTRAP_DEMO:-false}
+      BOOTSTRAP_CORPUS_DIR: /srv/corpus
       BM25_SCORE_FLOOR: ${BM25_SCORE_FLOOR:-0.5}
       BM25_MARGIN: ${BM25_MARGIN:-0.15}
       API_TOKEN: ${API_TOKEN:-}
+    volumes:
+      - ../data/corpus:/srv/corpus:ro
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     depends_on:

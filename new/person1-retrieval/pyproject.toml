@@ -4,10 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "person1-retrieval"
-version = "0.1.0"
-description = "Person 1 Vietnamese segmentation spike"
+version = "0.2.0"
+description = "Person 1 corpus validation and lexical/dense/hybrid retrieval"
 requires-python = ">=3.12,<3.13"
-dependencies = ["underthesea==9.5.0", "pyvi==0.1.1"]
+dependencies = ["underthesea==9.5.0", "pyvi==0.1.1", "numpy>=1.26", "jsonschema>=4.23", "referencing>=0.35"]
+
+[project.optional-dependencies]
+dense = ["sentence-transformers>=3,<6"]
+test = ["pytest>=8,<10"]
+
+[project.scripts]
+person1 = "person1_retrieval.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

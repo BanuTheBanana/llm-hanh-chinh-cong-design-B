@@ -1,0 +1,711 @@
+[
+  {
+    "procedure_id": "PROC-S01-R0002",
+    "canonical_name": "Thủ tục xác nhận tình trạng hôn nhân",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0002-D",
+      "PROC-S01-R0002-E",
+      "PROC-S01-R0002-F",
+      "PROC-S01-R0002-G",
+      "PROC-S01-R0002-H",
+      "PROC-S01-R0002-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0003",
+    "canonical_name": "Thủ tục đăng ký khai sinh",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0003-D",
+      "PROC-S01-R0003-E",
+      "PROC-S01-R0003-F",
+      "PROC-S01-R0003-G",
+      "PROC-S01-R0003-H",
+      "PROC-S01-R0003-I",
+      "PROC-S01-R0003-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0004",
+    "canonical_name": "Thủ tục đăng ký khai tử",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0004-D",
+      "PROC-S01-R0004-E",
+      "PROC-S01-R0004-F",
+      "PROC-S01-R0004-G",
+      "PROC-S01-R0004-H",
+      "PROC-S01-R0004-I",
+      "PROC-S01-R0004-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0005",
+    "canonical_name": "Thủ tục đăng ký kết hôn",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0005-D",
+      "PROC-S01-R0005-E",
+      "PROC-S01-R0005-F",
+      "PROC-S01-R0005-G",
+      "PROC-S01-R0005-H",
+      "PROC-S01-R0005-I",
+      "PROC-S01-R0005-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0006",
+    "canonical_name": "Thủ tục nhận cha mẹ con",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0006-D",
+      "PROC-S01-R0006-E",
+      "PROC-S01-R0006-F",
+      "PROC-S01-R0006-G",
+      "PROC-S01-R0006-H",
+      "PROC-S01-R0006-I",
+      "PROC-S01-R0006-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0007",
+    "canonical_name": "Đăng ký kết hôn có yếu tố nước ngoài",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0007-D",
+      "PROC-S01-R0007-E",
+      "PROC-S01-R0007-F",
+      "PROC-S01-R0007-G",
+      "PROC-S01-R0007-H",
+      "PROC-S01-R0007-I",
+      "PROC-S01-R0007-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0008",
+    "canonical_name": "Nội quy lao động",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0008-D",
+      "PROC-S01-R0008-E",
+      "PROC-S01-R0008-F",
+      "PROC-S01-R0008-G",
+      "PROC-S01-R0008-H",
+      "PROC-S01-R0008-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0009",
+    "canonical_name": "Thực hiện, điều chỉnh, thôi hưởng trợ cấp hưu trí xã hội",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0009-D",
+      "PROC-S01-R0009-E",
+      "PROC-S01-R0009-F",
+      "PROC-S01-R0009-G",
+      "PROC-S01-R0009-H",
+      "PROC-S01-R0009-I",
+      "PROC-S01-R0009-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0010",
+    "canonical_name": "Xác định, xác định lại mức độ khuyết tật và cấp Giấy xác nhận khuyết tật",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0010-D",
+      "PROC-S01-R0010-E",
+      "PROC-S01-R0010-F",
+      "PROC-S01-R0010-G",
+      "PROC-S01-R0010-H",
+      "PROC-S01-R0010-I",
+      "PROC-S01-R0010-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0011",
+    "canonical_name": "Thủ tục hỗ trợ chi phí khuyến khích hoả táng đối với người dân có hộ khẩu Thành phố Hồ Chí Minh",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0011-D",
+      "PROC-S01-R0011-E",
+      "PROC-S01-R0011-F",
+      "PROC-S01-R0011-G",
+      "PROC-S01-R0011-H",
+      "PROC-S01-R0011-I",
+      "PROC-S01-R0011-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0012",
+    "canonical_name": "Giải quyết chế độ trợ cấp thờ cúng liệt sĩ.",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0012-D",
+      "PROC-S01-R0012-E",
+      "PROC-S01-R0012-F",
+      "PROC-S01-R0012-G",
+      "PROC-S01-R0012-H",
+      "PROC-S01-R0012-I",
+      "PROC-S01-R0012-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0013",
+    "canonical_name": "Cấp đổi Bằng “Tổ quốc ghi công”",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0013-D",
+      "PROC-S01-R0013-E",
+      "PROC-S01-R0013-F",
+      "PROC-S01-R0013-G",
+      "PROC-S01-R0013-H",
+      "PROC-S01-R0013-I",
+      "PROC-S01-R0013-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0014",
+    "canonical_name": "Cấp giấy xác nhận thân nhân của người có công",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0014-D",
+      "PROC-S01-R0014-E",
+      "PROC-S01-R0014-F",
+      "PROC-S01-R0014-G",
+      "PROC-S01-R0014-H",
+      "PROC-S01-R0014-I",
+      "PROC-S01-R0014-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0015",
+    "canonical_name": "Hưởng trợ cấp khi người có công đang hưởng trợ cấp ưu đãi từ trần",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0015-D",
+      "PROC-S01-R0015-E",
+      "PROC-S01-R0015-F",
+      "PROC-S01-R0015-G",
+      "PROC-S01-R0015-H",
+      "PROC-S01-R0015-I",
+      "PROC-S01-R0015-J",
+      "PROC-S01-R0015-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0016",
+    "canonical_name": "Giải quyết chế độ trợ cấp thờ cúng liệt sĩ",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0016-D",
+      "PROC-S01-R0016-E",
+      "PROC-S01-R0016-F",
+      "PROC-S01-R0016-G",
+      "PROC-S01-R0016-H",
+      "PROC-S01-R0016-I",
+      "PROC-S01-R0016-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0017",
+    "canonical_name": "Hỗ trợ chi phí khuyến khích hỏa táng",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0017-D",
+      "PROC-S01-R0017-E",
+      "PROC-S01-R0017-F",
+      "PROC-S01-R0017-G",
+      "PROC-S01-R0017-H",
+      "PROC-S01-R0017-I",
+      "PROC-S01-R0017-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0018",
+    "canonical_name": "Hỗ trợ chi phí mai táng cho đối tượng bảo trợ xã hội",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0018-D",
+      "PROC-S01-R0018-E",
+      "PROC-S01-R0018-F",
+      "PROC-S01-R0018-G",
+      "PROC-S01-R0018-H",
+      "PROC-S01-R0018-I",
+      "PROC-S01-R0018-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0019",
+    "canonical_name": "Thực hiện, điều chỉnh, thôi hưởng trợ cấp xã hội hàng tháng, hỗ trợ kinh phí chăm sóc, nuôi dưỡng hàng tháng",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0019-D",
+      "PROC-S01-R0019-E",
+      "PROC-S01-R0019-F",
+      "PROC-S01-R0019-G",
+      "PROC-S01-R0019-H",
+      "PROC-S01-R0019-I",
+      "PROC-S01-R0019-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0020",
+    "canonical_name": "Hưởng trợ cấp khi người có công đang hưởng trợ cấp ưu đãi từ trần ",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0020-D",
+      "PROC-S01-R0020-E",
+      "PROC-S01-R0020-F",
+      "PROC-S01-R0020-G",
+      "PROC-S01-R0020-H",
+      "PROC-S01-R0020-I",
+      "PROC-S01-R0020-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0021",
+    "canonical_name": "Thực hiện, điều chỉnh, thôi hưởng trợ cấp hưu trí xã hội",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0021-D",
+      "PROC-S01-R0021-E",
+      "PROC-S01-R0021-F",
+      "PROC-S01-R0021-G",
+      "PROC-S01-R0021-H",
+      "PROC-S01-R0021-I",
+      "PROC-S01-R0021-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0022",
+    "canonical_name": "Hỗ trợ chi phí mai táng đối với đối tượng hưởng trợ cấp hưu trí xã hội",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0022-D",
+      "PROC-S01-R0022-E",
+      "PROC-S01-R0022-F",
+      "PROC-S01-R0022-G",
+      "PROC-S01-R0022-H",
+      "PROC-S01-R0022-I",
+      "PROC-S01-R0022-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0023",
+    "canonical_name": "Giải quyết chế độ hỗ trợ để theo học đến trình độ đại học tại các cơ sở giáo dục thuộc hệ thống giáo dục quốc dân",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0023-D",
+      "PROC-S01-R0023-E",
+      "PROC-S01-R0023-F",
+      "PROC-S01-R0023-G",
+      "PROC-S01-R0023-H",
+      "PROC-S01-R0023-I",
+      "PROC-S01-R0023-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0024",
+    "canonical_name": "Xác định, xác định lại mức độ khuyết tật và cấp giấy xác nhận khuyết tật",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0024-D",
+      "PROC-S01-R0024-E",
+      "PROC-S01-R0024-F",
+      "PROC-S01-R0024-G",
+      "PROC-S01-R0024-H",
+      "PROC-S01-R0024-I",
+      "PROC-S01-R0024-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0025",
+    "canonical_name": "Giải quyết chế độ người hoạt động kháng chiến giải phóng dân tộc, bảo vệ tổ quốc và làm nghĩa vụ quốc tế",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0025-D",
+      "PROC-S01-R0025-E",
+      "PROC-S01-R0025-F",
+      "PROC-S01-R0025-G",
+      "PROC-S01-R0025-H",
+      "PROC-S01-R0025-I",
+      "PROC-S01-R0025-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0026",
+    "canonical_name": " HỒ SƠ CẤP GIẤY PHÉP XÂY DỰNG\n",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0026-D",
+      "PROC-S01-R0026-E",
+      "PROC-S01-R0026-F",
+      "PROC-S01-R0026-G",
+      "PROC-S01-R0026-H",
+      "PROC-S01-R0026-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0027",
+    "canonical_name": "THÔNG TIN QUY HOẠCH",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0027-D",
+      "PROC-S01-R0027-E",
+      "PROC-S01-R0027-F",
+      "PROC-S01-R0027-G",
+      "PROC-S01-R0027-H",
+      "PROC-S01-R0027-I",
+      "PROC-S01-R0027-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0028",
+    "canonical_name": "CẤP GIẤY PHÉP XÂY DỰNG",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0028-D",
+      "PROC-S01-R0028-E",
+      "PROC-S01-R0028-F",
+      "PROC-S01-R0028-G",
+      "PROC-S01-R0028-H",
+      "PROC-S01-R0028-I",
+      "PROC-S01-R0028-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0029",
+    "canonical_name": "Vay vốn hỗ trợ tạo việc làm, duy trì và mở rộng việc làm từ Quỹ quốc gia về việc làm đối với người lao động",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0029-D",
+      "PROC-S01-R0029-E",
+      "PROC-S01-R0029-F",
+      "PROC-S01-R0029-G",
+      "PROC-S01-R0029-H",
+      "PROC-S01-R0029-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0030",
+    "canonical_name": "Chuyển trường đối với học sinh THCS",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0030-D",
+      "PROC-S01-R0030-E",
+      "PROC-S01-R0030-F",
+      "PROC-S01-R0030-G",
+      "PROC-S01-R0030-H",
+      "PROC-S01-R0030-I",
+      "PROC-S01-R0030-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0031",
+    "canonical_name": "THÔNG BÁO KHỞI CÔNG",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0031-D",
+      "PROC-S01-R0031-E",
+      "PROC-S01-R0031-F",
+      "PROC-S01-R0031-G",
+      "PROC-S01-R0031-H",
+      "PROC-S01-R0031-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0032",
+    "canonical_name": "ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT LẦN ĐẦU",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0032-D",
+      "PROC-S01-R0032-E",
+      "PROC-S01-R0032-F",
+      "PROC-S01-R0032-G",
+      "PROC-S01-R0032-H",
+      "PROC-S01-R0032-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0033",
+    "canonical_name": "Vay vốn hỗ trợ tạo việc làm, duy trì và mở rộng việc làm từ Quỹ quốc gia về việc làm đối với cơ sở sản xuất, kinh doanh.",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0033-D",
+      "PROC-S01-R0033-E",
+      "PROC-S01-R0033-F",
+      "PROC-S01-R0033-G",
+      "PROC-S01-R0033-H",
+      "PROC-S01-R0033-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0034",
+    "canonical_name": "HỒ SƠ CẤP SỐ NHÀ",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0034-D",
+      "PROC-S01-R0034-E",
+      "PROC-S01-R0034-F",
+      "PROC-S01-R0034-G",
+      "PROC-S01-R0034-H",
+      "PROC-S01-R0034-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0035",
+    "canonical_name": "XÁC NHẬN VỊ TRÍ NHÀ - ĐẤT",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0035-D",
+      "PROC-S01-R0035-E",
+      "PROC-S01-R0035-F",
+      "PROC-S01-R0035-G",
+      "PROC-S01-R0035-H",
+      "PROC-S01-R0035-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0036",
+    "canonical_name": "XÁC NHẬN TÌNH TRẠNG NHÀ Ở",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0036-D",
+      "PROC-S01-R0036-E",
+      "PROC-S01-R0036-F",
+      "PROC-S01-R0036-G",
+      "PROC-S01-R0036-H",
+      "PROC-S01-R0036-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0037",
+    "canonical_name": "Thủ tục Đăng ký thành lập hộ kinh doanh",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0037-D",
+      "PROC-S01-R0037-E",
+      "PROC-S01-R0037-F",
+      "PROC-S01-R0037-G",
+      "PROC-S01-R0037-H",
+      "PROC-S01-R0037-I",
+      "PROC-S01-R0037-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0038",
+    "canonical_name": "Đăng ký thay đổi nội dung đăng ký hộ kinh doanh",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0038-D",
+      "PROC-S01-R0038-E",
+      "PROC-S01-R0038-F",
+      "PROC-S01-R0038-G",
+      "PROC-S01-R0038-H",
+      "PROC-S01-R0038-I",
+      "PROC-S01-R0038-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0039",
+    "canonical_name": "Tạm ngừng kinh doanh/tiếp tục kinh doanh trước thời hạn đã thông báo của hộ kinh doanh",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0039-D",
+      "PROC-S01-R0039-E",
+      "PROC-S01-R0039-F",
+      "PROC-S01-R0039-G",
+      "PROC-S01-R0039-H",
+      "PROC-S01-R0039-I",
+      "PROC-S01-R0039-K",
+      "PROC-S01-R0039-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0040",
+    "canonical_name": "Chấm dứt hoạt động hộ kinh doanh",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0040-D",
+      "PROC-S01-R0040-E",
+      "PROC-S01-R0040-F",
+      "PROC-S01-R0040-G",
+      "PROC-S01-R0040-H",
+      "PROC-S01-R0040-I",
+      "PROC-S01-R0040-K",
+      "PROC-S01-R0040-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0041",
+    "canonical_name": "Cấp lại Giấy chứng nhận đăng ký hộ kinh doanh",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0041-D",
+      "PROC-S01-R0041-E",
+      "PROC-S01-R0041-F",
+      "PROC-S01-R0041-G",
+      "PROC-S01-R0041-H",
+      "PROC-S01-R0041-I",
+      "PROC-S01-R0041-K",
+      "PROC-S01-R0041-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0042",
+    "canonical_name": "Thủ tục xét, cấp học bổng chính sách",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0042-D",
+      "PROC-S01-R0042-E",
+      "PROC-S01-R0042-F",
+      "PROC-S01-R0042-G",
+      "PROC-S01-R0042-H",
+      "PROC-S01-R0042-I",
+      "PROC-S01-R0042-J",
+      "PROC-S01-R0042-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  },
+  {
+    "procedure_id": "PROC-S01-R0043",
+    "canonical_name": " chứng thực chữ ký - chứng thực Hợp đồng giao dịch/Di chúc",
+    "aliases": [],
+    "official_codes": [],
+    "jurisdiction": null,
+    "fragment_ids": [
+      "PROC-S01-R0043-D",
+      "PROC-S01-R0043-E",
+      "PROC-S01-R0043-F",
+      "PROC-S01-R0043-G",
+      "PROC-S01-R0043-H",
+      "PROC-S01-R0043-I",
+      "PROC-S01-R0043-M"
+    ],
+    "source_id": "SRC-ADMIN-XLSX-001"
+  }
+]

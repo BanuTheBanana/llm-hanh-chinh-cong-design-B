@@ -1,0 +1,276 @@
+[
+  {
+    "case_id": "A-fee",
+    "query": "demo alpha lệ phí",
+    "status": "resolved",
+    "procedure_id": "DEMO-A",
+    "section_types": [
+      "fee"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "A-required_documents",
+    "query": "demo alpha hồ sơ",
+    "status": "resolved",
+    "procedure_id": "DEMO-A",
+    "section_types": [
+      "required_documents"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "A-processing_time",
+    "query": "demo alpha bao lâu",
+    "status": "resolved",
+    "procedure_id": "DEMO-A",
+    "section_types": [
+      "processing_time"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "B-fee",
+    "query": "demo beta lệ phí",
+    "status": "resolved",
+    "procedure_id": "DEMO-B",
+    "section_types": [
+      "fee"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "B-required_documents",
+    "query": "demo beta hồ sơ",
+    "status": "resolved",
+    "procedure_id": "DEMO-B",
+    "section_types": [
+      "required_documents"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "B-processing_time",
+    "query": "demo beta bao lâu",
+    "status": "resolved",
+    "procedure_id": "DEMO-B",
+    "section_types": [
+      "processing_time"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "C-fee",
+    "query": "demo gamma lệ phí",
+    "status": "resolved",
+    "procedure_id": "DEMO-C",
+    "section_types": [
+      "fee"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "C-required_documents",
+    "query": "demo gamma hồ sơ",
+    "status": "resolved",
+    "procedure_id": "DEMO-C",
+    "section_types": [
+      "required_documents"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "C-processing_time",
+    "query": "demo gamma bao lâu",
+    "status": "resolved",
+    "procedure_id": "DEMO-C",
+    "section_types": [
+      "processing_time"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "ambiguous",
+    "query": "demo chung lệ phí",
+    "status": "ambiguous",
+    "procedure_id": null,
+    "section_types": [],
+    "split": "dev",
+    "candidate_ids": [
+      "DEMO-A",
+      "DEMO-B",
+      "DEMO-C"
+    ]
+  },
+  {
+    "case_id": "absent",
+    "query": "zzzzzzzz",
+    "status": "low_confidence",
+    "procedure_id": null,
+    "section_types": [],
+    "split": "dev"
+  },
+  {
+    "case_id": "scope",
+    "query": "demo alpha",
+    "status": "low_confidence",
+    "procedure_id": null,
+    "section_types": [],
+    "split": "dev",
+    "filters": {
+      "scope": "unsupported"
+    }
+  },
+  {
+    "case_id": "choice",
+    "query": "cái đầu tiên",
+    "status": "resolved",
+    "procedure_id": "DEMO-B",
+    "section_types": [
+      "fee"
+    ],
+    "split": "dev",
+    "state": {
+      "unresolved_references": [
+        "DEMO-B",
+        "DEMO-A"
+      ],
+      "last_requested_section_types": [
+        "fee"
+      ]
+    }
+  },
+  {
+    "case_id": "invalid-choice",
+    "query": "cái thứ ba",
+    "status": "low_confidence",
+    "procedure_id": null,
+    "section_types": [],
+    "split": "dev",
+    "state": {
+      "unresolved_references": [
+        "DEMO-B",
+        "DEMO-A"
+      ]
+    }
+  },
+  {
+    "case_id": "multi-field",
+    "query": "demo beta lệ phí và hồ sơ",
+    "status": "resolved",
+    "procedure_id": "DEMO-B",
+    "section_types": [
+      "fee",
+      "required_documents"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "correction",
+    "query": "không phải demo alpha mà demo gamma lệ phí",
+    "status": "resolved",
+    "procedure_id": "DEMO-C",
+    "section_types": [
+      "fee"
+    ],
+    "split": "dev"
+  },
+  {
+    "case_id": "test-A",
+    "query": "xin hỏi demo alpha cần nộp giấy tờ gì",
+    "status": "resolved",
+    "procedure_id": "DEMO-A",
+    "section_types": [
+      "required_documents"
+    ],
+    "split": "test"
+  },
+  {
+    "case_id": "test-B",
+    "query": "demo beta mất bao lâu",
+    "status": "resolved",
+    "procedure_id": "DEMO-B",
+    "section_types": [
+      "processing_time"
+    ],
+    "split": "test"
+  },
+  {
+    "case_id": "test-C",
+    "query": "demo gamma mức thu",
+    "status": "resolved",
+    "procedure_id": "DEMO-C",
+    "section_types": [
+      "fee"
+    ],
+    "split": "test"
+  },
+  {
+    "case_id": "test-ambiguous",
+    "query": "demo chung hồ sơ",
+    "status": "ambiguous",
+    "procedure_id": null,
+    "section_types": [],
+    "split": "test",
+    "candidate_ids": [
+      "DEMO-A",
+      "DEMO-B",
+      "DEMO-C"
+    ]
+  },
+  {
+    "case_id": "test-missing",
+    "query": "qzxv9812",
+    "status": "low_confidence",
+    "procedure_id": null,
+    "section_types": [],
+    "split": "test"
+  },
+  {
+    "case_id": "test-filter",
+    "query": "demo beta",
+    "status": "low_confidence",
+    "procedure_id": null,
+    "section_types": [],
+    "split": "test",
+    "filters": {
+      "jurisdiction": "other"
+    }
+  },
+  {
+    "case_id": "test-choice",
+    "query": "chọn cái thứ hai",
+    "status": "resolved",
+    "procedure_id": "DEMO-A",
+    "section_types": [
+      "required_documents"
+    ],
+    "split": "test",
+    "state": {
+      "unresolved_references": [
+        "DEMO-C",
+        "DEMO-A"
+      ],
+      "last_requested_section_types": [
+        "required_documents"
+      ]
+    }
+  },
+  {
+    "case_id": "test-switch",
+    "query": "demo gamma hồ sơ",
+    "status": "resolved",
+    "procedure_id": "DEMO-C",
+    "section_types": [
+      "required_documents"
+    ],
+    "split": "test",
+    "state": {
+      "last_resolved_procedure_id": "DEMO-A",
+      "unresolved_references": [
+        "DEMO-A",
+        "DEMO-B"
+      ]
+    }
+  }
+]

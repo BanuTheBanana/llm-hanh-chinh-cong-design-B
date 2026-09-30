@@ -1,0 +1,12 @@
+[
+  {
+    "source_id": "SRC-ADMIN-XLSX-001",
+    "title": "Tổng hợp các thủ tục hành chính (22.12) (1)",
+    "review_status": "draft",
+    "superseded_by": null,
+    "version": "xlsx-sha256-2c87a82f750faa62073801e9d61e83c02a1b4ff0586f862eec453f088f303bb9",
+    "content_hash": "2c87a82f750faa62073801e9d61e83c02a1b4ff0586f862eec453f088f303bb9",
+    "ingested_at": "2026-09-28T04:31:01.494274Z",
+    "effective_date": null
+  }
+]
