@@ -14,10 +14,17 @@ class ContractValidationError(ValueError):
 
 @lru_cache(maxsize=1)
 def contract_dir() -> Path:
+    fallbacks: list[Path] = []
     for parent in Path(__file__).resolve().parents:
         candidate = parent / "contracts"
         if (candidate / "evidence_bundle.schema.json").exists():
-            return candidate
+            # The active authority is repository-root contracts/. Prefer the parent
+            # that also owns new/, rather than the compatibility copy new/contracts/.
+            if (parent / "new").is_dir():
+                return candidate
+            fallbacks.append(candidate)
+    if fallbacks:
+        return fallbacks[-1]
     raise RuntimeError("repository-root contracts/ directory was not found")
 
 
