@@ -16,7 +16,7 @@ Mở http://localhost:8000/docs . POST /api/v1/answer:
 
 Mặc định tự tạo corpus giả lập để demo. Truy hồi BM25 thật; AI mock trích nguyên văn evidence. Không cần API key/LLM/frontend. Cấu hình mặc định chỉ bind localhost.
 
-Nếu dùng PostgreSQL đang chạy trên máy anh, xem person2-backend/README.md mục “Dùng PostgreSQL hiện có”. URL mặc định trong .env.example đã trỏ hanh_chinh_mvp, app_user, port 5432. Nếu chạy Compose, host DB phải là postgres; không dùng 127.0.0.1 từ container backend.
+Nếu dùng PostgreSQL đang chạy trên máy, xem person2-backend/README.md mục “Dùng PostgreSQL hiện có”. URL mặc định trong .env.example đã trỏ hanh_chinh_mvp, app_user, port 5432. Nếu chạy Compose, host DB phải là postgres; không dùng 127.0.0.1 từ container backend.
 
 Gói này gồm các file thay đổi theo cấu trúc `new/`. Chép vào repo, đồng bộ contracts theo CONTRACT_CHANGES.md. Không xóa frontend/person3 hoặc code ngoài gói. Không chứa Excel/corpus công ty. Hướng dẫn nhập ba JSON thật và kiểm thử nằm trong person2-backend/README.md.
 

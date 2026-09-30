@@ -18,6 +18,8 @@ INSUFFICIENT_EVIDENCE_PROMPT = (
 def clarification_prompt(candidates: list[dict]) -> str:
     """Ask the user to choose between near-tied candidate procedures."""
     names = [f"“{c['canonical_name']}”" for c in candidates]
+    if not names:
+        return "Bạn có thể mô tả rõ hơn tên thủ tục bạn đang hỏi không?"
     if len(names) == 1:
         options = names[0]
     else:

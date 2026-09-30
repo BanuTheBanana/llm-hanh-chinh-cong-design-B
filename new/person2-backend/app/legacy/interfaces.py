@@ -1,6 +1,6 @@
 """The seams between tracks. Each real component must satisfy one of these.
 
-Objects are plain dicts that validate against the JSON Schemas in ./schemas.
+Objects are plain dicts that validate against the repository-root JSON Schemas in contracts/.
 """
 from __future__ import annotations
 

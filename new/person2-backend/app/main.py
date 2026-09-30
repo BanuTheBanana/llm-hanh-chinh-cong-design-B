@@ -1,4 +1,4 @@
-import asyncio,hashlib,hmac,logging,re
+import asyncio,hashlib,hmac,logging
 from contextlib import asynccontextmanager
 from datetime import datetime,timezone
 from pathlib import Path
@@ -14,9 +14,9 @@ from app.corpus import read_corpus
 from app.repository import import_corpus,load_active,get_state,save_state,log_event
 from app.contracts import validate
 from app.service import ground_and_answer
-from app.legacy.interpretation import extract_explicit_filters
+from app.legacy.conversation_state import build_conversation_state,resolve_filters
 from person1_retrieval import VietnameseSegmenter,SegmenterConfig
-from person1_retrieval.retriever import LexicalRetriever,sections
+from person1_retrieval.retriever import LexicalRetriever
 
 logging.basicConfig(level=logging.INFO)
 class Filters(BaseModel):
@@ -77,10 +77,8 @@ def create_app(settings=None):
                             allow_draft=settings.allow_draft,score_floor=settings.bm25_score_floor,margin_floor=settings.bm25_margin))
             retriever=app.state.retriever
             raw=request.query_text_raw
-            follow=bool(re.match(r'^(còn\b|vậy\b|thế\b|thủ tục đó\b|cái đó\b)',raw.casefold()))
-            explicit=extract_explicit_filters(raw);provided=request.filters.model_dump(exclude_unset=True)
-            carried=(state or {}).get('active_filters',{}) if follow else {}
-            filters={k:provided.get(k,explicit.get(k) or carried.get(k)) for k in ['jurisdiction','effective_date','scope']}
+            provided=request.filters.model_dump(exclude_unset=True)
+            filters=resolve_filters(raw,provided,state)
             ri={'query_text_raw':raw,'query_text_segmented':await run_in_threadpool(app.state.segmenter.segment,raw),
                 'filters':filters,'conversation_session_id':sid,'top_k':request.top_k}
             try:validate('retrieval_input',ri)
@@ -89,9 +87,7 @@ def create_app(settings=None):
             validate('evidence_bundle',bundle)
             result=ground_and_answer(bundle,raw) if respond else bundle
             # Clear prior on new topic or ambiguity instead of leaking old identity.
-            new={'session_id':sid,'active_filters':filters,'last_resolved_procedure_id':bundle['resolved_procedure_id'],
-                'last_requested_section_types':sections(raw),'unresolved_references':[],
-                'updated_at':datetime.now(timezone.utc).isoformat()}
+            new=build_conversation_state(sid,filters,bundle,raw,datetime.now(timezone.utc).isoformat())
             validate('conversation_state',new);await save_state(db,new)
             await log_event(db,sid,{'snapshot':fp,'bundle_id':bundle['bundle_id'],'top_score':bundle['top_score'],
                 'second_score':bundle['second_score'],'margin':bundle['margin'],'confidence_status':bundle['confidence_status'],

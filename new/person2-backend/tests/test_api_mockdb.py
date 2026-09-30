@@ -49,4 +49,5 @@ def test_endpoints_with_mocked_storage(monkeypatch):
         assert call('demo alpha',top_k=0).status_code==422
     assert len(logs)==5
     assert all('top_score' in p and 'second_score' in p and 'margin' in p for p in logs)
-    assert all('query_text_raw' not in p and 'text' not in p for p in logs)
+    assert all('snapshot' in p and 'bundle_id' in p and 'segmenter' in p for p in logs)
+    assert all(not {'query_text_raw','query','text','answer_text','source_text'} & p.keys() for p in logs)

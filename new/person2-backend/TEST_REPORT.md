@@ -12,3 +12,21 @@ Thực hiện trong môi trường Linux, Python 3.12.
 - Không publish server online vì chưa có server/hosting đích.
 
 Sau khi PostgreSQL test sẵn sàng: chạy tests/test_api_postgres.py theo README để kiểm tra kết nối, tạo bảng, seed snapshot, ghi/đọc state qua hai instance API và audit. Nên hoàn thành gate này trước khi merge/deploy ngoài localhost.
+
+## Kiểm tra bổ sung sau khi hoàn thiện grounding/state
+
+Windows, Python 3.12:
+
+- `tests/test_grounding_state.py`: **15 passed**. Covers multi-field sufficiency,
+	procedure/source-version consistency, citation binding, ambiguity/abstention, filter
+	carry-over/reset, state replacement, and preservation of ambiguous candidate IDs.
+- `py_compile` passed for the changed backend modules.
+- Full backend suite in the project-local Python 3.12 venv: **22 passed, 1 skipped**.
+  The skipped test is PostgreSQL integration because `TEST_DATABASE_URL` was unset.
+- API mock-storage tests ran as part of that suite, including the strengthened audit
+	assertions for useful metadata without raw query/answer/source text.
+- The full Person 1 retrieval suite also passed: **30 passed**, including real segmenter
+	integration tests. Python dependency install and test commands are documented in
+	`../team-handoff/handoffs/PERSON2_TEST_HANDOFF.txt`.
+- PostgreSQL integration is still pending; run it with the disposable database described
+	in the handoff before merge/deployment.

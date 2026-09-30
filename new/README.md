@@ -23,4 +23,7 @@ This directory implements the proposed 3-person architecture without silently re
 - `person3-generation-evaluation/`: Generation & Evaluation
 - `contracts/`: shared JSON Schema contracts
 
+Team decisions, the current worklist, and role-specific handoffs are indexed in
+[team-handoff/README.txt](team-handoff/README.txt).
+
 Track code should depend on contracts, not another track's internals.
