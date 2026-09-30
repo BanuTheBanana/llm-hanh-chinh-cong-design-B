@@ -30,8 +30,9 @@ function AnswerView({ answer }: { answer: GroundedAnswer }) {
       <p>{answer.clarification_prompt}</p></div>
   }
   if (answer.status === 'insufficient_data') {
+    const message = answer.clarification_prompt?.trim() || answer.answer_text.trim() || 'Backend chưa có đủ dữ liệu để trả lời câu hỏi này.'
     return <div className="reply insufficient"><div className="reply-label"><WarningCircle size={17} /> Chưa đủ dữ liệu</div>
-      <p>{answer.answer_text}</p></div>
+      <p>{message}</p></div>
   }
   return <div className="reply"><div className="reply-label"><SealCheck size={17} weight="fill" /> Trợ lý hành chính</div>
     <p className="reply-text">{answer.answer_text}</p><Sources citations={answer.citations} /></div>
