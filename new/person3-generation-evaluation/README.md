@@ -9,6 +9,21 @@ Implementation track for the shared architecture. This folder consumes the repos
 `contracts/` as the authority and does not change RetrievalInput, EvidenceBundle,
 GroundedAnswer, or Citation shapes.
 
+## Code handoff status
+
+Person 3 code deliverables are complete for team integration: grounded generation client,
+prompt/output contract, local OpenAI-compatible runtime adapter, structural citation gate,
+benchmark/regression utilities, retrieval metric split, threshold tuning, latency telemetry,
+failure taxonomy, and the standalone benchmark frontend.
+
+Integration is intentionally left to the team: Person 2 still owns wiring the real generator
+into the FastAPI runtime, and the deployment machine still owns PostgreSQL/Docker/model
+startup. A real-model benchmark, semantic-groundedness adjudication, production threshold
+selection, and final E2E acceptance remain runtime/evaluation results rather than code that
+can be truthfully pre-filled.
+
+See `INTEGRATION_HANDOFF.md` for the exact boundary.
+
 ## What is implemented
 
 Generation:
