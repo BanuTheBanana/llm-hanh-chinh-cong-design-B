@@ -1,0 +1,14 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"citation.schema.json",
+  "title":"Citation",
+  "type":"object",
+  "properties":{
+    "claim_text":{"type":"string"},
+    "fragment_id":{"type":"string"},
+    "source_id":{"type":"string"},
+    "source_locator":{"type":"string"}
+  },
+  "required":["claim_text","fragment_id","source_id","source_locator"],
+  "additionalProperties":false
+}

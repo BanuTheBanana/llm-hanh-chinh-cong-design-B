@@ -1,0 +1,85 @@
+{
+  "count": 8,
+  "corpus_fingerprint": "6b61165a8ba68223573482bd29fabdd2f29f40d7ba976bbcec05e1fd9f8ae6fc",
+  "fusion_method": "lexical_bm25_procedure_max",
+  "score_floor": 0.5,
+  "margin_floor": 0.15,
+  "procedure_and_status_accuracy": 1.0,
+  "status_accuracy": 1.0,
+  "resolved_precision": 1.0,
+  "resolved_coverage": 0.625,
+  "field_precision": 1.0,
+  "field_recall": 1.0,
+  "all_requested_fields_rate": 1.0,
+  "ambiguity_candidate_recall": 1.0,
+  "latency_ms": {
+    "p50": 0.8617494999612063,
+    "p95": 2.742060000008449
+  },
+  "cases": [
+    {
+      "case_id": "test-A",
+      "status": "resolved",
+      "procedure_id": "DEMO-A",
+      "top_score": 2.4450774189421653,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "test-B",
+      "status": "resolved",
+      "procedure_id": "DEMO-B",
+      "top_score": 1.527807665590591,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "test-C",
+      "status": "resolved",
+      "procedure_id": "DEMO-C",
+      "top_score": 1.527807665590591,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "test-ambiguous",
+      "status": "ambiguous",
+      "procedure_id": null,
+      "top_score": 0.9984721292786335,
+      "second_score": 0.9984721292786335,
+      "margin": 0.0
+    },
+    {
+      "case_id": "test-missing",
+      "status": "low_confidence",
+      "procedure_id": null,
+      "top_score": null,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "test-filter",
+      "status": "low_confidence",
+      "procedure_id": null,
+      "top_score": null,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "test-choice",
+      "status": "resolved",
+      "procedure_id": "DEMO-A",
+      "top_score": 0.0,
+      "second_score": null,
+      "margin": null
+    },
+    {
+      "case_id": "test-switch",
+      "status": "resolved",
+      "procedure_id": "DEMO-C",
+      "top_score": 2.4450774189421653,
+      "second_score": null,
+      "margin": null
+    }
+  ]
+}
