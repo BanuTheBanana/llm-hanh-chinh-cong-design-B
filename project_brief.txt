@@ -1,0 +1,177 @@
+LLM HÀNH CHÍNH CÔNG
+System Architecture, Team Work Breakdown & Implementation Brief
+Shared reference for a 3-person development team
+One-sentence definition
+A lightweight, evidence-grounded RAG assistant for Vietnamese public-administration procedures: resolve what the user is asking for, retrieve the exact authoritative evidence, and let a small local LLM explain only that evidence.
+1. Executive Summary
+The system targets a small legal/administrative corpus (roughly 38 procedures and about 200 fragments).
+Query ? Interpretation ? Evidence Retrieval (resolution-by-retrieval) ? Grounding ? Quantized LLM ? Answer + Citations
+• Procedure/field resolution is not a separate component — it is merged into retrieval itself: the query is embedded and matched directly against procedure/fragment embeddings, and the top match's score (and its margin over the second-best match) is the confidence signal. See Section 8 and 9.
+• A lightweight exact-string shortcut sits in front of retrieval for queries that already contain an official procedure name/code/alias, so the common case still gets a near-zero-cost path without maintaining a full separate resolver tier.
+• Lexical (BM25/FTS) and dense retrieval operate on actual evidence fragments, not only procedure names.
+• The generator receives a bounded evidence bundle and does not decide which source is authoritative.
+• Source provenance, version/effective-date metadata, stable fragment IDs, and hashes are part of the core contract.
+• Conversation state supports follow-ups, but deterministic state resolution is preferred over a mandatory large intent/context model.
+• Abstention and clarification are correct outcomes when evidence is missing or ambiguous — including when retrieval confidence is low, or when the top two candidates are too close to call.
+• Evaluation separates retrieval correctness, citation binding, groundedness, abstention, conversation behavior, and resource/latency cost.
+
+2. Scope and Engineering Constraints
+Constraint / GoalEngineering consequenceSmall corpusUse simple local retrieval structures; no distributed vector DB is required at this scale.Legal/admin domainEvidence provenance, source review state, effective dates, and citation binding are mandatory correctness features.Quantized local modelGeneration must integrate with a local runtime such as llama.cpp/llama-server or equivalent. Target end-to-end response latency should be fixed early (e.g. ?5–8s for a fast-path answer, ?15s for a hybrid-path answer on the target demo hardware) so Person 3 can size the model accordingly rather than discovering a mismatch late.Vietnamese textVietnamese is written with spaces between syllables, not necessarily between words (e.g. "h?c sinh" = one word, two syllables). Any lexical index or query must pass through a Vietnamese word segmenter (e.g. underthesea, pyvi, or VnCoreNLP) applied consistently to both corpus fragments at index time and incoming queries at search time — otherwise BM25/FTS will match on meaningless syllable fragments instead of real words. Note this still applies even without a separate resolver: the query is segmented once during interpretation and that same normalized text feeds both the exact-match shortcut and the embedding/BM25 retrieval step.Conversational UXKeep a compact structured state for procedure, fields, filters, and unresolved references.Resource limitsDo not keep multiple heavyweight models in the critical path without evidence that they improve quality.ReproducibilityCorpus snapshots and indexes must be fingerprinted and rebuildable.
+3. Core Design Principles
+1. Evidence before generation: retrieval establishes the factual boundary; generation explains it.
+2. Deterministic before probabilistic: exact codes, aliases, and explicit filters should be resolved without a model whenever possible; everything else is resolved through retrieval confidence rather than a separate classifier or LLM call.
+3. One responsibility per layer: API, domain, retrieval, generation, storage, offline RAG, and evaluation stay separable.
+4. Small system, measurable system: add complexity only when an evaluation result demonstrates a real failure mode.
+5. Version-aware by default: do not silently mix different source versions or effective dates.
+6. Abstain rather than guess: unsupported legal claims are worse than a targeted clarification.
+7. Conversation is context, not authority: previous turns help interpret references; current retrieved evidence remains authoritative.
+
+4. Target System Architecture
+ComponentResponsibilityAPIReceives requests and returns stable answer/clarification/insufficient-data responses.Conversation / StateStores compact structured context: selected procedure, requested fields, scope, date, and unresolved references.Query InterpretationNormalizes and segments Vietnamese input (see Section 2 and 8.2) and extracts explicit filters (date, jurisdiction) and follow-up references. Does not resolve procedure/field identity itself — that happens as part of Retrieval.RetrievalMerged resolution + retrieval. Exact-string shortcut first; otherwise embeds the query and matches directly against procedure/fragment embeddings (dense) plus lexical (BM25/FTS), fuses candidates, and returns a bounded evidence bundle. The top match's score and its margin over the runner-up double as the confidence signal used for fast-path vs. clarification decisions (see Section 9).GroundingChecks answerability and citation support against retrieved evidence.GenerationUses the quantized local LLM to formulate the answer from the evidence bundle.StoragePersists corpus metadata, conversations, application state, and caches.Offline RAGBuilds/validates corpus, creates indexes, and runs evaluation.
+5. Request-Time Dataflow
+1. Receive: API accepts query, session context, and explicit filters.
+2. Interpret: normalize and segment the text (Vietnamese word segmentation) and extract explicit filters/date/jurisdiction and follow-up references.
+3. Exact-string shortcut: if the (segmented) query already contains a known official procedure name, code, or alias, jump straight to projecting that procedure's fragments — no embedding step needed for this case.
+4. Retrieve (resolution-by-retrieval): otherwise embed the query and search directly over procedure/fragment embeddings plus lexical (BM25/FTS) indexes, fuse candidates, and rank them.
+5. Confidence check: read the top result's absolute score and its margin over the second-best result.
+– High absolute score + clear margin ? treat as resolved, proceed with those fragments.
+– Low absolute score ? likely no good match in the corpus; move toward abstention/clarification.
+– High score but narrow margin over the runner-up ? genuine ambiguity between two candidates; ask a clarifying question naming both.
+6. Evidence bundle: return a bounded set of fragments with IDs, scores/method, provenance, source version, and locators.
+7. Ground: determine whether evidence is sufficient, contradictory, or missing; request clarification or abstain when needed.
+8. Generate: pass the evidence bundle and strict instructions to the quantized LLM.
+9. Verify: ensure every citation points to evidence from this request and does not invent source/version links.
+10. Return: answer text, status, citations, and traceable evidence metadata.
+
+6. Canonical Data Contracts
+ObjectMeaningSourceManifestAuthoritative source metadata, review/publish status, URL/reference, hashes, and version information.ProcedureRecordCanonical procedure identity, name, aliases/codes, jurisdiction, and fragment references.ProcedureFragmentRetrievable evidence unit: fragment_id, procedure_id, section type, text, source_id, ordinal, content hash, source locator.FiltersExplicit constraints such as jurisdiction, effective date, and scope.RetrievalInputQuery + resolved intents + filters + retrieval settings.EvidenceOne returned fragment with provenance, score/method, and source/version metadata.EvidenceBundleBounded evidence set passed to grounding and generation. Schema owned jointly by Person 1 and Person 2 (see Section 14) — any field change requires sign-off from both before merging.CitationStable mapping from an answer claim/span to evidence fragment(s).GroundedAnswerAnswer text + status + citations + evidence references.ConversationStateCompact structured state for multi-turn interpretation.
+7. Corpus, Provenance, and Versioning
+The corpus is the authority boundary. The prior system already had strong ideas here and those concepts should survive the rewrite.
+• Validate source metadata before a corpus snapshot becomes active.
+• Give every fragment a stable ID and content hash.
+• Keep source locators and provenance so every answer can be audited.
+• Track review/publish state and do not treat unreviewed material as authoritative silently.
+• Track effective dates/version identifiers.
+• Fingerprint the complete corpus snapshot so every retrieval index can be tied to the exact data used to build it.
+
+8. Retrieval Design (includes resolution)
+8.1 Exact-string shortcut
+If the segmented query already contains a known official procedure name, code, or alias, skip straight to that procedure's fragments. This is the only "dictionary"-style piece kept in the design — small, cheap to maintain, and worth keeping purely because it's near-zero cost for the common case. It is not a full resolver: anything it doesn't match falls straight through to 8.3/8.4 below, with no intermediate tier.
+8.2 Lexical retrieval
+BM25 or SQLite FTS handles exact terminology, legal phrases, procedure codes, names, and distinctive field language.
+Vietnamese segmentation requirement: before indexing or querying, all Vietnamese text must pass through a word segmenter (e.g. underthesea, pyvi, or VnCoreNLP) so that multi-syllable words (e.g. "h?c sinh," "gi?y t? tùy thân") are treated as single tokens rather than split into meaningless syllable fragments. This segmentation step must be applied identically at corpus index time and at query time, or lexical matching will silently degrade. This is Person 1's responsibility as part of the corpus/retrieval pipeline.
+8.3 Dense retrieval (also serves as resolution)
+Embeddings search actual evidence fragments — and procedure-level descriptions — for semantic matches. With the current corpus size, vectors can remain local/in-memory or in a lightweight store. Because resolution and retrieval are merged, this step is what decides which procedure and field the query is about, not just what to display: the top-ranked fragment's procedure/field identity is taken as the resolved intent.
+8.4 Fusion / reranking
+Fuse lexical and dense candidates with a transparent rule. Add a reranker only after evaluation demonstrates that fusion is insufficient.
+Critical distinction: Dense routing over procedure names is useful for procedure selection, but it is not a complete hybrid legal retriever. The final evidence fragments themselves need to be searchable and ranked. This matters more, not less, under resolution-by-retrieval: since there is no separate resolver to catch a wrong field within a correctly-identified procedure, fragment-level ranking quality is now solely responsible for field-level correctness (see Section 9).
+9. Conversation and Interpretation
+• Use normalization and deterministic rules for explicit dates, jurisdiction terms, and common follow-up references (procedure/field identity itself is resolved via retrieval, not rules — see Section 8).
+• Maintain structured state rather than relying on the entire prior conversation as opaque text.
+• Clarification should identify the minimum missing variable that prevents safe retrieval.
+• On corrections or procedure switches, explicitly replace stale state so old fields do not leak into the new task.
+
+Resolution-by-retrieval — how confidence and ambiguity are decided: Since there's no separate classifier, "confidently known" becomes two concrete, testable signals read directly off the retrieval scores:
+1. Absolute threshold — the top match's score is below a set floor (e.g. under ~0.5) ? probably no good match in the corpus at all ? abstain and ask the user to rephrase, rather than guessing.
+2. Margin between top two candidates — the top match and runner-up are both high but close together (e.g. 0.81 vs 0.79) ? genuine ambiguity between two real candidates, not low confidence ? ask a clarifying question naming both candidates ("did you mean X or Y?") rather than a generic "please clarify."
+
+Both thresholds are hyperparameters that must be tuned empirically against a real evaluation set (Section 12), not guessed once and left alone — the same risk flagged for any confidence threshold applies here regardless of which mechanism produces the score.
+Known remaining risk — field-level accuracy, not just procedure-level: merging resolution into retrieval removes a component, but does not remove the underlying hard problem — it relocates it. A short or vague query may correctly retrieve the right procedure while still ranking the wrong field's fragment as the top hit (e.g. correctly identifying "ID card renewal" but surfacing the "required documents" fragment when the user actually asked about "processing time"). Mitigations:
+• Build the evaluation set (Section 12) to score procedure-level and field-level retrieval accuracy separately, not as one combined number.
+• Log every retrieval decision with its top-2 scores and margin so Person 3 can tune the two thresholds above against real paraphrase data, the same way a resolver's confidence threshold would have been tuned.
+• Keep the exact-string shortcut (8.1) deliberately, even though it's "just a dictionary" — it removes the field-ambiguity risk entirely for the subset of queries it catches, since it goes straight to a known field, not a ranked guess.
+
+10. Grounding and Generation
+10.1 Generator responsibilities
+• Summarize and organize retrieved evidence in user-friendly language.
+• Follow formatting and citation instructions.
+• Avoid unsupported claims.
+• Never invent a procedure, requirement, source, or effective date that is absent from the evidence.
+
+10.2 Grounding responsibilities
+• Determine whether the evidence is sufficient to answer.
+• Bind citations to actual retrieved fragments.
+• Reject citations pointing outside the current evidence bundle.
+• Provide clarification/insufficient-data status when support is inadequate.
+
+11. Storage and Infrastructure
+PostgreSQL is reasonable for durable structured storage and application state, but it does not need to become the retrieval engine. For a small corpus, loading the active corpus/indexes into memory is simpler and easier to inspect.
+• Keep database access behind storage interfaces.
+• Use migrations if persistent schemas are introduced.
+• Avoid a distributed vector database until scale demands it.
+• Treat source/MCP integration as synchronization/publishing infrastructure, not a mandatory per-query dependency.
+• Keep model runtimes independently configurable.
+
+12. Evaluation
+Evaluation areaWhat to measureTarget (fill in before build starts)Procedure-level retrieval correctnessCorrect procedure identified, scored separately from field correctness.e.g. ?90% on the direct-lookup test setField-level retrieval correctnessCorrect field's fragment ranked top, given the procedure was already correctly identified.e.g. ?85% — track separately; this is the main new risk under resolution-by-retrieval (Section 9)CoverageWhether the evidence contains every field needed for the answer.e.g. ?85% full-field coverageCitation bindingWhether answer citations point to the actual evidence returned.100% (any miss is a hard failure)GroundednessWhether factual/legal claims stay within evidence.100% on the abstention/absent-info test setAbstentionWhether missing evidence (low absolute score) leads to clarification or insufficient-data behavior.e.g. ?90% correct abstain/clarify decisionsAmbiguity detectionWhether a narrow top-2 margin correctly triggers a "did you mean X or Y" clarification instead of silently picking one.e.g. ?85% correct ambiguity detectionVersion correctnessWhether effective-date/source-version constraints are respected.100% (no silent version mixing)Conversation correctnessFollow-ups, corrections, and procedure switches.e.g. ?80% correct state carry-overLatency/resource useWhether model calls and infrastructure cost are justified.vs. the latency budget set in Section 2
+The evaluation set should include direct lookups, paraphrases, multi-field requests, ambiguous requests (including near-tied procedure pairs, to test the margin threshold specifically), follow-ups, corrections, version edge cases, and queries for information intentionally absent from the corpus.
+Numeric targets above are placeholders — the team should agree on final numbers before implementation begins so Section 12 can actually function as a merge gate (Section 15, step 10), not just a category list.
+13. Three-Person Work Split
+The architecture and the data contracts are fixed, so each person owns one track and works in parallel, building against mock versions of the other tracks until the real components are ready. Inside a track, the solutions are the owner's to propose. Significant decisions are made together through short written proposals, as described in the companion document, Work Split & Working Agreement.
+PersonPrimary ownershipMain deliverablesPerson 1 — Corpus & RetrievalCorpus validation and snapshots, Vietnamese segmentation, exact-string shortcut, lexical and dense indexes, fusion, and the confidence signal (top_score, second_score, margin, confidence_status, ambiguous_candidates).Reproducible corpus snapshot; index builder; retrieve(RetrievalInput) ? EvidenceBundle with provenance; segment(text) function; retrieval log with top-2 scores and margin.Person 2 — Backend & GroundingAPI, ConversationState, interpretation (rule-based extraction of filters and follow-ups), orchestration, clarification and abstention responses, both grounding checks, storage and audit log.End-to-end pipeline returning GroundedAnswer for all three statuses (with mock retriever and generator until the real ones land); ConversationState logic; grounding verifier; cross-object validation script.Person 3 — Generation & EvaluationQuantized LLM runtime, prompt contract, citation output format, benchmark and regression harness, threshold tuning, latency measurement.Generation client; benchmark with agreed numeric targets (Section 12), split by procedure-level and field-level accuracy; tuned thresholds; failure taxonomy; end-to-end acceptance report.
+How the team decides
+• Fixed vs. open. The design principles, the JSON Schema contracts, the pipeline shape, and the evaluation categories are fixed. Choices inside a track are open and belong to the track owner.
+• Written proposals. Any decision that touches a shared contract, or that the owner is unsure about, gets a one-page proposal (problem, options, tradeoffs, recommendation). The other two comment within an agreed window before anyone builds.
+• Data over opinion. Disagreements are settled with a time-boxed spike on the shared sample corpus.
+• Decision log. Every accepted decision gets one line in a shared log.
+• Disagree and commit. Once a decision is logged, reopening it needs new evidence. If a cross-track decision is truly deadlocked, the project lead breaks the tie.
+
+14. Team Interfaces
+BoundaryStable contractSign-offPerson 1 ? Person 2RetrievalInput ? EvidenceBundle (includes top-2 scores/margin, since confidence/ambiguity decisions are read from these rather than from a separate resolver). Schema jointly owned; changes to either object require both to review and sign off before merging, to prevent contract drift.BothPerson 2 ? Person 3EvidenceBundle ? answer + citations, then GroundedAnswerBothPerson 1 ? Person 3Retrieval logs, benchmark fixtures, and threshold config ? retrieval metrics (procedure-level and field-level, scored separately) and tuned thresholdsBothAll ? CorpusImmutable corpus snapshot + fingerprint + index versionPerson 1 owns; others consume15. Suggested Implementation Order
+1. Freeze domain contracts first.
+2. Build one clean, validated corpus snapshot with provenance and version metadata.
+3. Implement the exact-string shortcut and direct evidence projection for known aliases.
+4. Implement lexical fragment retrieval (with Vietnamese segmentation in place) and benchmark it.
+5. Add dense fragment + procedure retrieval and transparent fusion; this is what performs resolution (Section 8.3).
+6. Tune the absolute-score and margin thresholds (Section 9) against real evaluation data before treating any result as "confidently resolved."
+7. Integrate the quantized generator using the EvidenceBundle contract.
+8. Add grounding and citation verification.
+9. Add deterministic conversation state and targeted clarification.
+10. Use the evaluation harness (with numeric targets set, split by procedure/field level) as the gate for further optimization.
+
+16. What We Are Deliberately Not Building Yet
+• Distributed vector infrastructure.
+• Multiple always-on LLMs for intent, context, routing, and generation.
+• A separate procedure/field resolver component or classifier — deliberately merged into retrieval (Section 8); revisit only if evaluation (Section 12) shows field-level accuracy is unacceptable and a dedicated small classifier is genuinely needed.
+• A general-purpose agent framework for ordinary administrative lookups.
+• Mandatory MCP calls during every answer.
+• Training/QLoRA work before retrieval and grounding are stable.
+• Separate phase-specific implementations of the same subsystem.
+
+17. Definition of Done
+• Known procedure questions reach the correct procedure/fields via the exact-string shortcut or a confidently-ranked retrieval result.
+• Paraphrased questions retrieve the correct evidence fragments — at both the procedure and field level — with reproducible provenance.
+• Answers contain citations that resolve to actual retrieved evidence.
+• Ambiguous questions (low absolute score, or a narrow top-2 margin) receive targeted clarification rather than a silent guess.
+• Unsupported questions produce insufficient-data behavior rather than fabricated legal claims.
+• Follow-ups and corrections do not leak stale procedure/field state.
+• Corpus changes produce a new fingerprint and compatible index version.
+• A fixed benchmark reproduces retrieval (procedure- and field-level), grounding, citation, and abstention/ambiguity measurements against the numeric targets in Section 12.
+• The complete request path runs locally with the intended quantized model runtime within the latency budget set in Section 2.
+
+18. Lessons Carried Forward from the Previous Repository
+• Keep the strong corpus validation/provenance concepts.
+• Reduce orchestration around the retrieval core.
+• Make fragment-level hybrid retrieval explicit rather than using dense search only for procedure routing.
+• Keep a cheap exact-match shortcut so ordinary known-procedure queries don't pay for an embedding call, without needing a full separate resolver/classifier to get that benefit.
+• Treat direct catalog retrieval as an intentional architecture path, not a special-case hack.
+• Move source/MCP management toward an update/synchronization subsystem.
+
+19. Open Technical Decisions
+• Exact embedding model and vector dimension.
+• Exact quantized generator/runtime and inference parameters.
+• PostgreSQL vs. SQLite/in-memory split for the first production-shaped version.
+• Fusion formula and retrieval thresholds, selected from evaluation results.
+• The absolute-score and margin thresholds for confidence/ambiguity under resolution-by-retrieval (Section 9) — must be tuned against real data, not fixed in advance.
+• How users specify or discover historical/effective-date contexts.
+• Whether a reranker improves measured retrieval enough to justify its cost.
+• Which Vietnamese segmentation tool to standardize on (Section 8.2), and how to handle segmenter errors on domain-specific legal terms not in its default vocabulary.
+• Final numeric targets for the evaluation table (Section 12).
+• Whether field-level accuracy under resolution-by-retrieval proves good enough in practice, or whether a dedicated small classifier (deliberately deferred in Section 16) becomes justified by evaluation data.
+
+Working rule for the whole team
+Do not add a subsystem because it sounds more advanced. Add it when a stable interface exists and an evaluation result demonstrates that it fixes a real failure mode.
+End of system brief
+LLM Hành chính công — System Brief
+
+Page 1

@@ -16,7 +16,21 @@ class Settings(BaseSettings):
     bootstrap_demo: bool = True
     bm25_score_floor: float = 0.5  # UNCALIBRATED demo values
     bm25_margin: float = 0.15
-    api_token: str = ''  # optional for loopback; set before remote exposure
+    retrieval_mode: str = 'lexical'
+    dense_model_path: str = ''
+    dense_device: str = 'cpu'
+    dense_batch_size: int = 1
+    dense_query_prefix: str = ''
+    dense_document_prefix: str = ''
+    dense_score_floor: float = 0.02
+    dense_margin_floor: float = 0.001
+    dense_min_similarity: float = 0.4
+    dense_rrf_k: int = 60
+    auth_cookie_name: str = 'hcc_session'
+    auth_cookie_secure: bool = True
+    auth_session_hours: int = 12
+    allow_registration: bool = False
+    enable_dev_trace: bool = False
 
     @property
     def connection_url(self):

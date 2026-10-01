@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+!.env.rag.example
 __pycache__/
 *.py[cod]
 *.egg-info/

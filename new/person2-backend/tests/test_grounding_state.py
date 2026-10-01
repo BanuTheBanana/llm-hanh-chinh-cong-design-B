@@ -3,11 +3,13 @@ import pytest
 from app.contracts import validate
 from app.legacy.conversation_state import (
     build_conversation_state,
+    explain_state_transition,
     is_follow_up,
     resolve_filters,
 )
+from app.legacy.interpretation import extract_explicit_filters, requested_section_types
 from app.legacy.grounding import check_sufficiency, verify_citations
-from app.service import ground_and_answer
+from app.service import ground_and_answer, ground_and_answer_with_diagnostics
 
 
 def evidence(fragment_id="FEE-1", section_type="fee"):
@@ -61,6 +63,41 @@ def test_missing_requested_field_abstains_without_citations():
     assert result["answer_text"] == ""
     assert result["citations"] == []
     assert result["clarification_prompt"]
+
+
+def test_grounding_trace_reports_missing_requested_sections():
+    result, trace = ground_and_answer_with_diagnostics(
+        bundle(), "Nêu lệ phí và thời gian giải quyết"
+    )
+
+    assert result["status"] == "insufficient_data"
+    assert trace["sufficiency"]["status"] == "failed"
+    assert trace["sufficiency"]["requested_section_types"] == ["fee", "processing_time"]
+    assert trace["sufficiency"]["missing_section_types"] == ["processing_time"]
+    assert trace["citation_binding"]["status"] == "skipped"
+
+
+def test_grounding_trace_reports_citation_binding_failure_and_abstains(monkeypatch):
+    class InvalidCitationGenerator:
+        def generate(self, evidence_bundle):
+            return {
+                "answer_text": "Unsupported claim",
+                "citations": [{
+                    "fragment_id": "UNKNOWN",
+                    "source_id": "SOURCE-1",
+                    "source_locator": "section/UNKNOWN",
+                    "claim_text": "Unsupported claim",
+                }],
+            }
+
+    monkeypatch.setattr("app.service.MockGenerator", InvalidCitationGenerator)
+    result, trace = ground_and_answer_with_diagnostics(bundle(), "lệ phí")
+
+    assert result["status"] == "insufficient_data"
+    assert result["answer_text"] == ""
+    assert result["citations"] == []
+    assert trace["citation_binding"]["status"] == "failed"
+    assert "not in evidence bundle" in trace["citation_binding"]["problems"][0]
 
 
 @pytest.mark.parametrize(
@@ -194,6 +231,17 @@ def test_explicit_and_supplied_filters_override_carried_values():
     assert resolve_filters("còn lệ phí", {"jurisdiction": "Tỉnh B"}, state)["jurisdiction"] == "Tỉnh B"
 
 
+def test_interpretation_separates_jurisdiction_date_scope_and_requested_field():
+    query = "Hồ sơ ở tỉnh Bình Dương ngày 02/03/2025 dành cho cá nhân"
+
+    assert extract_explicit_filters(query) == {
+        "jurisdiction": "tỉnh Bình Dương",
+        "effective_date": "2025-03-02",
+        "scope": "cá nhân",
+    }
+    assert requested_section_types(query) == ["required_documents"]
+
+
 def test_state_replaces_old_procedure_and_requested_fields():
     current = bundle()
     current["resolved_procedure_id"] = "PROC-2"
@@ -212,6 +260,48 @@ def test_state_replaces_old_procedure_and_requested_fields():
     current["resolved_procedure_id"] = None
     cleared = build_conversation_state("SESSION-1", state["active_filters"], current, "không rõ", "2026-09-30T00:00:01Z")
     assert cleared["last_resolved_procedure_id"] is None
+
+
+def test_state_trace_reports_carried_filters_and_procedure_replacement():
+    previous = {
+        "active_filters": {"jurisdiction": "Tỉnh A", "effective_date": None, "scope": None},
+        "last_resolved_procedure_id": "PROC-1",
+        "last_requested_section_types": ["fee"],
+        "unresolved_references": [],
+    }
+    current = {
+        "active_filters": {"jurisdiction": "Tỉnh A", "effective_date": None, "scope": None},
+        "last_resolved_procedure_id": "PROC-2",
+        "last_requested_section_types": ["processing_time"],
+        "unresolved_references": [],
+    }
+
+    trace = explain_state_transition("còn thời gian", previous, current, {}, {})
+
+    assert trace["carried_filters"] == {"jurisdiction": "Tỉnh A"}
+    assert trace["state_reset_or_replacement_reason"] == "follow_up_replaced_procedure_context"
+
+
+def test_state_trace_reports_new_topic_filter_reset_and_ambiguity_resolution():
+    previous = {
+        "active_filters": {"jurisdiction": "Tỉnh A"},
+        "last_resolved_procedure_id": "PROC-1",
+        "last_requested_section_types": ["fee"],
+        "unresolved_references": ["PROC-2", "PROC-3"],
+    }
+    current = {
+        "active_filters": {"jurisdiction": None, "effective_date": None, "scope": None},
+        "last_resolved_procedure_id": "PROC-2",
+        "last_requested_section_types": ["processing_time"],
+        "unresolved_references": [],
+    }
+
+    switched = explain_state_transition("thủ tục khác", previous, current, {}, {})
+    selected = explain_state_transition("chọn thủ tục 1", previous, current, {}, {})
+
+    assert switched["state_reset_or_replacement_reason"] == "new_topic_replaced_ambiguous_context"
+    assert switched["carried_filters"] == {}
+    assert selected["state_reset_or_replacement_reason"] == "ambiguity_selection_resolved"
 
 
 def test_ambiguous_state_preserves_candidate_ids_until_resolved():

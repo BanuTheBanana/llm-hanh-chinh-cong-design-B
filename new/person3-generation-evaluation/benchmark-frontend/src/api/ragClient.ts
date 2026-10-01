@@ -55,11 +55,102 @@ export type EvidenceBundle = {
   margin?: number | null
 }
 
+export type RankedCandidate = {
+  rank: number
+  procedure_id: string
+  canonical_name: string
+  score: number
+  exact_match: boolean
+  field_types: string[]
+  fragment_ids: string[]
+}
+
+export type RetrievalDiagnostics = {
+  selected_retrieval_mode: string
+  retrieval_mode: string
+  fusion_method: string
+  score_type: string
+  filters_applied: Filters
+  requested_section_types: string[]
+  exact_matches: Array<{ procedure_id: string; canonical_name: string; matched_term: string }>
+  selected_procedure_id: string | null
+  ranked_candidates: RankedCandidate[]
+  top_score: number | null
+  second_score: number | null
+  margin: number | null
+  confidence_status: 'resolved' | 'ambiguous' | 'low_confidence'
+  eligible_fragment_count: number
+  embedding: { kind: string; model_fingerprint: string; query_prefix: string; document_prefix: string; device: string; batch_size: number } | null
+  thresholds: { score_floor: number; margin_floor: number; dense_min_similarity: number | null; rrf_k: number | null }
+}
+
 export type Health = {
   status: string
   database?: string
   generator?: string
   active_snapshot?: string | null
+}
+
+export type Account = { account_id: string; username: string }
+
+export type InterpretationTrace = {
+  trace_id: string
+  query_text_raw: string
+  normalized_query_text: string
+  segmented_query_text: string
+  explicit_filters: Filters
+  resolved_filters: Filters
+  requested_section_types: string[]
+  follow_up: boolean
+  prior_state: {
+    exists: boolean
+    active_filters: Filters
+    last_resolved_procedure_id: string | null
+    last_requested_section_types: string[]
+    unresolved_references: string[]
+  }
+  segmenter: { backend: string; backend_version: string; config_fingerprint: string }
+  interpretation_outcome: string
+  retrieval_input_valid: boolean
+}
+
+export type GroundingDiagnostics = {
+  sufficiency: {
+    status: 'passed' | 'failed'
+    requested_section_types: string[]
+    available_section_types: string[]
+    missing_section_types: string[]
+    problems: string[]
+  }
+  citation_binding: { status: string; checked_count: number; problems: string[] }
+  generation: { mode: string; status: string }
+}
+
+export type ConversationTrace = {
+  follow_up: boolean
+  previous_state: {
+    active_filters: Filters
+    last_resolved_procedure_id: string | null
+    last_requested_section_types: string[]
+    unresolved_references: string[]
+  } | null
+  current_state: {
+    active_filters: Filters
+    last_resolved_procedure_id: string | null
+    last_requested_section_types: string[]
+    unresolved_references: string[]
+  }
+  carried_filters: Filters
+  state_reset_or_replacement_reason: string
+}
+
+export type StageTrace = {
+  trace_id: string
+  interpretation: InterpretationTrace
+  retrieval: RetrievalDiagnostics
+  evidence: Evidence[]
+  grounding: GroundingDiagnostics
+  conversation: ConversationTrace
 }
 
 // Vite proxies these paths during development because Person 2 currently has no
@@ -94,7 +185,7 @@ function bundle(value: unknown): EvidenceBundle {
 async function request(path: string, init?: RequestInit): Promise<{ data: unknown; sessionId: string | null }> {
   let response: Response
   try {
-    response = await fetch(base + path, { ...init, headers: { Accept: 'application/json', ...init?.headers } })
+    response = await fetch(base + path, { ...init, credentials: 'include', headers: { Accept: 'application/json', ...init?.headers } })
   } catch {
     throw new Error('Không kết nối được backend. Kiểm tra VITE_API_BASE_URL và trạng thái dịch vụ.')
   }
@@ -106,7 +197,7 @@ async function request(path: string, init?: RequestInit): Promise<{ data: unknow
     } catch { /* HTTP error without JSON body */ }
     throw new Error(detail || `Backend trả HTTP ${response.status}.`)
   }
-  return { data: await response.json(), sessionId: response.headers.get('X-Conversation-Session-Id') }
+  return { data: response.status === 204 ? null : await response.json(), sessionId: response.headers.get('X-Conversation-Session-Id') }
 }
 
 export async function getHealth(): Promise<Health> {
@@ -115,8 +206,30 @@ export async function getHealth(): Promise<Health> {
   return data as Health
 }
 
-async function post(path: '/api/v1/retrieve' | '/api/v1/answer', query: Query) {
+async function post(path: '/api/v1/retrieve' | '/api/v1/answer' | '/api/v1/interpret' | '/api/v1/retrieve/trace' | '/api/v1/answer/trace', query: Query) {
   return request(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(query) })
+}
+
+function parseAccount(value: unknown): Account {
+  if (!object(value) || typeof value.account_id !== 'string' || typeof value.username !== 'string') {
+    throw new Error('Backend trả về tài khoản không đúng contract.')
+  }
+  return value as Account
+}
+
+async function authenticate(path: '/api/v1/auth/register' | '/api/v1/auth/login', username: string, password: string) {
+  const { data } = await request(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) })
+  return parseAccount(data)
+}
+
+export const registerAccount = (username: string, password: string) => authenticate('/api/v1/auth/register', username, password)
+export const loginAccount = (username: string, password: string) => authenticate('/api/v1/auth/login', username, password)
+export async function getCurrentAccount() {
+  const { data } = await request('/api/v1/auth/me')
+  return parseAccount(data)
+}
+export async function logoutAccount() {
+  await request('/api/v1/auth/logout', { method: 'POST' })
 }
 
 export async function retrieve(query: Query) {
@@ -124,7 +237,44 @@ export async function retrieve(query: Query) {
   return { data: bundle(data), sessionId }
 }
 
+export async function retrieveWithDiagnostics(query: Query) {
+  const { data, sessionId } = await post('/api/v1/retrieve/trace', query)
+  if (!object(data) || !object(data.evidence_bundle) || !object(data.diagnostics) ||
+      typeof data.diagnostics.selected_retrieval_mode !== 'string' || !Array.isArray(data.diagnostics.ranked_candidates)) {
+    throw new Error('Backend trả về trace truy xuất không đúng contract.')
+  }
+  return {
+    data: bundle(data.evidence_bundle),
+    diagnostics: data.diagnostics as RetrievalDiagnostics,
+    stageTrace: data.stage_trace as StageTrace,
+    sessionId,
+  }
+}
+
 export async function ask(query: Query) {
   const { data, sessionId } = await post('/api/v1/answer', query)
   return { data: answer(data), sessionId }
+}
+
+export async function askWithDiagnostics(query: Query) {
+  const { data, sessionId } = await post('/api/v1/answer/trace', query)
+  if (!object(data) || !object(data.grounded_answer) || !object(data.stage_trace) ||
+      typeof data.stage_trace.trace_id !== 'string' || !object(data.stage_trace.grounding) ||
+      !object(data.stage_trace.conversation)) {
+    throw new Error('Backend trả về trace grounding không đúng contract.')
+  }
+  return {
+    data: answer(data.grounded_answer),
+    stageTrace: data.stage_trace as StageTrace,
+    sessionId,
+  }
+}
+
+export async function interpret(query: Query) {
+  const { data, sessionId } = await post('/api/v1/interpret', query)
+  if (!object(data) || typeof data.trace_id !== 'string' || typeof data.segmented_query_text !== 'string' ||
+      typeof data.retrieval_input_valid !== 'boolean') {
+    throw new Error('Backend trả về trace diễn giải không đúng contract.')
+  }
+  return { data: data as InterpretationTrace, sessionId }
 }

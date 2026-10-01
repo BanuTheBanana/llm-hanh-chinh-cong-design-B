@@ -11,12 +11,13 @@ from .segmenter import normalize_text
 
 
 class LocalSentenceEncoder:
-    def __init__(self, path, *, query_prefix='', document_prefix='', device='cpu'):
+    def __init__(self, path, *, query_prefix='', document_prefix='', device='cpu', batch_size=1):
         path=Path(path).resolve()
         if not path.is_dir(): raise ValueError('A local embedding model directory is required')
+        if not isinstance(batch_size,int) or batch_size<1: raise ValueError('batch_size must be a positive integer')
         from sentence_transformers import SentenceTransformer
         self.model=SentenceTransformer(str(path),local_files_only=True,trust_remote_code=False,device=device)
-        self.query_prefix=query_prefix;self.document_prefix=document_prefix
+        self.query_prefix=query_prefix;self.document_prefix=document_prefix;self.device=device;self.batch_size=batch_size
         digest=hashlib.sha256()
         for file in sorted(p for p in path.rglob('*') if p.is_file()):
             digest.update(str(file.relative_to(path)).encode())
@@ -26,11 +27,13 @@ class LocalSentenceEncoder:
 
     def encode(self,texts,*,query=False):
         prefix=self.query_prefix if query else self.document_prefix
-        return self.model.encode([prefix+normalize_text(t) for t in texts],normalize_embeddings=True,convert_to_numpy=True,show_progress_bar=False)
+        return self.model.encode([prefix+normalize_text(t) for t in texts],batch_size=self.batch_size,
+            normalize_embeddings=True,convert_to_numpy=True,show_progress_bar=False)
 
     def metadata(self):
         return {'kind':'local_sentence_transformer','model_fingerprint':self.model_fingerprint,
-                'query_prefix':self.query_prefix,'document_prefix':self.document_prefix}
+            'query_prefix':self.query_prefix,'document_prefix':self.document_prefix,
+            'device':self.device,'batch_size':self.batch_size}
 
 
 def unit_rows(values,rows):

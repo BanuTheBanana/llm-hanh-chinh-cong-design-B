@@ -59,17 +59,23 @@ class LexicalRetriever:
         return True
 
     def exact_matches(self,raw):
+        return {match['procedure_id'] for match in self.exact_match_details(raw)}
+
+    def exact_match_details(self,raw):
         # Conservative explicit correction only; arbitrary negation needs intent modeling.
         text=normalize_text(raw)
         correction=re.fullmatch(r'không phải .+? mà (?:là )?(.+)',text,re.I)
         if correction:text=correction.group(1)
         segmented=self.segmenter.segment(text).casefold()
-        hits=[(pid,m.start(),m.end(),name==names[0]) for pid,names in self.names.items() for name in names
+        hits=[(pid,m.start(),m.end(),name==names[0],name) for pid,names in self.names.items() for name in names
               for m in re.finditer(r'(?<!\w)'+re.escape(name)+r'(?!\w)',segmented)]
-        return {pid for pid,start,end,canonical in hits if not any(
+        selected=[(pid,name) for pid,start,end,canonical,name in hits if not any(
             (other_start<=start and end<=other_end and (other_start<start or end<other_end))
             or (other_start==start and other_end==end and other_canonical and not canonical)
-            for _,other_start,other_end,other_canonical in hits)}
+            for _,other_start,other_end,other_canonical,_ in hits)]
+        unique=list(dict.fromkeys(selected))
+        return [{'procedure_id':pid,'canonical_name':self.procedures[pid]['canonical_name'],
+                 'matched_term':name.replace('_',' ')} for pid,name in unique]
 
     def requested_sections(self,raw):
         # A term embedded in a procedure title is not a field request by itself.
@@ -95,7 +101,11 @@ class LexicalRetriever:
             scored.append((score,self.fragments[i]))
         return scored
 
-    def retrieve(self,request, state=None):
+    def retrieve(self,request,state=None):
+        bundle,_=self.retrieve_with_diagnostics(request,state)
+        return bundle
+
+    def retrieve_with_diagnostics(self,request,state=None):
         start=time.perf_counter()
         validate('retrieval_input',request)
         # Contract keeps the supplied field, but never permits a different index/query tokenizer.
@@ -107,7 +117,8 @@ class LexicalRetriever:
         context=resolve_context(raw,state,self.procedures)
         if context['carry'] and not requested:
             requested=list((state or {}).get('last_requested_section_types') or [])
-        matches=self.exact_matches(raw)
+        exact_matches=self.exact_match_details(raw)
+        matches={match['procedure_id'] for match in exact_matches}
         # Only short explicit follow-up references may use prior identity.
         follow=bool(re.match(r'^(còn\b|vậy\b|thế\b|thủ tục đó\b|cái đó\b)',raw.strip().casefold()))
         prior=(state or {}).get('last_resolved_procedure_id')
@@ -158,7 +169,43 @@ class LexicalRetriever:
             'created_at':datetime.now(timezone.utc).isoformat()}
         validate('evidence_bundle',bundle)
         log.info('snapshot=%s method=%s top=%s second=%s margin=%s status=%s elapsed_ms=%.3f evidence_count=%s',self.fingerprint,self.fusion_method,top,second,gap,status,(time.perf_counter()-start)*1000,len(evidence))
-        return bundle
+        ranked_candidates=[]
+        for rank,(procedure_id,score) in enumerate(ranked[:5],start=1):
+            candidate_fragments=[fragment for _,fragment in scored if fragment['procedure_id']==procedure_id]
+            ranked_candidates.append({
+                'rank':rank,
+                'procedure_id':procedure_id,
+                'canonical_name':self.procedures[procedure_id]['canonical_name'],
+                'score':score,
+                'exact_match':procedure_id in matches,
+                'field_types':list(dict.fromkeys(fragment['section_type'] for fragment in candidate_fragments)),
+                'fragment_ids':[fragment['fragment_id'] for fragment in candidate_fragments[:5]],
+            })
+        mode=getattr(self,'mode','lexical')
+        diagnostics={
+            'selected_retrieval_mode':'exact_match' if exact_matches else {'lexical':'lexical_bm25','dense':'dense','hybrid':'hybrid_rrf'}[mode],
+            'fusion_method':self.fusion_method,
+            'score_type':{'lexical':'BM25','dense':'cosine','hybrid':'RRF'}[mode],
+            'filters_applied':request.get('filters',{}),
+            'requested_section_types':requested,
+            'exact_matches':exact_matches,
+            'selected_procedure_id':selected,
+            'ranked_candidates':ranked_candidates,
+            'top_score':top,
+            'second_score':second,
+            'margin':gap,
+            'confidence_status':status,
+            'eligible_fragment_count':len(indices),
+            'retrieval_mode':mode,
+            'embedding':self.encoder.metadata() if hasattr(self,'encoder') else None,
+            'thresholds':{
+                'score_floor':self.score_floor,
+                'margin_floor':self.margin_floor,
+                'dense_min_similarity':getattr(self,'dense_min_similarity',None),
+                'rrf_k':getattr(self,'rrf_k',None),
+            },
+        }
+        return bundle,diagnostics
 
 
 ORDINALS={'đầu tiên':0,'đầu':0,'nhất':0,'một':0,'hai':1,'ba':2,'bốn':3,'năm':4}

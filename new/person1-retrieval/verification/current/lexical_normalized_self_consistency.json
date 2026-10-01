@@ -1,0 +1,72 @@
+{
+  "corpus_fingerprint": "26eca8804426c22afb227fcbabc174a3e61d20907809561c90d00b965d91ecd9",
+  "counts": {
+    "sources": 1,
+    "procedures": 42,
+    "fragments": 289
+  },
+  "review_status_counts": {
+    "draft": 1
+  },
+  "missing_effective_dates": 1,
+  "duplicate_name_groups": 2,
+  "checks": {
+    "canonical_name_correct": 36,
+    "field_queries": 200,
+    "field_queries_correct": 168,
+    "field_queries_abstained": 32,
+    "canonical_name_unresolved": 6,
+    "strict_mode_abstained": 42
+  },
+  "unresolved_records": [
+    {
+      "procedure_id": "PROC-S01-R0009",
+      "status": "low_confidence",
+      "duplicate_canonical_name": true
+    },
+    {
+      "procedure_id": "PROC-S01-R0010",
+      "status": "low_confidence",
+      "duplicate_canonical_name": true
+    },
+    {
+      "procedure_id": "PROC-S01-R0015",
+      "status": "ambiguous",
+      "duplicate_canonical_name": false
+    },
+    {
+      "procedure_id": "PROC-S01-R0020",
+      "status": "ambiguous",
+      "duplicate_canonical_name": false
+    },
+    {
+      "procedure_id": "PROC-S01-R0021",
+      "status": "low_confidence",
+      "duplicate_canonical_name": true
+    },
+    {
+      "procedure_id": "PROC-S01-R0024",
+      "status": "low_confidence",
+      "duplicate_canonical_name": true
+    }
+  ],
+  "segmenter": {
+    "wrapper_version": "1.0.0",
+    "backend": "underthesea",
+    "backend_version": "9.5.0",
+    "normalization": "NFC+whitespace; preserve-case",
+    "protected_terms": [],
+    "underthesea_use_token_normalize": false,
+    "config_fingerprint": "f5d40324d30b0015cefd1036459b8c486e3a2c6b7fb7875eb09bc4864f88d86b"
+  },
+  "retrieval": {
+    "mode": "lexical",
+    "fusion_method": "lexical_bm25_procedure_max",
+    "score_floor": 0.5,
+    "margin_floor": 0.15,
+    "dense_min_similarity": null,
+    "rrf_k": null,
+    "embedding": null
+  },
+  "quality_claim": "self_consistency_only_not_independent_gold_accuracy"
+}

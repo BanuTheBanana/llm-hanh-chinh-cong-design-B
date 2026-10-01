@@ -54,7 +54,13 @@ def extract_explicit_filters(text: str) -> dict:
         re.IGNORECASE,
     )
     if jurisdiction_match:
-        filters["jurisdiction"] = " ".join(jurisdiction_match.group(1).split())
+        jurisdiction = re.split(
+            r"\s+(?=(?:ngày|từ ngày|dành cho|đối với|vào)\b)",
+            jurisdiction_match.group(1),
+            maxsplit=1,
+            flags=re.IGNORECASE,
+        )[0]
+        filters["jurisdiction"] = " ".join(jurisdiction.split())
 
     scope_match = re.search(r"\b(?:đối với|dành cho)\s+([^,.!?;]{2,60})", text, re.IGNORECASE)
     if scope_match:

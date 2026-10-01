@@ -1,0 +1,98 @@
+BAO CAO CONG VIEC CAN LAM
+Du an: LLM Hanh chinh cong
+Ngay danh gia: 2026-10-01
+
+CAP NHAT TRANG THAI 2026-10-01
+- Rollout local Versions 0-4 da qua cac kiem tra ghi trong TEST_REPORT: Docker Desktop 4.92.0 / Engine 29.8.0 / Compose 5.5.1, PostgreSQL 16.15, health, retrieval/evidence trace, account isolation, state persistence sau restart, va frontend build.
+- PostgreSQL integration chay pass trong disposable Docker test runner voi database rieng; host suite co the skip integration neu TEST_DATABASE_URL chua duoc dat.
+- Snapshot local dang active: 42 procedures / 289 fragments, fingerprint 26eca8804426c22afb227fcbabc174a3e61d20907809561c90d00b965d91ecd9. Source duy nhat van draft, khong co effective date duoc xac minh.
+- Client web cho RAG API da duoc chon: new/person3-generation-evaluation/benchmark-frontend. new/web la contract G1/Core Backend rieng, khong gop vao rollout nay.
+- Qwen3-1.7B-Instruct va llama.cpp da duoc chon lam ung vien; chua chon GGUF/revision/quantization cuoi, chua benchmark model that, va chua noi generator vao API.
+- Con chan acceptance: corpus duyet, benchmark DEV/TEST co nhan va target duoc phe duyet, tuning retrieval, generation that + grounding semantic, Alembic migrations, va E2E tren may dich. Chua co hosting online/public.
+
+1. TOM TAT
+
+Du an da co khung kien truc, lexical retrieval BM25, backend API va grounding/state, generator adapter va evaluation tools; local web rollout Versions 0-4 da kiem tra. Dense retrieval la tuy chon Version 5, khong phai dieu kien de hoan thanh baseline. Phan con thieu de acceptance la corpus phap ly duyet, benchmark gold va target, model that duoc noi vao API, migration lau dai, va E2E tren cau hinh may dich. Test local khong chung minh do chinh xac phap ly hay san sang public.
+
+Uu tien truoc khi acceptance: (1) xac nhan contract authority va sua handoff link; (2) duyet corpus; (3) tao benchmark DEV/locked TEST va phe duyet target; (4) tich hop, benchmark model that; (5) migration va E2E tren may dich.
+
+2. HIEN TRANG DA GHI NHAN
+
+- Person 1 co validator/snapshot, underthesea 9.5.0 segmentation, exact shortcut, BM25, dense/hybrid modules va confidence/evaluation tooling. Runtime baseline theo STACK_DECISIONS la exact + BM25; dense/hybrid chi them sau DEV/locked-TEST va resource check. Corpus 42/289 la mot source draft, effective date chua duoc xac minh.
+- Person 2 co FastAPI, account/session isolation, state/interpretation, retrieval orchestration, grounding/citation, audit va snapshot importer. Demo hien dung mock generator; Alembic chua co, create_all chi bootstrap.
+- Person 3 co llama.cpp-compatible client, grounded generator, structural citation checks, benchmark/tuning tools va RAG benchmark frontend. Source handoff da co; viec con lai la tich hop runtime vao FastAPI va chay benchmark that.
+- Test report Iteration 4 ghi backend 30 passed / 1 skipped tren host, Person 1 67 passed, PostgreSQL integration 1 passed trong disposable runner, va frontend production build passed. Bao cao rieng Person 1 van ghi 30 passed tren Linux; can mot lenh CI/report co phien ban de hop nhat pham vi, khong cong don so lieu.
+- Docker Compose health, PostgreSQL, account isolation, persistence sau restart, va browser flow Versions 0-4 da duoc xac minh local. Chua co acceptance tren may dich hoac hosting online.
+- Benchmark hien chi co synthetic smoke/sample; chua co DEV gold va locked TEST do nhom phe duyet. BM25_SCORE_FLOOR=0.5 / BM25_MARGIN=0.15 van la demo, chua calibrated.
+- Schema hash: root `contracts/` va `new/contracts/` dang byte-identical, nhung Person 1/2 runtime doc `new/contracts/` con Person 3 runtime chon root `contracts/`. `schemas/` va `new/schemas/` la cap ban cu, khac hai ban `contracts/`. `new/README.md` van tro den `new/team-handoff/README.txt` khong ton tai.
+
+3. CONG VIEC UU TIEN
+
+P0 - Chot contracts va tai lieu lam viec chung
+Chu tri: ca ba track; Person 1 va Person 2 dong chu so huu EvidenceBundle/RetrievalInput.
+- Chon va ghi ro mot authority duy nhat: Person 1/2 hien doc `new/contracts/`, Person 3 doc root `contracts/`; hai bo dang giong nhau nhung runtime co the drift. Align ca ba track readers va README voi quyet dinh cua owners; xac dinh `schemas/` va `new/schemas/` la ban cu/khong runtime.
+- Chot va ghi nhan y nghia null, effective_date, source review/publish, section_type, score/margin va confidence_status. Yeu cau chu so huu ky duyet thay doi contracts.
+- Sua lien ket bi dut: `new/README.md` tro den `new/team-handoff/README.txt` khong ton tai. Thay bang handoff/test reports hien co hoac tao tai lieu duoc nhac den.
+Tieu chi xong: co authority duoc ghi ro, tat ca track validate cung schema/fixture, link tai lieu noi bo hoat dong, va contract decisions duoc owner duyet.
+
+P0 - Xac nhan corpus va provenance
+Chu tri: Person 1; Person 2 ho tro import va kiem tra schema.
+- Kiem tra tung source va 42 procedures / 289 fragments: tinh chinh xac/noi dung, jurisdiction, alias, section, source locator, ngay hieu luc, review status va quan he thay the.
+- Chuyen draft sang reviewed/published chi sau khi nguoi co tham quyen duyet. Khong dien ngay hieu luc hoac coi null la con hieu luc neu khong co can cu.
+- Kiem tra hash noi dung va quy trinh tao snapshot/fingerprint; ghi lai corpus version va nguon goc. Importer JSON hien khong doi chieu hash cua file Excel goc.
+Tieu chi xong: snapshot duoc duyet, co provenance/version co the audit, hash/fingerprint tai tao duoc; production config tu choi draft va metadata khong ro.
+
+P1 - Tao benchmark du lieu that va chot muc tieu
+Chu tri: Person 3; Person 1 cung cap retrieval logs/metrics; ca nhom duyet nhan va target.
+- Tao bo DEV co nhan procedure, field, evidence can thiet, ambiguity, abstention, filters, follow-up, correction, topic switch va truong hop version. Hien checked-in files chi synthetic smoke/sample, chua co gold set cua nhom.
+- Giu TEST khoa; chia theo nhom paraphrase/tinh huong de tranh ro ri giua DEV va TEST. Khong tuning tren TEST.
+- Chot target so cho procedure accuracy, field accuracy/coverage, citation binding, groundedness, abstention, ambiguity, conversation va latency. Cac target trong brief hien la vi du chua duoc nhom phe duyet.
+- Tune baseline exact + BM25 score-floor/top-2 margin tren DEV; danh gia locked TEST sau khi khoa cau hinh. Chi chay dense/hybrid nhu Version 5 tuy chon neu benchmark va resource check co ly do; thresholds phai rieng theo retrieval mode.
+Tieu chi xong: benchmark co version/fingerprint, ket qua DEV/TEST co the tai lap, target duoc phe duyet; chi so procedure va field duoc bao cao tach rieng.
+
+P1 - Tich hop generation that va kiem chung grounding
+Chu tri: Person 2 tich hop; Person 3 ho tro model/client/prompt.
+- Noi GroundedGenerator vao API theo boundary da ban giao; chi goi model khi evidence resolved va hop le.
+- Dung Qwen3-1.7B-Instruct + llama.cpp lam ung vien da chon; chon GGUF/revision va quantization (bat dau Q4_K_M), ghi tham so, seed, context, timeout, loi runtime va hardware fit sau benchmark.
+- Kiem tra citation tro den fragment trong bundle hien tai; danh gia semantic groundedness doc lap voi citation structure.
+Tieu chi xong: API tra du ca resolved/ambiguous/insufficient_data; khong co citation ngoai bundle; benchmark generation va review groundedness dat target da chot.
+
+P1 - Chay integration tren PostgreSQL va Docker
+Chu tri: Person 2; DevOps/may dich ho tro.
+- Local gate da pass: Compose health, PostgreSQL integration (1 passed) trong disposable runner, account isolation va state persistence sau restart. Giu regression tests; khong ghi lai nhu chua chay.
+- Them Alembic migration baseline va upgrade/rollback tests tren PostgreSQL test rieng; `create_all` hien chi bootstrap bang thieu, khong quan ly schema upgrade.
+- Lap lai Compose smoke tren may demo dich, kiem tra health/logs/restart/persistence va an toan volume; khong dung database that cho integration tests.
+Tieu chi xong: migration upgrade/recovery duoc kiem chung tren DB test; Compose smoke pass tren may dich va co huong dan migration/rollback.
+
+P1 - Nghiem thu E2E, hieu nang va bao mat
+Chu tri: ca nhom; Person 3 tong hop acceptance report.
+- Local browser/API/PostgreSQL journey voi mock, synthetic corpus va trace cho Versions 0-4 da pass. Client cho RAG API da chon la `new/person3-generation-evaluation/benchmark-frontend`; `new/web` dung contract G1/Core Backend rieng, khong thuoc rollout nay.
+- Chay full path corpus -> retrieval -> backend/state/grounding -> model -> GroundedAnswer tren may demo; do p50/p95 va tai nguyen. Nhom van can phe duyet latency targets theo hardware dich.
+- Public security review van pending: HTTPS/Secure cookie, tat self-registration/trace, rate limit, CSRF/origin, CORS/proxy, secrets, audit/logging va access control. Local account-isolation test khong thay the review; khong public DB/model endpoint.
+Tieu chi xong: acceptance report co corpus/config fingerprint, app/model/runtime/hardware, metrics va failure list; security sign-off va hosting rieng truoc public deployment.
+
+P2 - Hoan thien cac gioi han da biet sau khi co so lieu
+Chu tri: owner track tuong ung.
+- Danh gia segmenter bang gold set cho thuat ngu phap ly; hien chua co accuracy/F1 de chon backend.
+- Chi bat dense/hybrid Version 5 neu DEV/locked-TEST va resource benchmark cho thay can; lexical la baseline hien tai.
+- Xem xet index cache/ANN chi neu build/latency tren corpus muc tieu cho thay can thiet.
+- Them intent/model rieng, reranker, vector DB hoac fine-tuning chi khi benchmark chung minh co loi that ma phuong an don gian khong giai quyet duoc.
+
+4. THU TU DE XUAT
+
+1. Ghi nhan contract authority, sua handoff link va lam ro schema cu.
+2. Duyet corpus, xac minh provenance/effective date va tao snapshot phap ly.
+3. Tao DEV gold va locked TEST; phe duyet numeric targets.
+4. Tune exact + BM25 tren DEV; chi them dense/hybrid neu co can cu; freeze config truoc TEST.
+5. Tich hop Qwen/llama.cpp vao backend; kiem thu generator, citation va semantic groundedness.
+6. Them Alembic migration va kiem thu upgrade/rollback tren PostgreSQL test.
+7. Chay Version 7 E2E tren may demo; do latency/tai nguyen va lap acceptance report.
+8. Security review va hosting sign-off rieng truoc public deployment.
+
+5. NGOAI PHAM VI CAN GIU NGUYEN
+
+Khong can xay distributed vector database, nhieu LLM cho routing, agent framework, MCP bat buoc, QLoRA/fine-tuning hoac tach resolver thanh subsystem truoc khi co ket qua benchmark yeu cau. Thu muc old/ la snapshot he thong cu; chi tham khao khi can, khong nen tiep tuc phat trien song song voi new/.
+
+6. CAN CU DA DOC
+
+project_brief.txt; STACK_DECISIONS.txt; WEB_ROLLOUT_PLAN.txt; README.md; new/README.md; new/README_DEPLOY.md; new/CONTRACT_CHANGES.md; README va TEST_REPORT cua ba track; Person 3 INTEGRATION_HANDOFF.md; corpus/schema/benchmark README va retrieval verification reports. Bao cao nay tong hop tai lieu va test evidence hien co; khong thay the review tung source record phap ly, benchmark co nhan, model run hay acceptance tren may dich.

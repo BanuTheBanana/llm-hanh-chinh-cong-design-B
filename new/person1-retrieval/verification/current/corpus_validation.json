@@ -1,9 +1,9 @@
 {
-  "corpus_fingerprint": "6b61165a8ba68223573482bd29fabdd2f29f40d7ba976bbcec05e1fd9f8ae6fc",
+  "corpus_fingerprint": "26eca8804426c22afb227fcbabc174a3e61d20907809561c90d00b965d91ecd9",
   "counts": {
     "sources": 1,
-    "procedures": 3,
-    "fragments": 9
+    "procedures": 42,
+    "fragments": 289
   },
   "review_status_counts": {
     "draft": 1,

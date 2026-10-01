@@ -1,0 +1,52 @@
+STACK AND MODEL DECISIONS
+Project: LLM Hanh chinh cong
+Decision date: 2026-10-01
+Status: Initial implementation decisions; model quality and hardware fit still require benchmark evidence.
+
+1. WEB ROLLOUT
+- First client: new/person3-generation-evaluation/benchmark-frontend. It targets the Person 2 RAG API (/health, /api/v1/answer, /api/v1/retrieve).
+- Do not merge new/web into this client yet. new/web targets the separate G1/Core Backend contract.
+- First iteration: rollout Versions 0 and 1 only: real health/connectivity and API requests, plus a local deterministic fixture path for answered, clarification_needed, insufficient_data, and API-error states.
+- Live API mode remains the default. Fixture output is explicitly synthetic, never legal guidance, and makes no API request. PostgreSQL health stays tied to the real backend even while fixtures are selected.
+
+2. VIETNAMESE SEGMENTATION
+- Selected: underthesea 9.5.0, pinned consistently for corpus indexing and query-time segmentation.
+- Keep segmentation config/version in retrieval metadata and benchmark legal terminology before acceptance.
+- Do not run a second segmenter in the request path. PyVi/VnCoreNLP are not selected as runtime fallbacks.
+
+3. RETRIEVAL
+- Baseline: exact official code/name/alias shortcut plus segmented lexical BM25 over evidence fragments; current backend implementation is the initial runtime.
+- Keep dense retrieval as an optional later version; do not let it delay Versions 0-4 or change the lexical baseline.
+- Dense embedding candidate for Version 5: BAAI/bge-m3. It is multilingual and suitable for Vietnamese retrieval; enable only after a DEV/locked-TEST comparison and resource/latency check.
+- No reranker in the initial path. Reconsider BAAI/bge-reranker-v2-m3 only if evaluation shows a material ranking defect that BM25/dense fusion cannot address.
+- No vector database or separate resolver for the current small corpus. PostgreSQL stores durable state and corpus snapshots; retrieval indexes remain rebuildable in application memory.
+
+4. GENERATION
+- Selected family/size: Qwen3-1.7B-Instruct (the selected interpretation of the requested “Qwen 1.7B”).
+- Runtime: llama.cpp llama-server with a compatible GGUF quantization and its OpenAI-compatible local API. Start evaluation with Q4_K_M; compare Q5_K_M only if memory and latency permit. Do not commit model weights to the repository.
+- Generator boundary stays replaceable. Keep the deterministic extractive mock as the web/backend baseline until model adapter, citation checks, semantic-grounding review, and benchmark tests pass.
+- Keep generation disabled for ambiguous, low-confidence, or insufficient-evidence requests. The model must only receive the bounded validated EvidenceBundle.
+- The exact GGUF artifact/revision, context window, decoding parameters, timeout, and hardware fit are not certified yet; record them in the model benchmark report before enabling the runtime in a demo deployment.
+
+5. API, DATABASE, AND LOCAL INFRASTRUCTURE
+- Backend: existing FastAPI + SQLAlchemy async service.
+- Database: full PostgreSQL 16 service from the official postgres:16 image under Docker Compose, with a named persistent volume and private Compose network; only the API is published on loopback. This is PostgreSQL, not SQLite or an in-memory substitute.
+- Windows container development: Docker Desktop with the WSL2 backend, Docker Compose v2. Do not expose PostgreSQL or the local model server to the network.
+- Verified on this Windows host: Docker Desktop 4.92.0, Engine 29.8.0, Compose 5.5.1, PostgreSQL 16.15 (Debian build). The PostgreSQL service has no host port published; only the API binds loopback.
+- Use the existing asyncpg database driver. Keep test integration on a separate empty test database; never point tests at project data.
+- Existing create_all startup is bootstrap-only. Add and test an Alembic migration path before treating persistent schema upgrades as production-ready.
+- Do not install a second host PostgreSQL instance when the Compose PostgreSQL service is available; avoid two competing local databases.
+
+6. CURRENT IMPLEMENTATION BOUNDARY
+- Versions 0-4 use the benchmark frontend, cookie-authenticated RAG API, deterministic fixtures, and development-only V2-V4 interpretation/retrieval/evidence traces. Qwen and dense embeddings remain deferred behind their own tests and gates.
+- Corpus data currently described by project status is draft/demo. No UI or model output should present it as reviewed legal guidance.
+- The normalized local snapshot is active in PostgreSQL: 42 procedures, 289 fragments, fingerprint 26eca8804426c22afb227fcbabc174a3e61d20907809561c90d00b965d91ecd9. Its single source is still draft and has no effective date; allow-draft is for local evaluation only.
+- Compose health, isolated PostgreSQL integration, same-session cross-account isolation, and account-state persistence after backend restart passed locally. Version 7 acceptance still needs approved corpus data and target-machine model/latency measurements.
+
+7. ACCOUNT ISOLATION
+- Accounts use normalized usernames and passwords of at least 12 characters. Passwords are salted PBKDF2-HMAC-SHA256 hashes (600,000 iterations); raw passwords are never stored.
+- Login issues a random opaque session token in an HttpOnly, SameSite=Strict cookie; only its SHA-256 digest is stored server-side. Server sessions expire after 12 hours.
+- The authenticated account comes only from the server-validated cookie. Protected requests do not accept an account ID from the browser. Conversation state and audit records are keyed by account plus conversation session ID.
+- Raw query/answer transcripts are not persisted. The browser clears visible turns on logout/account switch; only compact follow-up state and non-content audit metadata persist.
+- Self-registration and trace access are disabled by default. The loopback demo env sample enables them and disables cookie Secure only for local HTTP; public deployment must disable self-registration/trace, enable Secure over HTTPS, and add registration rate limiting and an origin/CSRF review.
+- PostgreSQL account/session persistence passed the isolated integration test; this does not establish legal-data readiness or public-deployment security.

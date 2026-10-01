@@ -24,6 +24,8 @@ def main():
     parser.add_argument('--model-path')
     parser.add_argument('--query-prefix',default='')
     parser.add_argument('--document-prefix',default='')
+    parser.add_argument('--device',default='cpu')
+    parser.add_argument('--batch-size',type=int,default=1)
     parser.add_argument('--score-floor',type=float)
     parser.add_argument('--margin-floor',type=float)
     parser.add_argument('--dense-min-similarity',type=float)
@@ -46,7 +48,8 @@ def main():
         if not args.model_path or args.score_floor is None or args.margin_floor is None or args.dense_min_similarity is None:
             parser.error('dense/hybrid require local model and explicit score/margin/cosine thresholds')
         from .dense import LocalSentenceEncoder,HybridRetriever
-        dense=LocalSentenceEncoder(args.model_path,query_prefix=args.query_prefix,document_prefix=args.document_prefix)
+        dense=LocalSentenceEncoder(args.model_path,query_prefix=args.query_prefix,document_prefix=args.document_prefix,
+            device=args.device,batch_size=args.batch_size)
     def factory(s,m):
         kwargs=dict(allow_draft=args.allow_draft,score_floor=s,margin_floor=m)
         if dense:return HybridRetriever(corpus,segmenter,fp,encoder=dense,mode=args.mode,dense_min_similarity=args.dense_min_similarity,**kwargs)

@@ -14,9 +14,32 @@ class MockGenerator:
                 'source_locator':e['source_locator'],'claim_text':e['text']})
         return {'answer_text':'[MOCK AI — trích nguyên văn dữ liệu thử nghiệm]\n'+'\n\n'.join(lines),'citations':citations}
 
+def inspect_sufficiency(bundle,query):
+    requested=requested_section_types(query)
+    result=check_sufficiency(bundle,requested)
+    present=sorted({item['section_type'] for item in bundle.get('evidence',[])})
+    missing=[section for section in requested if section not in present]
+    return result,{
+        'status':'passed' if result.ok else 'failed',
+        'requested_section_types':requested,
+        'available_section_types':present,
+        'missing_section_types':missing,
+        'problems':result.problems,
+    }
+
 def ground_and_answer(bundle,query):
+    answer,_=ground_and_answer_with_diagnostics(bundle,query)
+    return answer
+
+def ground_and_answer_with_diagnostics(bundle,query):
     validate('evidence_bundle',bundle)
     status=bundle['confidence_status'];answer='';citations=[];prompt=None
+    sufficiency,sufficiency_trace=inspect_sufficiency(bundle,query)
+    diagnostics={
+        'sufficiency':sufficiency_trace,
+        'citation_binding':{'status':'skipped','checked_count':0,'problems':[]},
+        'generation':{'mode':'mock_extractive','status':'skipped'},
+    }
     if status=='ambiguous':
         candidates=bundle['ambiguous_candidates']
         distinct={c['procedure_id']:c for c in candidates if c['procedure_id'] and c['canonical_name'].strip()}
@@ -28,15 +51,23 @@ def ground_and_answer(bundle,query):
     elif status=='low_confidence':
         result_status='insufficient_data';prompt=NO_MATCH_PROMPT
     else:
-        sufficiency=check_sufficiency(bundle,requested_section_types(query))
         if not sufficiency.ok:
             result_status='insufficient_data';prompt=INSUFFICIENT_EVIDENCE_PROMPT
         else:
             generated=MockGenerator().generate(bundle)
             check=verify_citations(bundle,generated['answer_text'],generated['citations'])
-            if not check.ok:raise ValueError('Mock generation citation mismatch')
-            result_status='answered';answer=generated['answer_text'];citations=generated['citations']
+            diagnostics['citation_binding']={
+                'status':'passed' if check.ok else 'failed',
+                'checked_count':len(generated['citations']),
+                'problems':check.problems,
+            }
+            if not check.ok:
+                result_status='insufficient_data';prompt=INSUFFICIENT_EVIDENCE_PROMPT
+                diagnostics['generation']['status']='rejected_invalid_citations'
+            else:
+                result_status='answered';answer=generated['answer_text'];citations=generated['citations']
+                diagnostics['generation']['status']='completed'
     result={'status':result_status,'answer_text':answer,'citations':citations,'clarification_prompt':prompt,
         'evidence_bundle_id':bundle['bundle_id'],'created_at':datetime.now(timezone.utc).isoformat()}
     validate('grounded_answer',result)
-    return result
+    return result,diagnostics

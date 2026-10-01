@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
-from app.models import CorpusSnapshot, ActiveCorpus, Conversation, AuditEvent
+from app.models import CorpusSnapshot, ActiveCorpus, AccountConversation, AccountAuditEvent
 from app.corpus import canonical_corpus, fingerprint
 
 async def import_corpus(db, corpus, activate=True):
@@ -15,12 +15,12 @@ async def load_active(db):
     if row is None: return None
     return row.fingerprint,row.corpus
 
-async def get_state(db,session_id):
-    row=await db.get(Conversation,session_id)
+async def get_state(db,account_id,session_id):
+    row=await db.get(AccountConversation,(account_id,session_id))
     return row.state if row else None
 
-async def save_state(db,state):
-    await db.execute(insert(Conversation).values(session_id=state['session_id'],state=state).on_conflict_do_update(index_elements=['session_id'],set_={'state':state}))
+async def save_state(db,account_id,state):
+    await db.execute(insert(AccountConversation).values(account_id=account_id,session_id=state['session_id'],state=state).on_conflict_do_update(index_elements=['account_id','session_id'],set_={'state':state}))
 
-async def log_event(db,session_id,payload):
-    db.add(AuditEvent(session_id=session_id,payload=payload))
+async def log_event(db,account_id,session_id,payload):
+    db.add(AccountAuditEvent(account_id=account_id,session_id=session_id,payload=payload))

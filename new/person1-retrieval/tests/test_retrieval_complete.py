@@ -117,6 +117,15 @@ def test_dense_semantic_route_and_provenance(corpus,mode):
     req=request('ẩn dụ a');req['filters']={'jurisdiction':'other'}
     assert r.retrieve(req)['confidence_status']=='low_confidence'
 
+def test_retrieval_diagnostics_report_hybrid_scale_and_encoder(corpus):
+    retriever=hybrid(corpus)
+    _,diagnostics=retriever.retrieve_with_diagnostics(request('ẩn dụ a'))
+
+    assert diagnostics['selected_retrieval_mode']=='hybrid_rrf'
+    assert diagnostics['score_type']=='RRF'
+    assert diagnostics['embedding']=={'kind':'test_fixture_only'}
+    assert diagnostics['thresholds']['rrf_k']==60
+
 def test_save_dense_index(corpus,tmp_path):
     r=hybrid(corpus);r.save_index(tmp_path)
     meta=json.loads((tmp_path/'index.json').read_text())

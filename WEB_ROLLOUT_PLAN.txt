@@ -1,0 +1,117 @@
+WEB ROLLOUT AND MODULE-ISOLATION PLAN
+Project: LLM Hanh chinh cong
+Purpose: Build and test the web experience in small deployable versions so failures can be localized to a module.
+Status: Versions 0-4 are implemented and verified locally. PostgreSQL account isolation/restart persistence, V3 retrieval inspection, and V4 normalized-corpus evidence/grounding/state traces passed; Versions 5-7 remain planned.
+
+1. GUIDING APPROACH
+
+- Ship one working vertical slice at a time. Each version must have a known test set and a pass/fail gate before the next module is enabled.
+- Keep the current RAG benchmark frontend as the first web client for the Person 2 API. It already calls /health, /api/v1/answer, and /api/v1/retrieve through a Vite proxy.
+- Do not combine it with new/web yet. That frontend documents a different G1/Core Backend contract. Reuse it only after the API contract is deliberately aligned.
+- Keep the current deterministic mock/extractive generator as the baseline. Qwen3-1.7B-Instruct is selected for later evaluation; runtime configuration remains a replaceable adapter decision.
+- Keep development diagnostics outside GroundedAnswer and EvidenceBundle. These are shared contracts; debug fields should not silently change user-facing API shapes.
+- Mark synthetic/demo corpus and mock output clearly in the web UI. Do not present draft or unreviewed corpus as authoritative legal guidance.
+
+2. DEPLOYMENT VERSIONS
+
+Version 0 - Web shell and connectivity
+Goal: Prove that the browser app builds, opens, and can reach the backend.
+Included: Frontend layout, backend URL configuration, health indicator, request/error display, and Vite proxy for local development.
+Test: Start frontend and API separately; verify healthy/unavailable states and a useful error when the backend is stopped.
+Gate: Frontend build passes; no secrets are embedded in browser assets; health status reflects the actual API/database state.
+
+Version 1 - API/UI contract slice
+Goal: Prove that web request and response handling works without retrieval dependencies.
+Included: Synthetic fixed responses or a deterministic test adapter for answered, clarification-needed, insufficient-data, and API-error states. Include request/session handling and reset/new-session behavior.
+Test: Replay a small fixed set of requests and inspect rendered results. Verify session ID is retained only as intended and errors do not erase the user's question.
+Gate: All response states render correctly; API contract tests pass; no RAG or model is needed to test the UI.
+
+Version 2 - Interpretation and segmentation
+Goal: Isolate what the system understood before retrieval.
+Included: Raw query, normalized query, segmented query, extracted filters, requested fields, prior-state inputs, and interpretation outcome.
+Test: Vietnamese normalization/segmentation examples, dates, jurisdiction/scope, field requests, and follow-up versus new-topic cases. Compare expected values to the trace.
+Gate: Backend RetrievalInput validates; segmentation is consistent for the same configuration; incorrect interpretation is visible before retrieval runs.
+
+Version 3 - Exact match and lexical retrieval
+Goal: Verify deterministic routing and BM25 independently of generation.
+Included: Exact code/name/alias result, selected retrieval mode, filters applied, top candidates, procedure/field IDs, scores, top-two margin, and confidence status. The existing "Xem nguon" action is the primary inspection path.
+Test: Known alias/code, paraphrase, wrong filter, missing result, near-tied candidates, and multi-field request against a fixed synthetic corpus first.
+Gate: EvidenceBundle validates; exact routing, lexical ranking, ambiguity, and low-confidence behavior match expected fixtures. Demo thresholds remain labeled uncalibrated.
+
+Version 4 - Evidence, grounding, and conversation state
+Goal: Separate retrieval defects from answerability and state defects.
+Included: Evidence fragments with source/locator/version, requested sections, sufficiency result and reason, citation binding result, current conversation state, carried filters, and state reset/replacement reason.
+Test: Missing requested field, evidence from wrong procedure/source, invalid citation, follow-up, correction, procedure switch, and ambiguity selection.
+Gate: Unsupported or incomplete answers become clarification/insufficient-data; citations refer only to the active EvidenceBundle; stale state does not leak into a new topic.
+
+Version 5 - Hybrid retrieval (optional, behind a feature flag)
+Goal: Measure dense/hybrid retrieval without disturbing the known lexical baseline.
+Included: Dense and hybrid modes as separately selectable configurations, embedding model/config fingerprint, branch ranks, fusion method, and mode-specific scores/thresholds.
+Test: Run the same versioned DEV cases for lexical, dense, and hybrid. Tune only on DEV; keep TEST locked.
+Gate: Keep hybrid enabled only if the approved procedure-level and field-level targets improve without violating latency/resource budgets. Do not compare BM25, cosine, and RRF scores as if they shared a scale.
+Note: The backend README currently describes BM25 as its default and dense/hybrid as not wired into the API runtime. This version requires explicit integration before it can be tested through the web.
+
+Version 6 - Generator adapter, model still optional
+Goal: Prove the answer-generation boundary independently of model choice.
+Included: A selectable generator mode: deterministic mock/extractive baseline, then a local OpenAI-compatible runtime adapter when a candidate model is available. Show generator state as mock, skipped, unavailable, or active.
+Test: Use fixed EvidenceBundles and a fake runtime first; validate malformed output, timeout/error handling, citation binding, and no generation for ambiguous/low-confidence requests. Compare model candidates later using the same benchmark.
+Gate: The mock baseline remains runnable; adapter contract tests pass; a model is not required to deploy Versions 0-5. Do not claim semantic groundedness from citation structure alone.
+
+Version 7 - Full local web deployment
+Goal: Run the integrated web, API, retrieval, database, and chosen generator on the intended demo machine.
+Included: Frontend build/reverse proxy, API, PostgreSQL, imported approved corpus snapshot, selected retrieval configuration, and optional local model server.
+Test: Full browser journey: health -> ask -> trace -> answer/citations -> follow-up -> new session; restart services and verify persistence. Run PostgreSQL integration, Docker smoke tests, and locked acceptance suite.
+Gate: Record corpus fingerprint, app/version, retrieval/segmenter configuration, generator/runtime configuration (or explicitly "mock"), hardware, latency, and failures. Do not expose database or model endpoints publicly.
+
+3. DEVELOPMENT MODE: PROCESS TRACE
+
+Purpose: Let a developer see which stage ran, what it received, what it produced, how long it took, and where a failure occurred. Example labels may read "Segment: ..." and "Retrieved: ...".
+
+Suggested UI: Add a Development trace toggle to the benchmark frontend. For each turn, show a collapsible ordered timeline beside or below the answer. Each stage has status (passed/skipped/failed), duration, and a compact input/output summary. Selecting a stage reveals safe diagnostic detail. Keep normal answer mode uncluttered.
+
+Trace stages to expose:
+1. Request received: trace ID, endpoint, request validation, session ID presence (not credentials).
+2. Conversation/state: loaded state summary, follow-up/topic-switch decision, filters carried/reset.
+3. Interpretation: normalized query, extracted filters, requested section types, unresolved reference choice.
+4. Segmentation: segmenter name/version/config fingerprint and segmented query text.
+5. Exact shortcut: match/no match, matched alias/code and procedure ID.
+6. Retrieval: lexical/dense/hybrid branch status, filters, top-k, candidate procedure/fragment IDs, score/margin and confidence status.
+7. Evidence bundle: bundle ID, corpus fingerprint, source/version/locator metadata, fragment IDs and selected text preview.
+8. Grounding: requested-field sufficiency, missing sections, evidence consistency, citation validation result.
+9. Generation: mock/skipped/active, runtime/model identifier when known, elapsed time, output validation and error category. Never imply a model ran when it did not.
+10. Final response: GroundedAnswer status, citation-to-fragment mapping, total time.
+11. Persistence/audit: state and audit write result; never include credentials or database connection strings.
+
+Trace transport and safety:
+- Keep diagnostics separate from the normal answer/evidence schemas. Use a trace ID and a development-only trace response/channel (for example, a development trace endpoint or an explicitly requested debug envelope). Choose one approach during implementation and document it.
+- Backend must enforce development mode; hiding the toggle in the browser is not a security boundary. Disable trace access in production unless a separately reviewed admin mechanism exists.
+- Limit traces to local/dev environments, apply a short retention policy, and avoid storing raw queries/source text by default. For local debugging, permit the segmented query and retrieved text preview only when explicitly enabled.
+- Never expose API tokens, secrets, private environment values, or database credentials. Do not place secrets in VITE_* variables.
+- Show unavailable/skipped stages distinctly from failures. A skipped LLM stage in model-free versions is expected, not an error.
+
+4. MODULE-ISOLATION TEST METHOD
+
+- Use a versioned set of small fixtures with expected output per stage. Each fixture should have a case ID, input, expected status, expected procedure/field/evidence IDs where applicable, and expected trace stage outcomes.
+- Keep a deterministic mock at every external boundary: corpus fixture, retrieval fixture where needed, generator fake, and database test service. This permits frontend and orchestration tests without a model or production corpus.
+- When a full request fails, use the last successful trace stage to identify the owning module. Re-run that stage with its fixture and compare its output before changing neighboring modules.
+- Preserve request/trace IDs across frontend, API logs, and backend diagnostics. Show one user-facing error plus the failing stage; avoid exposing raw stack traces in the normal UI.
+- Run the same acceptance cases after each version. Record app commit/version, fixture version, corpus fingerprint, and configuration so regressions are comparable.
+
+5. FIRST IMPLEMENTATION MILESTONES
+
+1. Confirm the target UI is the Person 3 benchmark frontend for the RAG API; document the separate status of new/web.
+2. Agree the trace contract and development-only access policy without changing shared response schemas.
+3. Add fixtures for health, all GroundedAnswer statuses, and API failures; verify current frontend behavior.
+4. Add backend trace stages first for request, state, interpretation/segmentation, retrieval, evidence, grounding, generator, and persistence.
+5. Display those stages in the frontend with a toggle and clear mock/demo labels.
+6. Complete Versions 0-4 with synthetic fixtures; deploy them locally before enabling dense retrieval or selecting a model.
+7. Add optional Versions 5-6 only after the baseline is stable and benchmark data is ready.
+8. Run Version 7 acceptance on the target machine and publish the deployment/test report.
+
+6. OUT OF SCOPE UNTIL EVIDENCE REQUIRES IT
+
+- Downloading/enabling model weights or declaring a final production model before benchmark and target-hardware constraints are agreed.
+- Replacing the mock baseline before the model adapter is tested.
+- Enabling dense/hybrid retrieval without API integration and DEV evaluation.
+- Public deployment, public debug traces, or browser-held backend secrets.
+- Adding distributed vector infrastructure, fine-tuning, or a separate resolver merely to make the first web version work.

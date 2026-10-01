@@ -18,16 +18,22 @@ Swagger: http://localhost:8000/docs . Mặc định bind loopback. Đây là tri
 
 Compose dùng database container riêng, không chiếm port 5432 trên host nên không đụng PostgreSQL anh đang chạy. Trong container, host là `postgres`, không phải `127.0.0.1`. Tên database mặc định `hanh_chinh_mvp`. DB dùng volume bền vững `rag_postgres_data`. Không chạy `down -v` nếu muốn giữ dữ liệu.
 
-Lần đầu tự nạp 3 thủ tục/9 fragment **giả lập**. Tất cả output mock được gắn nhãn; chưa phải chatbot tư vấn pháp luật thật. ALLOW_DRAFT=true và ngưỡng BM25 chỉ là cấu hình demo chưa tune.
+Lần đầu tự nạp 3 thủ tục/9 fragment **giả lập** khi `BOOTSTRAP_DEMO=true`. Tất cả output mock được gắn nhãn; chưa phải chatbot tư vấn pháp luật thật. ALLOW_DRAFT=true và ngưỡng BM25 chỉ là cấu hình demo chưa tune.
 
 Gọi thử:
 
 ```powershell
+$credentials = @{ username = 'demo_user'; password = 'replace-with-a-long-local-password' } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/auth/register -ContentType 'application/json' -Body $credentials -SessionVariable hcc
 $body = @{ query_text_raw = 'demo alpha lệ phí'; session_id = 'minh-demo' } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/answer -ContentType 'application/json; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes($body))
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/answer -WebSession $hcc -ContentType 'application/json; charset=utf-8' -Body $body
 ```
 
-Thử tiếp `còn thời gian`, `demo chung lệ phí` (mơ hồ), `zzzzzzzz` (không có bằng chứng). Endpoint `/api/v1/retrieve` trả EvidenceBundle, `/api/v1/answer` trả GroundedAnswer. Session trả thêm ở header X-Conversation-Session-Id. Nếu đặt API_TOKEN, thêm header `Authorization: Bearer ...` cho hai POST endpoint; health/docs không chứa văn bản corpus và vẫn công khai.
+Mật khẩu tài khoản tối thiểu 12 ký tự. Backend lưu PBKDF2-SHA256 hash và token phiên đã hash; cookie HttpOnly/SameSite=Strict hết hạn sau 12 giờ. Mỗi request lấy account từ cookie; không nhận `account_id` từ body. State/audit dùng khóa account + session, nên cùng một `session_id` không chia sẻ context giữa hai account. Chỉ metadata audit được lưu, không lưu transcript câu hỏi/trả lời. Tài khoản tự đăng ký chỉ dành cho demo local; chưa bật rate limit hay xác minh email.
+
+Thử tiếp `còn thời gian`, `demo chung lệ phí` (mơ hồ), `zzzzzzzz` (không có bằng chứng). Endpoint `/api/v1/retrieve` trả EvidenceBundle, `/api/v1/answer` trả GroundedAnswer. Session trả thêm ở header X-Conversation-Session-Id. `/api/v1/interpret`, `/api/v1/retrieve/trace`, và `/api/v1/answer/trace` chỉ hoạt động khi `ENABLE_DEV_TRACE=true`; các endpoint này trả trace chẩn đoán ngoài shared schemas và chỉ dùng ở loopback/dev.
+
+Snapshot normalized hiện được nạp cục bộ: 42 procedure / 289 fragment, fingerprint `26eca8804426c22afb227fcbabc174a3e61d20907809561c90d00b965d91ecd9`. Nguồn duy nhất vẫn `draft`, chưa có effective date. `ALLOW_DRAFT=true` chỉ để đánh giá local; tuyệt đối chưa phải corpus pháp lý đã duyệt.
 
 ## Dùng PostgreSQL hiện có trên máy anh (không Docker DB)
 
@@ -41,7 +47,7 @@ Copy-Item .env.example .env
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-.env.example đã có URL anh dùng: database hanh_chinh_mvp, user app_user, port 5432. PostgreSQL/service, role và database phải tồn tại, user phải được tạo bảng. App tạo 4 bảng rag_* còn thiếu nhưng không tạo database/role. Không in connection URL vào log. Đổi port/mật khẩu trong .env theo máy.
+.env.example đã có URL anh dùng: database hanh_chinh_mvp, user app_user, port 5432. PostgreSQL/service, role và database phải tồn tại, user phải được tạo bảng. App tạo các bảng rag_* còn thiếu nhưng không tạo database/role. Không in connection URL vào log. Đổi port/mật khẩu trong .env theo máy.
 
 ## Nhập corpus thật đã xuất JSON
 
@@ -98,4 +104,6 @@ Không đặt biến thì test PostgreSQL được skip. Xem TEST_REPORT.md đ�
 
 ## Giới hạn triển khai
 
-create_all chỉ bootstrap bảng còn thiếu, không phải hệ thống Alembic migration cho schema cũ. Chạy một worker cho demo. Docker engine/PostgreSQL không khả dụng trong môi trường soạn gói nên chưa build image hoặc kiểm tra DB thật ở đây. Cần xem `docker compose ... logs backend` trên máy đích. Public hosting cần địa chỉ server, cấu hình HTTPS và API_TOKEN; không đưa database ra Internet. Gói chưa sửa frontend, chưa có dense/fusion/LLM thật.
+`create_all` chỉ bootstrap bảng còn thiếu, không phải Alembic migration cho schema cũ. Chạy một worker cho demo. Local Docker verification: Docker Desktop 4.92.0 / Engine 29.8.0 / Compose 5.5.1; official `postgres:16` resolved to PostgreSQL 16.15. Compose health, isolated PostgreSQL integration, account isolation, and backend restart persistence passed; see `TEST_REPORT.md`. PostgreSQL is internal to the Compose network; only the API is published on loopback.
+
+Trước public hosting, bật cookie Secure qua HTTPS, tắt tự đăng ký và trace, thêm rate limit, rà soát CSRF/origin và không đưa database ra Internet. Corpus hiện là demo/draft và generator còn mock; không dùng để tư vấn pháp luật thật.
